@@ -13,6 +13,11 @@ export default defineConfig({
   vite: () => ({
     plugins: [svgr({ svgrOptions: { icon: true } })],
   }),
+  runner: {
+    binaries: {
+      chrome: '/Applications/Vivaldi.app/Contents/MacOS/Vivaldi',
+    },
+  },
   manifest: {
     name: 'Nice Tab Manager',
     permissions: [

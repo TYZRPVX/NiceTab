@@ -1,3 +1,7 @@
 allowBuilds:
   esbuild: true
   spawn-sync: true
+
+overrides:
+  rollup: 4.34.9
+  '@vitejs/plugin-react': ^4.4.1
