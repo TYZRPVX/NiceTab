@@ -35,6 +35,7 @@ type CustomStyleProps = {
 export default function EditInput({
   type = 'text',
   value,
+  displayValue,
   visible = true,
   disabled,
   maxLength = 40,
@@ -48,6 +49,7 @@ export default function EditInput({
 }: InputProps &
   CustomStyleProps & {
     value: string;
+    displayValue?: string;
     visible?: boolean;
     onValueChange?: (value?: string) => void;
     onEditingStatusChange?: (status: boolean) => void;
@@ -112,8 +114,8 @@ export default function EditInput({
         />
       ) : (
         <>
-          <span className="text-readonly" title={innerValue}>
-            {innerValue}
+          <span className="text-readonly" title={displayValue || innerValue}>
+            {displayValue || innerValue}
           </span>
           {visible && (
             <StyledActionIconBtn

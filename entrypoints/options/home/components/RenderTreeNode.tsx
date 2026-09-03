@@ -21,6 +21,22 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
   const nodeRef = useRef<HTMLDivElement>(null);
   const unnamedNodeName = node.type === 'tag' ? UNNAMED_TAG : UNNAMED_GROUP;
 
+  const treeNodeDisplayName = useMemo(() => {
+    if (node.type !== 'tabGroup') return node.title || unnamedNodeName;
+
+    const groupName = node.originData?.groupName || node.title || unnamedNodeName;
+    const isGeneratedName = /^G_\d{8}_\d{2}:\d{2}:\d{2}_\d+$/.test(groupName);
+    if (!isGeneratedName) return groupName;
+
+    const tabList = node.originData?.tabList || [];
+    const firstTabTitle = tabList.find(item => item.title?.trim())?.title?.trim();
+    if (!firstTabTitle) return groupName;
+
+    const title = tabList.length > 1 ? `${firstTabTitle} +${tabList.length - 1}` : firstTabTitle;
+    const time = node.originData?.createTime?.match(/\d{2}:\d{2}/)?.[0];
+    return time ? `${title} · ${time}` : title;
+  }, [node, unnamedNodeName]);
+
   // 是否锁定
   const isLocked = useMemo(() => {
     if (node.type === 'tag') {
@@ -202,6 +218,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
             <span className="tree-node-title">
               <EditInput
                 value={node.title || unnamedNodeName}
+                displayValue={treeNodeDisplayName}
                 disabled={isLocked}
                 visible={!isLocked}
                 fontSize={14}

@@ -28,19 +28,23 @@ export default function Favicon({
     setRenderUrl(faviconDefaultImage);
   };
 
-  const init = async () => {
-    if (!pageUrl?.trim?.()) {
-      setRenderUrl(faviconDefaultImage);
-      return;
-    }
-    const url = favIconUrl || (await getFaviconUrl(pageUrl));
-    setTimeout(() => {
-      setRenderUrl(url);
-    }, 100);
-  };
-
   useEffect(() => {
-    init();
+    let cancelled = false;
+
+    const loadFavicon = async () => {
+      if (!pageUrl?.trim?.()) {
+        if (!cancelled) setRenderUrl(faviconDefaultImage);
+        return;
+      }
+
+      const url = favIconUrl || (await getFaviconUrl(pageUrl));
+      if (!cancelled) setRenderUrl(url || faviconDefaultImage);
+    };
+
+    loadFavicon();
+    return () => {
+      cancelled = true;
+    };
   }, [pageUrl, favIconUrl]);
 
   return (

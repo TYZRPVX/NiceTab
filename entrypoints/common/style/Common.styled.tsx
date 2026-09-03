@@ -163,21 +163,29 @@ export const GlobalStyle = createGlobalStyle`
 
   ::-webkit-scrollbar-track {
     border-radius: 4px;
-    background: var(--bg-color, #fff) !important;
+    background: transparent !important;
   }
 
   ::-webkit-scrollbar-thumb,
   .nicetab-tree-list-scrollbar-thumb,
   .rc-virtual-list-scrollbar-thumb {
     border-radius: 4px;
-    background: ${props =>
-      `${props.theme.type === 'light' ? '#d9d9d9' : '#555'} !important`};
-    box-shadow:inset 0 0 4px rgba(0, 0, 0, .3);
+    background: transparent !important;
+    box-shadow: none !important;
   }
 
-  ::-webkit-scrollbar-thumb:hover,
-  .nicetab-tree-list-scrollbar-thumb:hover,
-  .rc-virtual-list-scrollbar-thumb:hover {
+  html.nt-scrollbar-visible::-webkit-scrollbar-thumb,
+  html.nt-scrollbar-visible ::-webkit-scrollbar-thumb,
+  html.nt-scrollbar-visible .nicetab-tree-list-scrollbar-thumb,
+  html.nt-scrollbar-visible .rc-virtual-list-scrollbar-thumb {
+    background: ${props =>
+      `${props.theme.type === 'light' ? '#d9d9d9' : '#555'} !important`};
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3);
+  }
+  html.nt-scrollbar-visible::-webkit-scrollbar-thumb:hover,
+  html.nt-scrollbar-visible ::-webkit-scrollbar-thumb:hover,
+  html.nt-scrollbar-visible .nicetab-tree-list-scrollbar-thumb:hover,
+  html.nt-scrollbar-visible .rc-virtual-list-scrollbar-thumb:hover {
     background: ${props =>
       `${props.theme.type === 'light' ? '#bfbfbf' : '#888'} !important`};
   }

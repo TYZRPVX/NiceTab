@@ -28,6 +28,8 @@ export interface RightPanelLayoutProps {
   initialWidth?: number;
   /** 是否显示折叠切换按钮 */
   showCollapseBtn?: boolean;
+  /** 空间不足时收起为悬停展开的边缘面板 */
+  autoHide?: boolean;
   /** 操作按钮区域内容（位于折叠按钮之后） */
   sideActionBox?: ReactNode;
   /** 主体内容 */
@@ -45,6 +47,7 @@ export default function RightPanelLayout({
   panelWidth,
   initialWidth,
   showCollapseBtn = true,
+  autoHide = false,
   sideActionBox,
   innerContent,
   className,
@@ -64,10 +67,20 @@ export default function RightPanelLayout({
       className={className}
       style={{ '--panel-width': `${width}px` } as React.CSSProperties}
     >
-      <div className={classNames('right-panel-inner-box', collapsed && 'collapsed')}>
-        <StyledHandle ref={dragHandleRef} $visible={!collapsed} onMouseDown={onMouseDown} />
+      <div
+        className={classNames(
+          'right-panel-inner-box',
+          collapsed && 'collapsed',
+          autoHide && 'auto-hidden',
+        )}
+      >
+        <StyledHandle
+          ref={dragHandleRef}
+          $visible={!collapsed && !autoHide}
+          onMouseDown={onMouseDown}
+        />
         <div className="right-panel-action-box">
-          {showCollapseBtn && (
+          {showCollapseBtn && !autoHide && (
             <ToggleSidebarBtn
               collapsed={collapsed}
               position="right"

@@ -28,6 +28,7 @@ const {
   LANGUAGE,
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
+  KEEP_AUDIBLE_TABS_OPEN,
   ACTION_AUTO_CLOSE_FLAGS,
   AUTO_PIN_ADMIN_TAB,
   ALLOW_SEND_PINNED_TABS,
@@ -248,6 +249,28 @@ export async function getFilteredTabs(
     }
   });
 }
+// 获取发送标签页后需要关闭的标签页id
+// 如果设置了保留正在播放音视频的标签页，则这些标签页发送后不会被关闭（已静音的除外）
+export async function getTabIdsToClose(tabs: Tabs.Tab[], settings: SettingsProps) {
+  const tabIds = tabs.map(tab => tab.id as number).filter(Boolean);
+  if (!settings[KEEP_AUDIBLE_TABS_OPEN] || !tabIds.length) return tabIds;
+
+  try {
+    const audibleTabs = await browser.tabs.query({ audible: true });
+    const audibleTabIds = new Set(
+      audibleTabs.filter(tab => !tab.mutedInfo?.muted).map(tab => tab.id),
+    );
+    return tabIds.filter(tabId => !audibleTabIds.has(tabId));
+  } catch {
+    return tabIds;
+  }
+}
+// 关闭发送后的标签页
+async function removeTabsAfterSend(tabs: Tabs.Tab[], settings: SettingsProps) {
+  const tabIds = await getTabIdsToClose(tabs, settings);
+  if (!tabIds.length) return;
+  await browser.tabs.remove(tabIds);
+}
 // 取消标签页高亮
 export async function cancelHighlightTabs(tabs?: Tabs.Tab[]) {
   await new Promise(res => setTimeout(res, 50));
@@ -327,7 +350,7 @@ async function sendAllTabs(
     actionAutoCloseFlags?.includes('sendAllTabs')
   ) {
     setTimeout(() => {
-      browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
+      removeTabsAfterSend(filteredTabs, settings);
     }, 30);
   } else {
     // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
@@ -373,7 +396,7 @@ async function sendCurrentGroup(targetData: SendTargetProps = {}, tab?: Tabs.Tab
     settings[CLOSE_TABS_AFTER_SEND_TABS] ||
     actionAutoCloseFlags?.includes('sendCurrentTab')
   ) {
-    browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
+    removeTabsAfterSend(filteredTabs, settings);
   } else {
     // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
     cancelHighlightTabs(filteredTabs);
@@ -420,7 +443,7 @@ async function sendCurrentTab(targetData: SendTargetProps = {}, tab?: Tabs.Tab) 
     settings[CLOSE_TABS_AFTER_SEND_TABS] ||
     actionAutoCloseFlags?.includes('sendCurrentTab')
   ) {
-    browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
+    removeTabsAfterSend(filteredTabs, settings);
   } else {
     // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
     cancelHighlightTabs(filteredTabs);
@@ -442,7 +465,7 @@ async function sendOtherTabs(targetData: SendTargetProps = {}) {
     settings[CLOSE_TABS_AFTER_SEND_TABS] ||
     actionAutoCloseFlags?.includes('sendOtherTabs')
   ) {
-    browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
+    removeTabsAfterSend(filteredTabs, settings);
   }
   // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
   cancelHighlightTabs();
@@ -469,7 +492,7 @@ async function sendLeftTabs(targetData: SendTargetProps = {}, currTab?: Tabs.Tab
     settings[CLOSE_TABS_AFTER_SEND_TABS] ||
     actionAutoCloseFlags?.includes('sendLeftTabs')
   ) {
-    browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
+    removeTabsAfterSend(filteredTabs, settings);
   }
   // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
   cancelHighlightTabs();
@@ -496,7 +519,7 @@ async function sendRightTabs(targetData: SendTargetProps = {}, currTab?: Tabs.Ta
     settings[CLOSE_TABS_AFTER_SEND_TABS] ||
     actionAutoCloseFlags?.includes('sendRightTabs')
   ) {
-    browser.tabs.remove(filteredTabs.map(t => t.id as number).filter(Boolean));
+    removeTabsAfterSend(filteredTabs, settings);
   }
   // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
   cancelHighlightTabs();

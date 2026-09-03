@@ -15,6 +15,7 @@
     "build:firefox": "pnpm convert:guide && wxt build -b firefox",
     "zip": "pnpm convert:guide && wxt zip",
     "zip:firefox": "pnpm convert:guide && wxt zip -b firefox",
+    "pack:crx": "node scripts/pack-crx.mjs",
     "compile": "tsc --noEmit",
     "fix-manifest": "node scripts/fix-manifest.mjs",
     "convert:guide": "node scripts/md2html.js GUIDE-zh.md",

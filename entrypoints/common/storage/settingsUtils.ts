@@ -38,6 +38,7 @@ const {
   EXCLUDE_DOMAINS_FOR_SENDING,
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
+  KEEP_AUDIBLE_TABS_OPEN,
   ACTION_AUTO_CLOSE_FLAGS,
   CREATE_NEW_GROUP_ON_SEND_SINGLE_TAB,
   ALLOW_DUPLICATE_TABS,
@@ -100,6 +101,7 @@ export default class SettingsUtils {
     [EXCLUDE_DOMAINS_FOR_SENDING]: DEFAULT_EXCLUDE_DOMAINS.join('\n'), // 发送标签页时排除的域名
     [OPEN_ADMIN_TAB_AFTER_SEND_TABS]: true, // 发送标签页后默认打开管理后台
     [CLOSE_TABS_AFTER_SEND_TABS]: true, // 发送标签页后是否关闭标签页
+    [KEEP_AUDIBLE_TABS_OPEN]: true, // 关闭标签页时，保留正在播放音视频的标签页
     [ACTION_AUTO_CLOSE_FLAGS]: [], // 各种操作的自动关闭标签页标志
     [CREATE_NEW_GROUP_ON_SEND_SINGLE_TAB]: true, // 发送单个标签页时是否创建新的标签组
     [ALLOW_DUPLICATE_TABS]: true, // 同一个标签组中是否允许重复的标签页

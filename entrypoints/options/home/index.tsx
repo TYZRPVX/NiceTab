@@ -74,6 +74,8 @@ import TabGroupList from './TabGroupList';
 // import FooterFloatButton from './components/FooterFloatButton';
 // const { TAB_COUNT_THRESHOLD } = ENUM_SETTINGS_PROPS;
 
+const minimumMainContentWidth = 640;
+
 export default function Home() {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
@@ -128,6 +130,21 @@ export default function Home() {
   const [rightPanelWidth, setRightPanelWidth] = useState<number>(() => {
     return stateUtils.state?.home?.rightPanelWidth || 400;
   });
+  const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const autoHideOpenedTabs =
+    !openedTabsCollapsed &&
+    viewportWidth <
+      (sidebarCollapsed ? 0 : sidebarWidth) +
+        rightPanelWidth +
+        minimumMainContentWidth;
+  const effectiveOpenedTabsCollapsed = openedTabsCollapsed || autoHideOpenedTabs;
 
   const onCollapseChange = (status: boolean) => {
     setSidebarCollapsed(status);
@@ -278,7 +295,7 @@ export default function Home() {
           style={
             {
               '--sidebar-grid-col': `${sidebarCollapsed ? 0 : sidebarWidth}px`,
-              '--right-panel-grid-col': `${openedTabsCollapsed ? 0 : rightPanelWidth}px`,
+              '--right-panel-grid-col': `${effectiveOpenedTabsCollapsed ? 0 : rightPanelWidth}px`,
             } as React.CSSProperties
           }
         >
@@ -382,7 +399,8 @@ export default function Home() {
 
           {/* 右侧面板 */}
           <RightPanel
-            collapsed={openedTabsCollapsed}
+            collapsed={effectiveOpenedTabsCollapsed}
+            autoHide={autoHideOpenedTabs}
             panelWidth={rightPanelWidth}
             initialWidth={defaultRightPanelWidth}
             onCollapseChange={onRightPanelCollapseChange}

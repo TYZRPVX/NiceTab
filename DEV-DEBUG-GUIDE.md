@@ -52,14 +52,92 @@ pnpm zip:firefox
 
 编译产物加载方式与 dev 版一致，去 `chrome://extensions/` 加载 `.output/chrome-mv3` 目录即可。
 
-## 4. 类型检查 / lint
+## 4. 打包成 .crx 安装包
+
+`.output/chrome-mv3` 是未打包目录，只能用「加载已解压的扩展程序」安装。要分发给别人（离线安装 / 内部分享），需要打成 `.crx`。
+
+### 4.1 一键脚本（推荐）
+
+```bash
+pnpm build        # 先产出 .output/chrome-mv3
+pnpm pack:crx     # 打包成 release/nice-tab-<version>.crx
+```
+
+脚本 `scripts/pack-crx.mjs` 做的事：
+- 调用本机 Chrome 的 `--pack-extension` 能力打包
+- 首次运行会生成私钥 `keys/nicetab.pem`，之后每次复用它，**保证扩展 ID 不变**（升级安装必须用同一把私钥）
+- 产物统一改名放到 `release/` 目录，带上 `package.json` 里的版本号
+
+常用参数：
+
+```bash
+# 指定 Chrome 路径（脚本找不到时）
+CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" pnpm pack:crx
+
+# 指定源目录 / 输出目录 / 私钥
+pnpm pack:crx -- --src=.output/chrome-mv3 --out=release --key=keys/nicetab.pem
+```
+
+> ⚠️ `keys/` 和 `*.pem` 已在 `.gitignore` 里，私钥不要提交，也不要泄露；丢了就只能换新 ID 重新分发。
+
+### 4.2 手动打包（Chrome 界面）
+
+1. 打开 `chrome://extensions/`，开启「开发者模式」
+2. 点击「打包扩展程序」
+3. 「扩展程序根目录」选 `.output/chrome-mv3`
+4. 「私有密钥文件」：首次留空（会生成 `.pem`），后续升级必须选上一次生成的 `.pem`
+5. 点「打包扩展程序」，会在源目录同级生成 `chrome-mv3.crx`
+
+### 4.3 安装 crx 的注意事项
+
+Chrome 出于安全策略，默认不允许从非商店渠道拖入安装 crx。测试时可以：
+- 直接用「加载已解压的扩展程序」加载 `.output/chrome-mv3`（最省事）
+- 或者把 crx 解压后再按未打包方式加载
+- 企业环境可通过策略 `ExtensionInstallAllowlist` / `ExtensionSettings` 放行
+
+### 4.4 crx 用 Git LFS 管理
+
+crx 是二进制大文件，直接进 git 会让仓库越来越臃肿，所以**用 Git LFS 托管**——文件照样提交到 GitHub，只是内容存在 LFS 里，git 仓库里只留一个指针。
+
+规则已经配好：
+- `.gitattributes`：`*.crx`、`*.xpi` 走 `filter=lfs`
+- `.gitignore`：`release/` 目录下只放行 `*.crx`，其他中间产物忽略
+
+首次使用需要在本机初始化一次 LFS：
+
+```bash
+brew install git-lfs   # 或参考 https://git-lfs.com
+git lfs install
+```
+
+之后正常提交即可：
+
+```bash
+pnpm build && pnpm pack:crx
+git add release/nice-tab-3.0.2.crx
+git commit -m "chore: release crx 3.0.2"
+git push
+```
+
+校验是否真的走了 LFS：
+
+```bash
+git lfs track          # 查看当前生效的 track 规则
+git lfs ls-files       # 列出被 LFS 管理的文件
+```
+
+克隆仓库的人需要装了 git-lfs 才能拿到真实的 crx；否则 checkout 出来的是指针文本文件，执行 `git lfs pull` 补齐即可。
+
+> 注意：如果之前已经有 crx 用普通方式提交过，加了 `.gitattributes` 也只对新提交生效，历史文件需要 `git lfs migrate import --include="*.crx"` 重写历史（会改 commit hash，谨慎操作）。
+
+## 5. 类型检查 / lint
 
 ```bash
 pnpm compile   # 只做 TS 类型检查，不产生文件
 pnpm lint      # eslint 检查 + 自动修复 entrypoints 目录
 ```
 
-## 5. 目录结构速览（entrypoints）
+## 6. 目录结构速览（entrypoints）
 
 - `background/` — 后台 service worker 逻辑
 - `content/` — content script（注入到网页）
@@ -71,7 +149,7 @@ pnpm lint      # eslint 检查 + 自动修复 entrypoints 目录
 
 改代码时先确认改的是哪个 entrypoint，对应上面调试方式去验证。
 
-## 6. 常见问题
+## 7. 常见问题
 
 - **改了 manifest 相关配置（`wxt.config.ts`）不生效**：需要重启 `pnpm dev`，manifest 级别的改动不支持热更新。
 - **权限相关改动**：修改 `permissions`/`host_permissions` 后，Chrome 会要求重新加载/重新授权扩展，去 `chrome://extensions/` 手动移除旧的再重新加载最稳。

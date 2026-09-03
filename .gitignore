@@ -30,7 +30,9 @@ public/docs/*
 .claude
 CLAUDE.md
 
-# Local CRX signing keys and generated extension packages.
+# crx 打包私钥，绝对不要提交
 keys/
 *.pem
+
+# Generated extension packages belong in GitHub Releases, not source control.
 release/

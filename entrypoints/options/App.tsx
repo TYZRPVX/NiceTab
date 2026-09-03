@@ -1,4 +1,13 @@
-import { useContext, useCallback, useState, useEffect, useMemo, useRef } from 'react';
+import {
+  lazy,
+  Suspense,
+  useContext,
+  useCallback,
+  useState,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 import {
   createHashRouter,
   RouterProvider,
@@ -84,20 +93,17 @@ import type {
   PageWidthTypes,
   ThemeTypes,
 } from '~/entrypoints/types';
-import Home from './home/index.tsx';
-import Settings from './settings/index.tsx';
-import ImportExport from './importExport/index.tsx';
-import SyncPage from './sync/index.tsx';
-import RecycleBin from './recycleBin/index.tsx';
+const Home = lazy(() => import('./home/index.tsx'));
+const Settings = lazy(() => import('./settings/index.tsx'));
+const ImportExport = lazy(() => import('./importExport/index.tsx'));
+const SyncPage = lazy(() => import('./sync/index.tsx'));
+const RecycleBin = lazy(() => import('./recycleBin/index.tsx'));
 import SendTargetActionHolder, {
   type SendTargetActionHolderProps,
 } from '~/entrypoints/options/home/SendTargetActionHolder';
 import { GlobalSearchPanel } from '~/entrypoints/common/components/BaseGlobalSearch';
 import { useGlobalSearchPanel } from '~/entrypoints/common/hooks/globalSearch';
 import { type LocaleKeys } from '~/entrypoints/common/locale';
-
-import { initFaviconApiData } from '~/entrypoints/common/utils/favicon';
-initFaviconApiData();
 
 const { SHOW_SEND_TARGET_MODAL } = ENUM_SETTINGS_PROPS;
 
@@ -143,6 +149,13 @@ const StyledPageContainer = styled.div<{
     width: 100%;
     padding: 80px 32px 40px;
     margin: 0 auto;
+  }
+  .route-loading {
+    display: grid;
+    min-height: calc(100vh - 184px);
+    place-items: center;
+    color: var(--nt-text-secondary);
+    font-size: 13px;
   }
   .float-button-box {
     position: fixed;
@@ -387,6 +400,49 @@ function AppLayout() {
   }, [location.pathname]);
 
   useEffect(() => {
+    const root = document.documentElement;
+    let isHoveringScrollbar = false;
+    let hideTimer: number | undefined;
+
+    const clearHideTimer = () => {
+      if (hideTimer) window.clearTimeout(hideTimer);
+      hideTimer = undefined;
+    };
+    const hide = () => {
+      if (!isHoveringScrollbar) root.classList.remove('nt-scrollbar-visible');
+    };
+    const showWhileScrolling = () => {
+      root.classList.add('nt-scrollbar-visible');
+      clearHideTimer();
+      if (!isHoveringScrollbar) hideTimer = window.setTimeout(hide, 800);
+    };
+    const handlePointerMove = (event: PointerEvent) => {
+      const isNearScrollbar = event.clientX >= document.documentElement.clientWidth - 16;
+      if (isNearScrollbar) {
+        isHoveringScrollbar = true;
+        root.classList.add('nt-scrollbar-visible');
+        clearHideTimer();
+      } else if (isHoveringScrollbar) {
+        isHoveringScrollbar = false;
+        clearHideTimer();
+        hideTimer = window.setTimeout(hide, 160);
+      }
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    document.addEventListener('scroll', showWhileScrolling, {
+      capture: true,
+      passive: true,
+    });
+    return () => {
+      clearHideTimer();
+      root.classList.remove('nt-scrollbar-visible');
+      window.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('scroll', showWhileScrolling, true);
+    };
+  }, []);
+
+  useEffect(() => {
     const handleSettingsSaveActionChange = (action: SettingsSaveAction | undefined) => {
       setSettingsSaveAction(action);
     };
@@ -514,7 +570,9 @@ function AppLayout() {
           </Space>
         </div>
         <div className="main-content">
-          <Outlet></Outlet>
+          <Suspense fallback={<div className="route-loading">Loading…</div>}>
+            <Outlet></Outlet>
+          </Suspense>
         </div>
 
         <div className="float-button-box">

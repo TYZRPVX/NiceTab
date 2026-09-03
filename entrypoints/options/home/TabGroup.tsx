@@ -152,6 +152,21 @@ function TabGroup({
     [groupId, groupName, createTime, isLocked, isStarred, selected],
   );
 
+  const groupDisplayName = useMemo(() => {
+    const savedName = groupName || UNNAMED_GROUP;
+    const isGeneratedName = /^G_\d{8}_\d{2}:\d{2}:\d{2}_\d+$/.test(savedName);
+    if (!isGeneratedName) return savedName;
+
+    const firstTabTitle = tabList.find(item => item.title?.trim())?.title?.trim();
+    if (!firstTabTitle) return savedName;
+    return tabList.length > 1 ? `${firstTabTitle} +${tabList.length - 1}` : firstTabTitle;
+  }, [groupName, tabList]);
+
+  const displayCreateTime = useMemo(
+    () => createTime?.replace(/:\d{2}$/, '') || '',
+    [createTime],
+  );
+
   // 框选相关状态
   useMultiSelection({
     groupData: group,
@@ -527,13 +542,13 @@ function TabGroup({
       <StyledGroupWrapper
         className={classNames('tab-group-wrapper', isLocked && 'locked')}
         data-gid={groupId}
-        $bgColor={selected ? token.colorPrimaryBg : token.colorBgContainer}
+        $bgColor={token.colorBgContainer}
         $active={selected}
         ref={groupRef}
       >
         {/* 标签组 header + tab 操作区域（sticky 置顶） */}
         <StyledGroupStickyHeader
-          $bgColor={selected ? token.colorPrimaryBg : token.colorBgContainer}
+          $bgColor={token.colorBgContainer}
           $active={selected}
         >
           <StyledGroupHeader className="group-header select-none">
@@ -554,7 +569,7 @@ function TabGroup({
               )}
               <div className="group-name-wrapper">
                 <EditInput
-                  value={groupName || UNNAMED_GROUP}
+                  value={groupDisplayName}
                   disabled={
                     !allowGroupActions.includes('rename') || tagLocked || isLocked
                   }
@@ -574,39 +589,43 @@ function TabGroup({
                   })}
                 </span>
                 <span className="group-create-time" title={createTime || ''}>
-                  {createTime || ''}
+                  {displayCreateTime}
                 </span>
               </div>
+              {tabList.length > 0 && (
+                <Checkbox
+                  className="group-select-toggle"
+                  checked={isAllChecked}
+                  indeterminate={checkAllIndeterminate}
+                  disabled={tagLocked || isLocked}
+                  title={$fmt('common.select')}
+                  aria-label={$fmt('common.select')}
+                  onChange={handleSelectAll}
+                ></Checkbox>
+              )}
             </div>
             <ActionBtnList
               actionBtnStyle={actionBtnStyle}
+              gap={12}
               {...groupActions}
             ></ActionBtnList>
           </StyledGroupHeader>
 
           {/* tab 选择、操作区域 */}
-          {tabList?.length > 0 && (
+          {selectedTabIds.length > 0 && (
             <StyledTabActions>
-              <div className="checkall-wrapper">
-                <Checkbox
-                  checked={isAllChecked}
-                  indeterminate={checkAllIndeterminate}
-                  disabled={tagLocked || isLocked}
-                  onChange={handleSelectAll}
-                ></Checkbox>
-                <span
-                  className="selected-count-text"
-                >
-                  {`${selectedTabIds.length} / ${tabList?.length}`}
-                </span>
-              </div>
-              {selectedTabIds.length > 0 && (
+              <span className="selected-count-text">
+                {$fmt({
+                  id: 'common.selectedTabCount',
+                  values: { count: selectedTabIds.length },
+                })}
+              </span>
+              <div className="tab-selection-actions">
                 <ActionBtnList
-                  actionBtnStyle={actionBtnStyle}
+                  actionBtnStyle="text"
                   outerList={selectedTabsActions}
-                  iconSize={14}
                 ></ActionBtnList>
-              )}
+              </div>
             </StyledTabActions>
           )}
         </StyledGroupStickyHeader>

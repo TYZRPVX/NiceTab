@@ -148,6 +148,7 @@ export enum ENUM_SETTINGS_PROPS {
   EXCLUDE_DOMAINS_FOR_SENDING = 'excludeDomainsForSending', // 发送标签页时排除的域名
   OPEN_ADMIN_TAB_AFTER_SEND_TABS = 'openAdminTabAfterSendTabs', // 发送标签页后是否打开管理后台
   CLOSE_TABS_AFTER_SEND_TABS = 'closeTabsAfterSendTabs', // 发送标签页后是否关闭标签页
+  KEEP_AUDIBLE_TABS_OPEN = 'keepAudibleTabsOpen', // 发送标签页后关闭标签页时，是否保留正在播放音视频的标签页
   ACTION_AUTO_CLOSE_FLAGS = 'actionAutoCloseFlags', // 各种发送标签页操作的自动关闭标签页标志
   CREATE_NEW_GROUP_ON_SEND_SINGLE_TAB = 'createNewGroupOnSendSingleTab', // 发送单个标签页时是否创建新的标签组
   ALLOW_DUPLICATE_TABS = 'allowDuplicateTabs', // 同一个标签组中是否允许重复的标签页

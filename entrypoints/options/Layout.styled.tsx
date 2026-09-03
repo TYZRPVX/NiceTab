@@ -68,11 +68,11 @@ export const StyledBaseSidebarWrapper = styled.div<{
 export const StyledBaseMainWrapper = styled.div`
   position: relative;
   width: 100%;
-  min-height: calc(100vh - 112px);
+  min-height: calc(100vh - 120px);
   display: grid;
   grid-template-columns:
     var(--sidebar-grid-col, ${defaultSidebarWidth}px)
-    auto
+    minmax(0, 1fr)
     var(--right-panel-grid-col, ${defaultRightPanelWidth}px);
   transition: grid-template-columns 0.2s ease-in-out;
   // overflow-x: hidden;
@@ -88,6 +88,10 @@ export const StyledBaseMainWrapper = styled.div`
     max-width: 980px;
     padding: 0 32px;
     margin: 0 auto;
+  }
+
+  #tab-group-list-panel {
+    min-width: 0;
   }
 `;
 
@@ -121,6 +125,47 @@ export const StyledBaseRightPanelWrapper = styled.div<{
         opacity: 0;
       }
       transform: translateX(var(--panel-width, ${defaultRightPanelWidth}px));
+    }
+
+    /* 窄窗口：仅保留边缘提示，悬停时以覆盖层方式展开。 */
+    &.auto-hidden {
+      transform: translateX(
+        calc(var(--panel-width, ${defaultRightPanelWidth}px) - 28px)
+      );
+      cursor: pointer;
+
+      &::after {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 10px;
+        content: '';
+        background: var(--nt-accent-soft);
+        border-radius: var(--nt-radius-lg) 0 0 var(--nt-radius-lg);
+      }
+
+      .right-panel-action-box {
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      &:hover,
+      &:focus-within {
+        cursor: default;
+        /* 展开后贴齐视口右侧，让指针始终落在面板内。 */
+        transform: translateX(16px);
+
+        &::after {
+          display: none;
+        }
+
+        .right-panel-inner-content {
+          pointer-events: auto;
+          visibility: visible;
+          opacity: 1;
+        }
+      }
     }
 
     /* 拖拽期间禁用 transition，避免布局滞后于鼠标 */

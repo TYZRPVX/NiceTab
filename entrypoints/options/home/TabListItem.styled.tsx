@@ -22,19 +22,15 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
   .tab-item-btn {
     flex-shrink: 0;
     margin-right: 4px;
-    &.btn-remove {
-      visibility: hidden;
-      pointer-eventes: none;
-    }
+    visibility: hidden;
+    pointer-events: none;
   }
   &:hover {
     border-color: var(--nt-border);
     background: var(--nt-surface-muted);
-  }
-  &:not(.locked):hover {
-    .btn-remove {
+    .tab-item-btn {
       visibility: visible;
-      pointer-eventes: unset;
+      pointer-events: auto;
     }
   }
   .img-favicon {

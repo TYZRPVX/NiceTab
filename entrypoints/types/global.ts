@@ -171,6 +171,7 @@ export type SettingsProps = {
   excludeDomainsForSending?: string; // 发送标签页时排除的域名
   openAdminTabAfterSendTabs?: boolean; // 发送标签页后是否打开管理后台
   closeTabsAfterSendTabs?: boolean; // 发送标签页后是否关闭标签页
+  keepAudibleTabsOpen?: boolean; // 发送标签页后关闭标签页时，是否保留正在播放音视频的标签页
   actionAutoCloseFlags?: ActionNames[]; // 各种发送标签页操作是否自动关闭标签页的开关配置
   createNewGroupOnSendSingleTab?: boolean; // 是否在发送单个标签页时自动创建标签组
   allowDuplicateTabs?: boolean; // 同一个标签组中是否允许重复的标签页

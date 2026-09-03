@@ -13,6 +13,7 @@ import useTooltipOption from '~/entrypoints/common/hooks/tooltipOption';
 const {
   OPEN_ADMIN_TAB_AFTER_SEND_TABS,
   CLOSE_TABS_AFTER_SEND_TABS,
+  KEEP_AUDIBLE_TABS_OPEN,
   ACTION_AUTO_CLOSE_FLAGS,
   SHOW_SEND_TARGET_MODAL,
   ALLOW_SEND_PINNED_TABS,
@@ -132,6 +133,22 @@ export default function FormModuleSend(
         <Radio.Group>
           <Radio value={true}>{$fmt(`settings.${CLOSE_TABS_AFTER_SEND_TABS}.yes`)}</Radio>
           <Radio value={false}>{$fmt(`settings.${CLOSE_TABS_AFTER_SEND_TABS}.no`)}</Radio>
+        </Radio.Group>
+      </Form.Item>
+      {/* 关闭标签页时-是否保留正在播放音视频的标签页 */}
+      <Form.Item<SettingsProps>
+        label={$fmt({
+          id: `settings.${KEEP_AUDIBLE_TABS_OPEN}`,
+          values: { mark: '：' },
+        })}
+        name={KEEP_AUDIBLE_TABS_OPEN}
+        tooltip={getFormTooltipOption({
+          title: $fmt(`settings.${KEEP_AUDIBLE_TABS_OPEN}.tooltip`),
+        })}
+      >
+        <Radio.Group>
+          <Radio value={true}>{$fmt(`settings.${KEEP_AUDIBLE_TABS_OPEN}.yes`)}</Radio>
+          <Radio value={false}>{$fmt(`settings.${KEEP_AUDIBLE_TABS_OPEN}.no`)}</Radio>
         </Radio.Group>
       </Form.Item>
       {/* 发送标签页各种操作单独控制, 当 `发送标签页后是否关闭标签页` 设置为保留标签页时生效 */}

@@ -78,6 +78,11 @@ export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
         white-space: nowrap;
       }
     }
+    .group-select-toggle {
+      flex: 0 0 auto;
+      margin-left: auto;
+      padding-left: 8px;
+    }
   }
   .group-action-btns {
     margin-top: 6px;
@@ -114,7 +119,7 @@ export const StyledGroupHeaderRecycle = styled(StyledGroupHeader)`
 export const StyledTabActions = styled.div<{ theme: StyledThemeProps }>`
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   min-height: 32px;
   margin-top: 8px;
   padding: 4px 8px;
@@ -122,21 +127,21 @@ export const StyledTabActions = styled.div<{ theme: StyledThemeProps }>`
   background: var(--nt-surface-muted);
   font-size: 12px;
   user-select: none;
-  .checkall-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .tab-action-btns {
-    margin: 4px 0;
-    font-size: 12px;
-    .action-btn {
-      display: flex;
-      align-items: center;
-      color: ${props => props.theme.colorTextSecondary || '#333'};
-      cursor: pointer;
-      &:hover {
-        color: ${props => props.theme.colorPrimary || PRIMARY_COLOR};
+  .tab-selection-actions {
+    min-width: 0;
+    margin-left: auto;
+    .group-action-btns {
+      flex-wrap: wrap;
+      margin: 0;
+      font-size: 12px;
+      .action-btn {
+        display: flex;
+        align-items: center;
+        color: ${props => props.theme.colorTextSecondary || '#333'};
+        cursor: pointer;
+        &:hover {
+          color: ${props => props.theme.colorPrimary || PRIMARY_COLOR};
+        }
       }
     }
   }

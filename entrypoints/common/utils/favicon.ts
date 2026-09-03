@@ -3,6 +3,9 @@ import { handleUrlWidthParams, getOrigin } from './url';
 const testPageUrl = 'https://favicon.nicetab.com';
 const storageKey = 'session_faviconStore';
 let testFaviconBase64 = '';
+let faviconApiDataInitialized = false;
+let faviconApiDataPromise: Promise<void> | undefined;
+const faviconUrlPromiseCache = new Map<string, Promise<string>>();
 
 // 将 favicon 保存到 sessionStorage 中
 function saveFaviconToStore(origin: string, faviconUrl: string) {
@@ -20,8 +23,19 @@ function getFaviconFromStore(origin: string) {
 
 // 初始化 _favicon api 兜底图base64值（在 dom 环境中调用）
 export async function initFaviconApiData() {
-  const testFaviconUrl = getFaviconByExtApi(testPageUrl);
-  testFaviconBase64 = await getBase64Value(testFaviconUrl);
+  if (faviconApiDataInitialized) return;
+  if (!faviconApiDataPromise) {
+    const testFaviconUrl = getFaviconByExtApi(testPageUrl);
+    faviconApiDataPromise = getBase64Value(testFaviconUrl)
+      .then(base64 => {
+        testFaviconBase64 = base64;
+      })
+      .finally(() => {
+        faviconApiDataInitialized = true;
+        faviconApiDataPromise = undefined;
+      });
+  }
+  return faviconApiDataPromise;
 }
 
 // 获取图片链接对应的base64值
@@ -57,22 +71,28 @@ export function getGstaticURL(pageUrl: string, size: number = 32) {
 // 获取网站图标
 export async function getFaviconUrl(pageUrl: string, size: number = 32) {
   const origin = getOrigin(pageUrl);
-  const faviconFromStore = getFaviconFromStore(origin);
-  if (faviconFromStore) return faviconFromStore;
+  const cacheKey = `${origin}:${size}`;
+  const cachedRequest = faviconUrlPromiseCache.get(cacheKey);
+  if (cachedRequest) return cachedRequest;
 
-  if (!testFaviconBase64) {
+  const request = (async () => {
+    const faviconFromStore = getFaviconFromStore(origin);
+    if (faviconFromStore) return faviconFromStore;
+
     await initFaviconApiData();
-  }
 
-  const _faviconUrlByExt = getFaviconByExtApi(pageUrl, size);
-  const base64 = await getBase64Value(_faviconUrlByExt);
+    const faviconUrlByExt = getFaviconByExtApi(pageUrl, size);
+    const base64 = await getBase64Value(faviconUrlByExt);
 
-  if (base64 !== testFaviconBase64) {
-    saveFaviconToStore(origin, _faviconUrlByExt);
-    return _faviconUrlByExt;
-  } else {
+    if (base64 !== testFaviconBase64) {
+      saveFaviconToStore(origin, faviconUrlByExt);
+      return faviconUrlByExt;
+    }
     return getGstaticURL(pageUrl, size);
-  }
+  })();
+
+  faviconUrlPromiseCache.set(cacheKey, request);
+  return request;
 }
 
 export default {
