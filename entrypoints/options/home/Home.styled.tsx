@@ -11,23 +11,25 @@ export const StyledSidebarWrapper = styled(SidebarLayout)<{
   theme: StyledThemeProps;
 }>`
   .sidebar-inner-content {
-    padding-right: 4px;
+    padding-right: 0;
 
     .tag-list-title {
       flex-shrink: 0;
       display: flex;
       align-items: center;
-      font-weight: bold;
-      gap: 8px;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 650;
     }
     .count-info {
       flex-shrink: 0;
-      padding: 8px 0 16px;
+      padding: 4px 0 14px;
+      margin: 0;
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      gap: 8px;
-      color: ${props => props.theme.colorTextSecondary || '#666'};
+      gap: 6px;
+      color: var(--nt-text-secondary);
       font-size: 12px;
     }
     .sidebar-action-btns-wrapper {
@@ -35,8 +37,10 @@ export const StyledSidebarWrapper = styled(SidebarLayout)<{
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 10px;
-      gap: 12px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--nt-border);
+      gap: 8px;
     }
     .sidebar-tree-wrapper {
       flex: 1;
@@ -49,7 +53,29 @@ export const StyledSidebarWrapper = styled(SidebarLayout)<{
       }
       .nicetab-tree {
         background: transparent;
+
+        .nicetab-tree-treenode {
+          padding: 2px 0;
+        }
+        .nicetab-tree-node-content-wrapper {
+          min-height: 30px;
+          padding: 3px 6px;
+          border-radius: var(--nt-radius-sm);
+          transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        .nicetab-tree-node-content-wrapper:hover {
+          background: var(--nt-surface-muted);
+        }
+        .nicetab-tree-node-selected {
+          background: var(--nt-accent-soft) !important;
+          color: ${props => props.theme.colorPrimary};
+        }
       }
+    }
+
+    .nicetab-input-affix-wrapper,
+    .nicetab-input-outlined {
+      border-radius: var(--nt-radius-sm);
     }
   }
 `;
@@ -57,7 +83,7 @@ export const StyledSidebarWrapper = styled(SidebarLayout)<{
 export const StyledTreeNodeItem = styled.div`
   display: flex;
   align-items: center;
-  padding-right: 8px; // 防止滚动条出现时，内容被遮挡
+  padding-right: 8px;
   cursor: pointer;
   .tree-node-title {
     width: 0;
@@ -70,14 +96,14 @@ export const StyledTreeNodeItem = styled.div`
     align-items: center;
     margin-left: 8px;
     flex-shrink: 0;
-    gap: 4px;
+    gap: 2px;
     visibility: hidden;
-    pointer-eventes: none;
+    pointer-events: none;
   }
   &:hover {
     .tree-node-icon-group {
       visibility: visible;
-      pointer-eventes: unset;
+      pointer-events: auto;
     }
   }
 `;
@@ -102,10 +128,10 @@ export const StyledRightPanelWrapper = styled(RightPanelLayout)<{
       flex-shrink: 0;
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-weight: bold;
-      font-size: 14px;
-      margin-bottom: 12px;
+      gap: 6px;
+      font-weight: 650;
+      font-size: 15px;
+      margin-bottom: 8px;
     }
 
     .opened-tabs-list {
@@ -128,18 +154,20 @@ export const StyledRightPanelWrapper = styled(RightPanelLayout)<{
 `;
 
 export const StyledGroupList = styled.div`
-  .tip {
-    padding: 0 16px;
-    margin-bottom: 8px;
-  }
   .count-info {
-    position: relative;
+    box-sizing: border-box;
+    width: fit-content;
     display: flex;
     align-items: center;
-    padding: 0 16px;
-    margin-bottom: 24px;
+    padding: 6px 10px;
+    margin-bottom: 16px;
+    border: 1px solid var(--nt-border);
+    border-radius: 999px;
+    background: var(--nt-surface);
+    color: var(--nt-text-secondary);
+    font-size: 12px;
     .count-item {
-      margin-right: 8px;
+      margin-right: 6px;
     }
   }
 `;

@@ -112,38 +112,49 @@ const StyledPageContainer = styled.div<{
     z-index: 10;
     display: flex;
     align-items: center;
-    height: 60px;
-    // box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    box-shadow: ${props => props.theme.boxShadow || '0 2px 12px 3px rgba(0, 0, 0, 0.1)'};
-    background: ${props => props.theme.colorBgContainer || '#fff'};
+    height: 64px;
+    border-bottom: 1px solid var(--nt-border);
+    background: color-mix(in srgb, var(--nt-surface) 94%, transparent);
+    backdrop-filter: blur(12px);
 
     .logo {
-      width: 100px;
+      width: 64px;
       height: 100%;
-      background: url('/icon/logo.png') no-repeat center / 30px 30px;
+      border-right: 1px solid var(--nt-border);
+      background: url('/icon/logo.svg') no-repeat center / 25px 25px;
     }
     .navbar-menu {
       flex: 1;
-      margin-left: 16px;
+      margin-left: 8px;
     }
     .menu-right {
       display: flex;
       align-items: center;
       padding: 0 24px;
+      color: var(--nt-text-secondary);
+      font-size: 12px;
     }
   }
   .main-content {
     position: relative;
-    width: 1200px;
-    padding: 100px 32px 40px;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 80px 32px 40px;
     margin: 0 auto;
   }
   .float-button-box {
     position: fixed;
     bottom: 24px;
-    right: 30px;
+    left: 50%;
+    z-index: 12;
     display: flex;
-    gap: 16px;
+    gap: 8px;
+    padding: 6px;
+    border: 1px solid var(--nt-border);
+    border-radius: 999px;
+    box-shadow: var(--nt-shadow-md);
+    background: color-mix(in srgb, var(--nt-surface) 94%, transparent);
+    transform: translateX(-50%);
   }
   @media screen and (max-width: 1199px) {
     .main-content {
@@ -386,7 +397,7 @@ function AppLayout() {
       <StyledPageContainer $widthType={pageWidthType} className="page-container">
         <GlobalStyle />
         <div className="header-navbar select-none">
-          {/* <div className="logo"></div> */}
+          <div className="logo" aria-label="Nice Tab"></div>
           <Menu
             className="navbar-menu"
             theme="light"

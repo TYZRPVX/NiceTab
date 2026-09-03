@@ -289,7 +289,6 @@ export default function RightPanel(rightPanelProps: RightPanelLayoutProps) {
                 />
                 <span
                   className="selected-count-text"
-                  style={{ color: ENUM_COLORS.volcano }}
                 >
                   {`${selectedTabIds.length} / ${tabs.length}`}
                 </span>

@@ -528,11 +528,13 @@ function TabGroup({
         className={classNames('tab-group-wrapper', isLocked && 'locked')}
         data-gid={groupId}
         $bgColor={selected ? token.colorPrimaryBg : token.colorBgContainer}
+        $active={selected}
         ref={groupRef}
       >
         {/* 标签组 header + tab 操作区域（sticky 置顶） */}
         <StyledGroupStickyHeader
           $bgColor={selected ? token.colorPrimaryBg : token.colorBgContainer}
+          $active={selected}
         >
           <StyledGroupHeader className="group-header select-none">
             <div className="group-header-top">
@@ -540,12 +542,12 @@ function TabGroup({
                 <div className="group-status-wrapper">
                   {isLocked && (
                     <LockFilled
-                      style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                      style={{ fontSize: '18px', color: token.colorPrimaryHover }}
                     />
                   )}
                   {isStarred && (
                     <StarFilled
-                      style={{ fontSize: '22px', color: token.colorPrimaryHover }}
+                      style={{ fontSize: '18px', color: token.colorPrimaryHover }}
                     />
                   )}
                 </div>
@@ -556,8 +558,8 @@ function TabGroup({
                   disabled={
                     !allowGroupActions.includes('rename') || tagLocked || isLocked
                   }
-                  maxWidth={240}
-                  fontSize={20}
+                  maxWidth={360}
+                  fontSize={17}
                   iconSize={16}
                   onValueChange={value =>
                     onChange?.({ groupName: value || UNNAMED_GROUP })
@@ -565,13 +567,15 @@ function TabGroup({
                 ></EditInput>
               </div>
               <div className="group-info">
-                <span className="tab-count" style={{ color: ENUM_COLORS.volcano }}>
+                <span className="tab-count">
                   {$fmt({
                     id: 'home.tab.count',
                     values: { count: tabList?.length || 0 },
                   })}
                 </span>
-                <span className="group-create-time">{createTime || ''}</span>
+                <span className="group-create-time" title={createTime || ''}>
+                  {createTime || ''}
+                </span>
               </div>
             </div>
             <ActionBtnList
@@ -592,7 +596,6 @@ function TabGroup({
                 ></Checkbox>
                 <span
                   className="selected-count-text"
-                  style={{ color: ENUM_COLORS.volcano }}
                 >
                   {`${selectedTabIds.length} / ${tabList?.length}`}
                 </span>

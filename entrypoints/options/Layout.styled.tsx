@@ -10,14 +10,20 @@ export const StyledBaseSidebarWrapper = styled.div<{
   position: relative;
 
   .sidebar-inner-box {
-    width: var(--sidebar-width, ${defaultSidebarWidth}px);
-    height: calc(100vh - 180px);
+    box-sizing: border-box;
+    width: calc(var(--sidebar-width, ${defaultSidebarWidth}px) - 32px);
+    height: calc(100vh - 112px);
     position: fixed;
-    top: 100px;
+    top: 80px;
+    left: 16px;
+    padding: 16px 12px;
     transition: transform 0.2s ease-in-out;
     transform: translateX(0);
-    border-right: 1px solid ${props => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
-    background: var(--bg-color);
+    border: 1px solid var(--nt-border);
+    border-radius: var(--nt-radius-lg);
+    box-shadow: var(--nt-shadow-sm);
+    background: var(--nt-surface);
+    overflow: hidden;
     z-index: 10;
 
     &.collapsed {
@@ -62,7 +68,7 @@ export const StyledBaseSidebarWrapper = styled.div<{
 export const StyledBaseMainWrapper = styled.div`
   position: relative;
   width: 100%;
-  min-height: 400px;
+  min-height: calc(100vh - 112px);
   display: grid;
   grid-template-columns:
     var(--sidebar-grid-col, ${defaultSidebarWidth}px)
@@ -77,7 +83,11 @@ export const StyledBaseMainWrapper = styled.div`
   }
 
   .main-content-wrapper {
-    padding: 0 60px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 980px;
+    padding: 0 32px;
+    margin: 0 auto;
   }
 `;
 
@@ -88,15 +98,20 @@ export const StyledBaseRightPanelWrapper = styled.div<{
   position: relative;
 
   .right-panel-inner-box {
-    width: var(--panel-width, ${defaultRightPanelWidth}px);
-    height: calc(100vh - 180px);
+    box-sizing: border-box;
+    width: calc(var(--panel-width, ${defaultRightPanelWidth}px) - 32px);
+    height: calc(100vh - 112px);
     position: fixed;
-    top: 100px;
-    right: 32px;
+    top: 80px;
+    right: 16px;
+    padding: 16px 12px;
     transition: transform 0.2s ease-in-out;
     transform: translateX(0);
-    border-left: 1px solid ${props => props.theme.colorBorder || 'rgba(5, 5, 5, 0.06)'};
-    background: var(--bg-color);
+    border: 1px solid var(--nt-border);
+    border-radius: var(--nt-radius-lg);
+    box-shadow: var(--nt-shadow-sm);
+    background: var(--nt-surface);
+    overflow: hidden;
     z-index: 10;
 
     &.collapsed {
@@ -130,7 +145,7 @@ export const StyledBaseRightPanelWrapper = styled.div<{
   .right-panel-inner-content {
     width: 100%;
     height: 100%;
-    padding-left: 16px;
+    padding: 0;
   }
 `;
 

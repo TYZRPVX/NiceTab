@@ -107,6 +107,27 @@ export const StyledColorItem = styled.div`
 export const GlobalStyle = createGlobalStyle`
   :root {
     --bg-color: ${props => props.theme.colorBgContainer || '#fff'};
+    --nt-page: ${props =>
+      props.theme.type === 'light'
+        ? '#f6f8fc'
+        : props.theme.colorBgLayout || props.theme.colorBgContainer || '#141414'};
+    --nt-surface: ${props => props.theme.colorBgContainer || '#fff'};
+    --nt-surface-muted: ${props => props.theme.colorFillAlter || '#f3f5f8'};
+    --nt-border: ${props => props.theme.colorBorderSecondary || props.theme.colorBorder || '#e6eaf0'};
+    --nt-text-secondary: ${props => props.theme.colorTextSecondary || '#667085'};
+    --nt-text-tertiary: ${props => props.theme.colorTextTertiary || '#98a2b3'};
+    --nt-accent-soft: ${props => props.theme.colorPrimaryBg || '#eff6ff'};
+    --nt-radius-sm: 6px;
+    --nt-radius-md: 10px;
+    --nt-radius-lg: 14px;
+    --nt-shadow-sm: ${props =>
+      props.theme.type === 'light'
+        ? '0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.08)'
+        : '0 1px 2px rgba(0, 0, 0, 0.2)'};
+    --nt-shadow-md: ${props =>
+      props.theme.type === 'light'
+        ? '0 8px 24px rgba(16, 24, 40, 0.08)'
+        : '0 8px 24px rgba(0, 0, 0, 0.32)'};
     --link-color: ${props =>
       props.theme.type === 'light' ? props.theme.colorLink : '#8AB4F8'};
     --link-color-hover: ${props =>
@@ -115,6 +136,7 @@ export const GlobalStyle = createGlobalStyle`
   html, body {
     --bg-color: ${props => props.theme.colorBgContainer || '#fff'};
     --text-color: ${props => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
+    background: var(--nt-page);
     color: ${props => props.theme.colorText || 'rgba(0, 0, 0, 0.88)'};
   }
 

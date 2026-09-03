@@ -1,52 +1,86 @@
 import styled from 'styled-components';
-import { ENUM_COLORS, PRIMARY_COLOR } from '~/entrypoints/common/constants';
+import { PRIMARY_COLOR } from '~/entrypoints/common/constants';
 import type { StyledThemeProps } from '~/entrypoints/types';
 import { StyleBtnDisabled } from '~/entrypoints/common/style/Common.styled';
 
-export const StyledGroupWrapper = styled.div<{ $bgColor?: string }>`
+export const StyledGroupWrapper = styled.div<{ $bgColor?: string; $active?: boolean }>`
   position: relative;
   width: 100%;
-  padding: 16px 8px;
-  border-radius: 8px;
+  box-sizing: border-box;
+  padding: 14px 12px 12px;
+  margin-bottom: 16px;
+  border: 1px solid ${props => (props.$active ? props.theme.colorPrimaryBorder : 'var(--nt-border)')};
+  border-radius: var(--nt-radius-md);
+  box-shadow: var(--nt-shadow-sm);
   background: ${props => props.$bgColor || '#fff'};
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+
+  &::before {
+    position: absolute;
+    top: 14px;
+    bottom: 14px;
+    left: -1px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: ${props => props.theme.colorPrimary};
+    content: '';
+    opacity: ${props => (props.$active ? 1 : 0)};
+    transition: opacity 0.15s ease;
+  }
+
+  &:hover {
+    box-shadow: var(--nt-shadow-md);
+  }
 `;
-export const StyledGroupStickyHeader = styled.div<{ $bgColor?: string }>`
+export const StyledGroupStickyHeader = styled.div<{ $bgColor?: string; $active?: boolean }>`
   position: sticky;
-  top: 60px;
+  top: 76px;
   z-index: 3;
-  padding-bottom: 4px;
+  padding: 0 4px 6px;
+  border-radius: var(--nt-radius-sm);
   background: ${props => props.$bgColor || '#fff'};
 `;
 
 export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
-  padding: 0 8px;
-  gap: 12px;
+  padding: 0;
   .group-header-top {
     display: flex;
     align-items: center;
-    gap: 12px;
+    min-width: 0;
+    gap: 8px;
     .group-status-wrapper {
       display: flex;
       align-items: center;
       gap: 4px;
     }
     .group-name-wrapper {
-      margin-right: 12px;
+      min-width: 0;
+      margin-right: 4px;
+      .text-readonly {
+        font-weight: 650;
+        letter-spacing: -0.01em;
+      }
     }
     .group-info {
       display: flex;
       align-items: center;
-      font-size: 14px;
+      min-width: 0;
+      gap: 8px;
+      color: var(--nt-text-secondary);
+      font-size: 12px;
       .tab-count {
-        margin-right: 8px;
+        color: inherit;
       }
       .group-create-time {
-        color: ${props => props.theme.colorTextTertiary || '#999'};
+        overflow: hidden;
+        color: var(--nt-text-tertiary);
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }
   .group-action-btns {
-    margin-top: 4px;
+    margin-top: 6px;
     font-size: 14px;
   }
 `;
@@ -80,16 +114,18 @@ export const StyledGroupHeaderRecycle = styled(StyledGroupHeader)`
 export const StyledTabActions = styled.div<{ theme: StyledThemeProps }>`
   display: flex;
   align-items: center;
-  gap: 24px;
-  height: 26px;
+  gap: 16px;
+  min-height: 32px;
   margin-top: 8px;
-  padding: 0 30px;
+  padding: 4px 8px;
+  border-radius: var(--nt-radius-sm);
+  background: var(--nt-surface-muted);
   font-size: 12px;
   user-select: none;
   .checkall-wrapper {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
   }
   .tab-action-btns {
     margin: 4px 0;
@@ -104,12 +140,15 @@ export const StyledTabActions = styled.div<{ theme: StyledThemeProps }>`
       }
     }
   }
+  .selected-count-text {
+    color: ${props => props.theme.colorPrimary};
+    font-weight: 600;
+  }
 `;
 
 export const StyledTabListWrapper = styled.div`
   min-height: 24px;
-  margin-top: 4px;
-  // margin-left: 24px;
+  margin-top: 6px;
   .tab-list-checkbox-group {
     width: 100%;
     display: block;

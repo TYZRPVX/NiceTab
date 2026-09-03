@@ -9,18 +9,27 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
   display: flex;
   align-items: center;
   width: 100%;
-  height: 28px;
-  padding-left: 4px;
+  box-sizing: border-box;
+  min-height: 34px;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: var(--nt-radius-sm);
   background: ${props => props.$bgColor || ''};
+  transition: background-color 0.15s ease, border-color 0.15s ease;
   .checkbox-item {
-    margin-right: 12px;
+    margin-right: 8px;
   }
   .tab-item-btn {
-    margin-right: 8px;
+    flex-shrink: 0;
+    margin-right: 4px;
     &.btn-remove {
       visibility: hidden;
       pointer-eventes: none;
     }
+  }
+  &:hover {
+    border-color: var(--nt-border);
+    background: var(--nt-surface-muted);
   }
   &:not(.locked):hover {
     .btn-remove {
@@ -29,7 +38,7 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
     }
   }
   .img-favicon {
-    margin-right: 8px;
+    margin-right: 9px;
   }
 `;
 
@@ -39,6 +48,13 @@ export const StyledTabTitle = styled.span`
   ${StyledEllipsis}
   .tab-item-title-text {
     font-size: 14px;
+  }
+  .link {
+    display: block;
+    color: inherit;
+  }
+  &:hover .link {
+    color: ${props => props.theme.colorPrimary};
   }
 `;
 

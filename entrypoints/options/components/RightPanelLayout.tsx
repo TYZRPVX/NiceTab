@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react';
-import { PiSplitHorizontal } from 'react-icons/pi';
 import styled from 'styled-components';
-import type { StyledThemeProps } from '~/entrypoints/types';
 import {
   StyledBaseRightPanelWrapper,
   defaultRightPanelWidth,
@@ -10,20 +8,15 @@ import { classNames } from '~/entrypoints/common/utils';
 import ToggleSidebarBtn from './ToggleSidebarBtn';
 import useDragResize from '~/entrypoints/options/common/hooks/useDragResize';
 
-const StyledHandle = styled.div<{ theme: StyledThemeProps; $visible?: boolean }>`
+const StyledHandle = styled.div<{ $visible?: boolean }>`
   position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 20px;
+  top: 0;
+  left: -5px;
+  width: 10px;
+  height: 100%;
   cursor: col-resize;
-  z-index: 10;
+  z-index: 11;
   visibility: ${props => (props.$visible ? 'visible' : 'hidden')};
-
-  &:hover {
-    transform: translate(-50%, -50%) scale(1.2);
-    color: ${props => props.theme.colorPrimary || '#fff'};
-  }
 `;
 
 export interface RightPanelLayoutProps {
@@ -72,9 +65,7 @@ export default function RightPanelLayout({
       style={{ '--panel-width': `${width}px` } as React.CSSProperties}
     >
       <div className={classNames('right-panel-inner-box', collapsed && 'collapsed')}>
-        <StyledHandle ref={dragHandleRef} $visible={!collapsed} onMouseDown={onMouseDown}>
-          <PiSplitHorizontal />
-        </StyledHandle>
+        <StyledHandle ref={dragHandleRef} $visible={!collapsed} onMouseDown={onMouseDown} />
         <div className="right-panel-action-box">
           {showCollapseBtn && (
             <ToggleSidebarBtn

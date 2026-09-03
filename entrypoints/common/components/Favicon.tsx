@@ -7,6 +7,9 @@ const StyledFavicon = styled.img<{ $size?: number }>`
   flex: 0 0 ${props => props.$size}px;
   width: ${props => props.$size}px;
   height: ${props => props.$size}px;
+  border-radius: 4px;
+  background: var(--nt-surface-muted);
+  object-fit: contain;
 `;
 
 export default function Favicon({
