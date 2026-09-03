@@ -42,6 +42,31 @@ export const StyledSidebarWrapper = styled(SidebarLayout)<{
       border-bottom: 1px solid var(--nt-border);
       gap: 8px;
     }
+    .tree-controls {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 6px 0 18px;
+    }
+    .tree-filters {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .tree-search {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tree-search-input {
+      min-width: 0;
+      flex: 1;
+    }
+    .tree-search-button {
+      flex: 0 0 42px;
+    }
     .sidebar-tree-wrapper {
       flex: 1;
       height: 0;

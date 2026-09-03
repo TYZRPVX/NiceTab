@@ -20,6 +20,7 @@ export type EventsEmitterProps = {
   'home:set-tree-searchValue': { value: string; callback?: () => void };
   'home:set-editing-status': boolean;
   'settings:values-change': any;
+  'settings:save-action-change': { hasChanged: boolean; onSave: () => void } | undefined;
   'sync:push-to-all-remotes': undefined;
   'sync:sync-status-change--gist': SyncStatusChangeEventProps<'gist'>;
   'sync:sync-status-change--webdav': SyncStatusChangeEventProps<'webdav'>;

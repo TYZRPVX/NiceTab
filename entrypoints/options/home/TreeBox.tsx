@@ -1,8 +1,8 @@
 import { useState, memo, useCallback, useRef, useLayoutEffect } from 'react';
 import { debounce } from 'lodash-es';
-import { Tree, Space, Typography, Button, Checkbox, Input, Empty, Spin } from 'antd';
+import { Tree, Typography, Button, Checkbox, Input, Empty, Spin } from 'antd';
 import type { TreeDataNode } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { DownOutlined, SearchOutlined } from '@ant-design/icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import type { TagItem, GroupItem } from '~/entrypoints/types';
 import type { TreeDataNodeUnion, MoveToCallbackProps } from './types';
@@ -238,8 +238,8 @@ function TreeBox() {
 
   return (
     <>
-      <Space size={8} direction="vertical">
-        <Space size={12}>
+      <div className="tree-controls">
+        <div className="tree-filters">
           <Typography.Text>{$fmt('common.filter')}:</Typography.Text>
           <Checkbox.Group
             options={[
@@ -249,18 +249,27 @@ function TreeBox() {
             value={filterList}
             onChange={onFilterChange}
           ></Checkbox.Group>
-        </Space>
+        </div>
 
         {/* 列表搜索框 */}
-        <Input.Search
-          value={searchText}
-          style={{ marginBottom: 8 }}
-          placeholder={$fmt('home.searchTagAndGroup')}
-          allowClear
-          onChange={onSearchTextChange}
-          onSearch={onSearch}
-        />
-      </Space>
+        <div className="tree-search">
+          <Input
+            className="tree-search-input"
+            value={searchText}
+            placeholder={$fmt('home.searchTagAndGroup')}
+            allowClear
+            onChange={onSearchTextChange}
+            onPressEnter={event => onSearch(event.currentTarget.value)}
+          />
+          <Button
+            className="tree-search-button"
+            icon={<SearchOutlined />}
+            title={$fmt('common.search')}
+            aria-label={$fmt('common.search')}
+            onClick={() => onSearch(searchText)}
+          />
+        </div>
+      </div>
       <div ref={listRef} className="sidebar-tree-wrapper">
         <Spin spinning={loading} size="large">
           {searchTreeData?.length > 0 ? (

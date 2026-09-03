@@ -203,9 +203,11 @@ export const updateAdminPageUrlDebounced = debounce(updateAdminPageUrl, 500);
 export async function openAdminTab(
   settingsData?: SettingsProps,
   params?: { tagId: string; groupId: string },
+  needOpen?: boolean,
 ) {
   const settings = settingsData || (await settingsUtils.getSettings());
-  const openAdminTabAfterSendTabs = settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
+  const openAdminTabAfterSendTabs =
+    needOpen ?? settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
   await openAdminRoutePage({ path: '/home', query: params }, openAdminTabAfterSendTabs);
 }
 // 获取过滤后的标签页
@@ -292,7 +294,15 @@ export async function getAllTabs(windowId?: number) {
 // 发送当前窗口的所有标签页
 async function sendAllTabs(
   targetData: SendTargetProps = {},
-  { onlyCurrentWindow = true }: { onlyCurrentWindow?: boolean } = {},
+  {
+    onlyCurrentWindow = true,
+    excludedTabIds = [],
+    forceOpenAdmin = false,
+  }: {
+    onlyCurrentWindow?: boolean;
+    excludedTabIds?: number[];
+    forceOpenAdmin?: boolean;
+  } = {},
 ) {
   const tabs = await browser.tabs.query(
     onlyCurrentWindow
@@ -305,10 +315,12 @@ async function sendAllTabs(
 
   // 获取插件设置
   const settings = await settingsUtils.getSettings();
-  const filteredTabs = await getFilteredTabs(tabs, settings);
-  if (!filteredTabs?.length) return;
+  const filteredTabs = (await getFilteredTabs(tabs, settings)).filter(
+    tab => !excludedTabIds.includes(tab.id as number),
+  );
+  if (!filteredTabs?.length) return false;
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs, targetData);
-  await openAdminTab(settings, { tagId, groupId });
+  await openAdminTab(settings, { tagId, groupId }, forceOpenAdmin || undefined);
   const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
   if (
     settings[CLOSE_TABS_AFTER_SEND_TABS] ||
@@ -320,6 +332,23 @@ async function sendAllTabs(
   } else {
     // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
     cancelHighlightTabs(filteredTabs);
+  }
+  return true;
+}
+
+export async function sendAllTabsFromCommandPage(commandTabId?: number) {
+  try {
+    const sentTabs = await sendAllTabs({}, {
+      excludedTabIds: commandTabId ? [commandTabId] : [],
+      forceOpenAdmin: true,
+    });
+    if (!sentTabs) {
+      await openAdminRoutePage({ path: '/home' });
+    }
+  } finally {
+    if (commandTabId) {
+      await browser.tabs.remove(commandTabId).catch(() => undefined);
+    }
   }
 }
 // 发送当前选中的标签页所在的标签组（支持多选）
@@ -750,6 +779,7 @@ export default {
   cancelHighlightTabs,
   getAllTabs,
   sendAllTabs,
+  sendAllTabsFromCommandPage,
   sendCurrentGroup,
   sendCurrentTab,
   sendOtherTabs,

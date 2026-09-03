@@ -1,7 +1,7 @@
-import { useContext, useState, useEffect, useMemo } from 'react';
-import { Menu, Form, Button, Badge, Modal, theme, message } from 'antd';
+import { useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import { Menu, Form, Modal, message } from 'antd';
 import type { MenuProps, FormProps } from 'antd';
-import { SaveOutlined, SettingOutlined } from '@ant-design/icons';
+import { SettingOutlined } from '@ant-design/icons';
 import { isEqual, debounce } from 'lodash-es';
 import { useBlocker } from 'react-router-dom';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
@@ -22,8 +22,6 @@ import { sendRuntimeMessage, classNames } from '~/entrypoints/common/utils';
 import { reloadOtherAdminPage } from '~/entrypoints/common/tabs';
 // import StickyFooter from '~/entrypoints/common/components/StickyFooter';
 
-import SidebarBaseBtn from '~/entrypoints/options/components/SidebarBaseBtn';
-
 import FormModuleCommon from './FormModuleCommon';
 import FormModuleSend from './FormModuleSend';
 import FormModuleOpen from './FormModuleOpen';
@@ -36,7 +34,6 @@ import FormModuleSync from './FormModuleSync';
 import {
   StyledSidebarWrapper,
   StyledMainWrapper,
-  // StyledFooterWrapper,
 } from './Settings.styled';
 
 const { LANGUAGE, AUTO_SYNC_TIME_RANGES } = ENUM_SETTINGS_PROPS;
@@ -56,7 +53,6 @@ export default function Settings() {
   const [messageApi, msgContextHolder] = message.useMessage();
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
   const [sidebarWidth, setSidebarWidth] = useState<number>(240);
-  const { token } = theme.useToken();
 
   const onCollapseChange = (status: boolean) => {
     setSidebarCollapsed(status);
@@ -159,8 +155,6 @@ export default function Settings() {
     setHasChanged(false);
   };
 
-  const onFinish = useMemo(() => debounce(handleFinish, 500), [handleFinish]);
-
   const [hasChanged, setHasChanged] = useState<boolean>(false);
   const handleValuesChange = () => {
     setHasChanged(true);
@@ -174,9 +168,14 @@ export default function Settings() {
     [handleValuesChange],
   );
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     form?.submit();
-  };
+  }, [form]);
+
+  useEffect(() => {
+    eventEmitter.emit('settings:save-action-change', { hasChanged, onSave: handleSave });
+    return () => eventEmitter.emit('settings:save-action-change', undefined);
+  }, [hasChanged, handleSave]);
 
   useEffect(() => {
     form.setFieldsValue({ [LANGUAGE]: locale });
@@ -232,21 +231,6 @@ export default function Settings() {
           initialWidth={240}
           onCollapseChange={onCollapseChange}
           onWidthChange={onSidebarWidthChange}
-          sideActionBox={
-            <Badge
-              dot={hasChanged}
-              status="processing"
-              color={token.colorPrimary}
-              offset={[-4, 4]}
-            >
-              <SidebarBaseBtn
-                title={$fmt('common.save')}
-                icon={<SaveOutlined />}
-                blink={hasChanged}
-                onClick={handleSave}
-              />
-            </Badge>
-          }
           innerContent={
             <Menu
               selectedKeys={[currModule]}
@@ -263,7 +247,7 @@ export default function Settings() {
             key={urlParams.randomId}
             layout="vertical"
             autoComplete="off"
-            onFinish={onFinish}
+            onFinish={handleFinish}
             onValuesChange={onValuesChange}
           >
             {/* ******************* 通用设置 ******************* */}

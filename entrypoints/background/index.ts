@@ -329,6 +329,8 @@ export default defineBackground(() => {
       strategyHandler(data.actionName);
     } else if (msgType === 'sendTabsActionConfirm') {
       handleSendTabsAction(data.actionName, data.targetData);
+    } else if (msgType === 'sendAllTabsFromCommandPage') {
+      await tabUtils.sendAllTabsFromCommandPage(data?.commandTabId);
     }
   });
 });

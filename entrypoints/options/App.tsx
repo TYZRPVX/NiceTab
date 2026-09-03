@@ -1,4 +1,4 @@
-import { useContext, useCallback, useState, useEffect, useMemo } from 'react';
+import { useContext, useCallback, useState, useEffect, useMemo, useRef } from 'react';
 import {
   createHashRouter,
   RouterProvider,
@@ -14,6 +14,7 @@ import {
   Tooltip,
   Typography,
   Button,
+  Badge,
   type MenuProps,
 } from 'antd';
 import {
@@ -34,6 +35,7 @@ import {
   KeyOutlined,
   CoffeeOutlined,
   CameraOutlined,
+  SaveOutlined,
   RollbackOutlined,
   SearchOutlined,
   ReadOutlined,
@@ -52,7 +54,7 @@ import {
   SHORTCUTS_PAGE_URL,
 } from '~/entrypoints/common/constants';
 import { actionHandler } from '../common/contextMenus';
-import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { GlobalContext, useIntlUtls, eventEmitter } from '~/entrypoints/common/hooks/global';
 import useMenus from '~/entrypoints/common/hooks/menu';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import useUpdate from '~/entrypoints/common/hooks/update';
@@ -231,6 +233,11 @@ const router = createHashRouter([
 
 const themeTypes: ThemeTypes[] = ['light', 'dark', 'auto'];
 
+type SettingsSaveAction = {
+  hasChanged: boolean;
+  onSave: () => void;
+};
+
 function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -238,6 +245,7 @@ function AppLayout() {
   const NiceGlobalContext = useContext(GlobalContext);
   const { updateDetail, updateReload } = useUpdate();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const [settingsSaveAction, setSettingsSaveAction] = useState<SettingsSaveAction>();
   const { $fmt, locale } = useIntlUtls();
   const { urlParams, setSearchParams } = useUrlParams();
   const sendTargetActionRef = useRef<SendTargetActionHolderProps>();
@@ -379,6 +387,14 @@ function AppLayout() {
   }, [location.pathname]);
 
   useEffect(() => {
+    const handleSettingsSaveActionChange = (action: SettingsSaveAction | undefined) => {
+      setSettingsSaveAction(action);
+    };
+    eventEmitter.on('settings:save-action-change', handleSettingsSaveActionChange);
+    return () => eventEmitter.off('settings:save-action-change', handleSettingsSaveActionChange);
+  }, []);
+
+  useEffect(() => {
     if (!urlParams.action) return;
     if (urlParams.action === 'globalSearch') {
       openGlobalSearchPanel();
@@ -517,12 +533,29 @@ function AppLayout() {
             onClick={openGlobalSearchPanel}
           />
 
-          <Button
-            shape="circle"
-            icon={<SendOutlined />}
-            title={$fmt('common.sendAllTabs')}
-            onClick={handleSendAllTabs}
-          />
+          {location.pathname === '/settings' ? (
+            <Badge
+              dot={settingsSaveAction?.hasChanged}
+              color={token.colorPrimary}
+              offset={[-2, 4]}
+            >
+              <Button
+                shape="circle"
+                type={settingsSaveAction?.hasChanged ? 'primary' : 'default'}
+                icon={<SaveOutlined />}
+                title={$fmt('common.save')}
+                aria-label={$fmt('common.save')}
+                onClick={settingsSaveAction?.onSave}
+              />
+            </Badge>
+          ) : (
+            <Button
+              shape="circle"
+              icon={<SendOutlined />}
+              title={$fmt('common.sendAllTabs')}
+              onClick={handleSendAllTabs}
+            />
+          )}
         </div>
       </StyledPageContainer>
     </ThemeProvider>

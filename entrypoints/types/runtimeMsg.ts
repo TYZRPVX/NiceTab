@@ -22,7 +22,8 @@ export type RuntimeMsgType =
   | 'sync:sync-status-change--gist'
   | 'sync:sync-status-change--webdav'
   | 'sendTabsActionStart'
-  | 'sendTabsActionConfirm';
+  | 'sendTabsActionConfirm'
+  | 'sendAllTabsFromCommandPage';
 
 export interface RuntimeMsgSetPrimaryColor {
   msgType: 'setPrimaryColor';
@@ -74,6 +75,10 @@ export interface RuntimeMsgSendTabsActionConfirm {
   msgType: 'sendTabsActionConfirm';
   data: { actionName: string; targetData: SendTargetProps; currWindowId?: number };
 }
+export interface RuntimeMsgSendAllTabsFromCommandPage {
+  msgType: 'sendAllTabsFromCommandPage';
+  data: { commandTabId?: number };
+}
 
 export type RuntimeMsgBaseProps =
   | RuntimeMsgSetPrimaryColor
@@ -86,7 +91,8 @@ export type RuntimeMsgBaseProps =
   | RuntimeMsgSyncStatusChangeGist
   | RuntimeMsgSyncStatusChangeWebdav
   | RuntimeMsgSendTabsActionStart
-  | RuntimeMsgSendTabsActionConfirm;
+  | RuntimeMsgSendTabsActionConfirm
+  | RuntimeMsgSendAllTabsFromCommandPage;
 
 // runtime message event props
 export type RuntimeMessageEventProps = RuntimeMsgBaseProps & {
@@ -117,7 +123,9 @@ export type SendRuntimeMessageBaseProps<T extends RuntimeMsgType> =
                       ? RuntimeMsgSendTabsActionStart
                       : T extends 'sendTabsActionConfirm'
                         ? RuntimeMsgSendTabsActionConfirm
-                        : never;
+                        : T extends 'sendAllTabsFromCommandPage'
+                          ? RuntimeMsgSendAllTabsFromCommandPage
+                          : never;
 
 // sendRuntimeMessage params
 export type SendRuntimeMessageParams<T extends RuntimeMsgType = any> =
