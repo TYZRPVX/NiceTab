@@ -95,40 +95,23 @@ Chrome 出于安全策略，默认不允许从非商店渠道拖入安装 crx。
 - 或者把 crx 解压后再按未打包方式加载
 - 企业环境可通过策略 `ExtensionInstallAllowlist` / `ExtensionSettings` 放行
 
-### 4.4 crx 用 Git LFS 管理
+### 4.4 GitHub Actions 自动打包
 
-crx 是二进制大文件，直接进 git 会让仓库越来越臃肿，所以**用 Git LFS 托管**——文件照样提交到 GitHub，只是内容存在 LFS 里，git 仓库里只留一个指针。
+`.crx` 是生成产物，不提交到 Git，也不使用 Git LFS。公开 fork 无法上传新的 LFS 对象。
 
-规则已经配好：
-- `.gitattributes`：`*.crx`、`*.xpi` 走 `filter=lfs`
-- `.gitignore`：`release/` 目录下只放行 `*.crx`，其他中间产物忽略
+工作流 `.github/workflows/build-crx.yml` 会在以下场景运行：
+- Actions 页面手动运行
+- 推送 `v*` 格式的 tag，例如 `v3.0.3`
 
-首次使用需要在本机初始化一次 LFS：
+首次使用前，在仓库的 **Settings → Secrets and variables → Actions** 新建一个 repository secret：
 
-```bash
-brew install git-lfs   # 或参考 https://git-lfs.com
-git lfs install
-```
+| Name | Value |
+| --- | --- |
+| `NICETAB_CRX_KEY` | 本机 `keys/nicetab.pem` 的完整内容 |
 
-之后正常提交即可：
+该私钥不能提交或发送到 issue。工作流会把它临时写入 runner，打包后只上传 `nice-tab-<version>.crx` artifact，保留 14 天。
 
-```bash
-pnpm build && pnpm pack:crx
-git add release/nice-tab-3.0.2.crx
-git commit -m "chore: release crx 3.0.2"
-git push
-```
-
-校验是否真的走了 LFS：
-
-```bash
-git lfs track          # 查看当前生效的 track 规则
-git lfs ls-files       # 列出被 LFS 管理的文件
-```
-
-克隆仓库的人需要装了 git-lfs 才能拿到真实的 crx；否则 checkout 出来的是指针文本文件，执行 `git lfs pull` 补齐即可。
-
-> 注意：如果之前已经有 crx 用普通方式提交过，加了 `.gitattributes` 也只对新提交生效，历史文件需要 `git lfs migrate import --include="*.crx"` 重写历史（会改 commit hash，谨慎操作）。
+使用同一份私钥，才能保持扩展 ID 不变并支持升级安装。
 
 ## 5. 类型检查 / lint
 
