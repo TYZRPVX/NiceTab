@@ -29,3 +29,8 @@ public/docs/*
 *.sw?
 .claude
 CLAUDE.md
+
+# Local CRX signing keys and generated extension packages.
+keys/
+*.pem
+release/

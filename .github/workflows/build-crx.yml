@@ -1,0 +1,97 @@
+name: Build signed CRX
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-crx:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js and pnpm
+        uses: pnpm/setup@v2
+        with:
+          version: 11.25.0
+          runtime: node@24
+          install: false
+
+      - name: Verify toolchain
+        run: |
+          node --version
+          pnpm --version
+
+      - name: Install dependencies
+        run: |
+          if grep -q '^lockfileVersion: 5.4' pnpm-lock.yaml; then
+            pnpm install --no-frozen-lockfile
+          else
+            pnpm install --frozen-lockfile
+          fi
+
+      - name: Build extension
+        run: pnpm build
+
+      - name: Set up Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v2
+        with:
+          chrome-version: stable
+          install-dependencies: true
+
+      - name: Restore CRX signing key
+        env:
+          NICETAB_CRX_KEY: ${{ secrets.NICETAB_CRX_KEY }}
+        run: |
+          if [ -z "$NICETAB_CRX_KEY" ]; then
+            echo "::error::Missing NICETAB_CRX_KEY. Add keys/nicetab.pem as a repository Actions secret."
+            exit 1
+          fi
+          install -d -m 700 keys
+          printf '%s' "$NICETAB_CRX_KEY" > keys/nicetab.pem
+          chmod 600 keys/nicetab.pem
+
+      - name: Package signed CRX
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+        run: |
+          "$CHROME_PATH" \
+            "--pack-extension=$GITHUB_WORKSPACE/.output/chrome-mv3" \
+            "--pack-extension-key=$GITHUB_WORKSPACE/keys/nicetab.pem" \
+            --no-sandbox \
+            --no-message-box
+          version="$(node -p "require('./package.json').version")"
+          mkdir -p release
+          mv .output/chrome-mv3.crx "release/nice-tab-${version}.crx"
+
+      - name: Upload CRX
+        uses: actions/upload-artifact@v7
+        with:
+          name: nice-tab-crx-${{ github.run_number }}
+          path: release/*.crx
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload CRX to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG_NAME" release/*.crx \
+              --repo "$GITHUB_REPOSITORY" \
+              --clobber
+          else
+            gh release create "$TAG_NAME" release/*.crx \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "$TAG_NAME" \
+              --generate-notes
+          fi
