@@ -29,6 +29,9 @@ import {
   newCreateTime,
   getUniqueList,
   getMergedList,
+  getAutomaticGroupName,
+  getDisplayGroupName,
+  normalizeLegacyGeneratedNames,
 } from '../utils';
 import { openNewTab } from '../tabs';
 import Store from './instanceStore';
@@ -145,9 +148,7 @@ export function mergeGroupsAndTabs({
       resultList = [];
     for (let item of list) {
       if (exceptValue != undefined && item[key] === exceptValue) {
-        const randomName =
-          dayjs(item.createTime).format('YYYYMMDD_HH:mm:ss_') + getRandomId(3, true);
-        exceptList.push({ ...item, groupName: `G_${randomName}` });
+        exceptList.push({ ...item, groupName: getDisplayGroupName(item) });
       } else {
         resultList.push(item);
       }
@@ -209,10 +210,9 @@ export default class TabListUtils {
 
   /* 分类相关方法 */
   getInitialTag(): TagItem {
-    const randomName = dayjs().format('YYYYMMDD_HH:mm:ss_') + getRandomId(3, true);
     return {
       tagId: getRandomId(),
-      tagName: `T_${randomName}` || UNNAMED_TAG,
+      tagName: UNNAMED_TAG,
       createTime: newCreateTime(),
       groupList: [],
     };
@@ -230,6 +230,9 @@ export default class TabListUtils {
   }
   async getTagList() {
     let tagList = await storage.getItem<TagItem[]>(this.storageKey);
+    const normalizedLegacyNames = tagList
+      ? normalizeLegacyGeneratedNames(tagList)
+      : false;
     const staticIndex = tagList?.findIndex(tag => tag.static) ?? -1;
     // 必须保证中转站排在第一位
     if (!tagList?.length || staticIndex == -1) {
@@ -239,6 +242,8 @@ export default class TabListUtils {
       const staticTag = tagList.splice(staticIndex, 1);
       tagList = [staticTag[0], ...tagList];
       await this.setTagList(tagList);
+    } else if (normalizedLegacyNames) {
+      await this.setTagList(tagList);
     }
 
     this.tagList = tagList;
@@ -247,6 +252,7 @@ export default class TabListUtils {
   }
   async setTagList(list?: TagItem[]) {
     this.tagList = list?.length ? list : [this.createStagingAreaTag()];
+    normalizeLegacyGeneratedNames(this.tagList);
     this.setCountInfo();
     storage.setItem(this.storageKey, this.tagList);
   }
@@ -340,10 +346,9 @@ export default class TabListUtils {
 
   /* 标签组相关方法 */
   getInitialTabGroup(): GroupItem {
-    const randomName = dayjs().format('YYYYMMDD_HH:mm:ss_') + getRandomId(3, true);
     return {
       groupId: getRandomId(),
-      groupName: `G_${randomName}` || UNNAMED_GROUP,
+      groupName: UNNAMED_GROUP,
       createTime: newCreateTime(),
       tabList: [],
     };
@@ -861,7 +866,7 @@ export default class TabListUtils {
       for (const [bsGroupId, group] of groupsMap.entries()) {
         const tabGroup = await browser.tabGroups.get(bsGroupId);
         // console.log('tabGroup', tabGroup);
-        group.groupName = tabGroup?.title || group.groupName;
+        group.groupName = tabGroup?.title || getAutomaticGroupName(group.tabList);
       }
     }
 
@@ -943,12 +948,23 @@ export default class TabListUtils {
     const createNewGroup = settings?.[CREATE_NEW_GROUP_ON_SEND_SINGLE_TAB] || false;
     // createNewGroup=true，就创建一个新标签组
     let newtabGroup = this.getInitialTabGroup();
+    let isNewGroup = createNewGroup || newTabs.length > 1;
     if (createNewGroup || newTabs.length > 1) {
       newtabGroup.tabList = newTabs;
     } else {
       const index = tag0?.groupList?.findIndex?.(g => !g.isStarred && !g.isLocked);
-      newtabGroup = ~index ? tag0?.groupList?.[index] : newtabGroup;
+      const existingGroup = ~index ? tag0?.groupList?.[index] : undefined;
+      if (existingGroup) {
+        newtabGroup = existingGroup;
+        isNewGroup = false;
+      } else {
+        isNewGroup = true;
+      }
       newtabGroup.tabList = [...newTabs, ...newtabGroup.tabList];
+    }
+
+    if (isNewGroup) {
+      newtabGroup.groupName = getAutomaticGroupName(newtabGroup.tabList);
     }
 
     if (tag0) {
@@ -1006,7 +1022,7 @@ export default class TabListUtils {
           };
           if (_isGroupSupported) {
             const bsGroup = await browser.tabGroups!.get(group.bsGroupId);
-            group.groupName = bsGroup?.title || group.groupName;
+            group.groupName = bsGroup?.title || getAutomaticGroupName(group.tabList);
           }
           result.push(group);
         }
@@ -1434,16 +1450,20 @@ export default class TabListUtils {
       needStarred = true;
     }
 
+    const tabList = (sourceData?.selectedGroup?.tabs || sourceData?.tabs || [])?.map?.(
+      (tab: Tabs.Tab) => ({
+        tabId: getRandomId(),
+        ...pick(tab, ['title', 'url', 'favIconUrl']),
+      }),
+    );
     const newGroup = {
       ...this.getInitialTabGroup(),
       isStarred: needStarred,
-      groupName: sourceData?.selectedGroup?.groupName || sourceData?.groupName,
-      tabList: (sourceData?.selectedGroup?.tabs || sourceData?.tabs || [])?.map?.(
-        (tab: Tabs.Tab) => ({
-          tabId: getRandomId(),
-          ...pick(tab, ['title', 'url', 'favIconUrl']),
-        }),
-      ),
+      groupName:
+        sourceData?.selectedGroup?.groupName ||
+        sourceData?.groupName ||
+        getAutomaticGroupName(tabList),
+      tabList,
     };
     _targetData.groupList?.splice(targetGroupIndex, 0, newGroup);
 

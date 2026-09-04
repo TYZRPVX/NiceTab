@@ -82,6 +82,10 @@ export const StyledSidebarWrapper = styled(SidebarLayout)<{
         .nicetab-tree-treenode {
           padding: 2px 0;
         }
+        /* Keep child groups clearly nested without wasting a full row-width step. */
+        .nicetab-tree-indent-unit {
+          width: 16px;
+        }
         .nicetab-tree-node-content-wrapper {
           min-height: 30px;
           padding: 3px 6px;

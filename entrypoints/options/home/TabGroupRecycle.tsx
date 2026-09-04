@@ -7,6 +7,7 @@ import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { getDisplayGroupName } from '~/entrypoints/common/utils';
 
 import EditInput from '../components/EditInput';
 import TabListItem from './TabListItem';
@@ -64,15 +65,20 @@ function TabGroup({
     return tabList.length * 28 || 20;
   }, [tabList]);
 
+  const groupDisplayName = useMemo(
+    () => getDisplayGroupName({ groupName, tabList }),
+    [groupName, tabList],
+  );
+
   const removeDesc = useMemo(() => {
     const typeName = $fmt(`home.tabGroup`);
     return $fmt({
       id: 'home.removeDesc',
       values: {
-        type: `${typeName}${` <strong>[${groupName}]</strong>`}`,
+        type: `${typeName}${` <strong>[${groupDisplayName}]</strong>`}`,
       },
     });
-  }, [$fmt]);
+  }, [$fmt, groupDisplayName]);
 
   // 已选择的tabItem数组
   const selectedTabs = useMemo(() => {
@@ -174,7 +180,7 @@ function TabGroup({
             )}
             <div className="group-name-wrapper">
               <EditInput
-                value={groupName || UNNAMED_GROUP}
+                value={groupDisplayName || UNNAMED_GROUP}
                 disabled={!allowGroupActions.includes('rename')}
                 maxWidth={240}
                 fontSize={16}

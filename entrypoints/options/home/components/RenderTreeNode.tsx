@@ -3,6 +3,7 @@ import { theme, Dropdown } from 'antd';
 import { CloseOutlined, MenuOutlined, MoreOutlined } from '@ant-design/icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
+import { getDisplayGroupName, getDisplayTagName } from '~/entrypoints/common/utils';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import EditInput from '~/entrypoints/options/components/EditInput';
 import DropComponent from '~/entrypoints/common/components/DropComponent';
@@ -24,19 +25,14 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
   const unnamedNodeName = node.type === 'tag' ? UNNAMED_TAG : UNNAMED_GROUP;
 
   const treeNodeDisplayName = useMemo(() => {
-    if (node.type !== 'tabGroup') return node.title || unnamedNodeName;
+    if (node.type !== 'tabGroup') {
+      return getDisplayTagName({ tagName: node.title || unnamedNodeName });
+    }
 
-    const groupName = node.originData?.groupName || node.title || unnamedNodeName;
-    const isGeneratedName = /^G_\d{8}_\d{2}:\d{2}:\d{2}_\d+$/.test(groupName);
-    if (!isGeneratedName) return groupName;
-
-    const { previewTitle, tabCount } = node.originData;
-    const firstTabTitle = previewTitle;
-    if (!firstTabTitle) return groupName;
-
-    const title = tabCount > 1 ? `${firstTabTitle} +${tabCount - 1}` : firstTabTitle;
-    const time = node.originData?.createTime?.match(/\d{2}:\d{2}/)?.[0];
-    return time ? `${title} · ${time}` : title;
+    return getDisplayGroupName({
+      groupName: node.originData?.groupName || node.title,
+      previewTitle: node.originData?.previewTitle,
+    });
   }, [node, unnamedNodeName]);
 
   // 是否锁定

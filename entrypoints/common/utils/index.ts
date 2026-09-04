@@ -7,6 +7,7 @@ export * from './os';
 export * from './importExport';
 export * from './click';
 export * from './sanitize';
+export * from './groupName';
 
 export default {
   name: 'common-utils',

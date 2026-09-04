@@ -6,7 +6,12 @@ import {
   LockOutlined,
   StarOutlined,
 } from '@ant-design/icons';
-import { getLocaleMessages, newCreateTime } from '~/entrypoints/common/utils';
+import {
+  getDisplayGroupName,
+  getDisplayTagName,
+  getLocaleMessages,
+  newCreateTime,
+} from '~/entrypoints/common/utils';
 import type { TagItem } from '~/entrypoints/types';
 import type { TreeDataNodeUnion, MoveDataProps, CascaderOption } from './types';
 
@@ -19,7 +24,7 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
     return {
       type: 'tag',
       key: tag.tagId,
-      title: tag.tagName,
+      title: getDisplayTagName(tag),
       isLeaf: false,
       icon: tag.static ? (
         <PushpinOutlined />
@@ -42,7 +47,7 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
         parentKey: tag.tagId,
         parentData: { isLocked: tag.isLocked, isStarred: tag.isStarred },
         key: group.groupId,
-        title: group.groupName,
+        title: getDisplayGroupName(group),
         isLeaf: true,
         icon: group.isLocked ? (
           <LockOutlined />
@@ -126,7 +131,7 @@ export const getCascaderData = async (
       <div className="cascader-label-custom cascader-label-tag">
         <TagOutlined />
         <span className="label-name">
-          {tag.static ? localeMessage?.['home.stagingArea'] : tag.tagName}
+          {tag.static ? localeMessage?.['home.stagingArea'] : getDisplayTagName(tag)}
         </span>
       </div>
     ),
@@ -140,7 +145,7 @@ export const getCascaderData = async (
         label: (
           <div className="cascader-label-custom cascader-label-group">
             <ProductOutlined />
-            <span className="label-name">{group.groupName}</span>
+            <span className="label-name">{getDisplayGroupName(group)}</span>
           </div>
         ),
         disabled: moveType !== 'tab' || group.groupId === groupId,
@@ -165,7 +170,7 @@ export const getTotalCascaderData = async (
       <div className="cascader-label-custom cascader-label-tag">
         <TagOutlined />
         <span className="label-name">
-          {tag.static ? localeMessage?.['home.stagingArea'] : tag.tagName}
+          {tag.static ? localeMessage?.['home.stagingArea'] : getDisplayTagName(tag)}
         </span>
       </div>
     ),
@@ -178,7 +183,7 @@ export const getTotalCascaderData = async (
         label: (
           <div className="cascader-label-custom cascader-label-group">
             <ProductOutlined />
-            <span className="label-name">{group.groupName}</span>
+            <span className="label-name">{getDisplayGroupName(group)}</span>
           </div>
         ),
         parentKey: tag.tagId,

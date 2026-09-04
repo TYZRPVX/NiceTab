@@ -17,7 +17,7 @@ import {
   UNNAMED_GROUP,
   ENUM_SETTINGS_PROPS,
 } from '~/entrypoints/common/constants';
-import { classNames } from '~/entrypoints/common/utils';
+import { classNames, getDisplayGroupName } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils, settingsUtils } from '~/entrypoints/common/storage';
 import DndComponent, {
@@ -153,15 +153,10 @@ function TabGroup({
     [groupId, groupName, createTime, isLocked, isStarred, selected],
   );
 
-  const groupDisplayName = useMemo(() => {
-    const savedName = groupName || UNNAMED_GROUP;
-    const isGeneratedName = /^G_\d{8}_\d{2}:\d{2}:\d{2}_\d+$/.test(savedName);
-    if (!isGeneratedName) return savedName;
-
-    const firstTabTitle = tabList.find(item => item.title?.trim())?.title?.trim();
-    if (!firstTabTitle) return savedName;
-    return tabList.length > 1 ? `${firstTabTitle} +${tabList.length - 1}` : firstTabTitle;
-  }, [groupName, tabList]);
+  const groupDisplayName = useMemo(
+    () => getDisplayGroupName({ groupName, tabList }),
+    [groupName, tabList],
+  );
 
   const displayCreateTime = useMemo(
     () => createTime?.replace(/:\d{2}$/, '') || '',
@@ -181,10 +176,10 @@ function TabGroup({
     return $fmt({
       id: 'home.removeDesc',
       values: {
-        type: `${typeName}${` <strong>[${groupName}]</strong>`}`,
+        type: `${typeName}${` <strong>[${groupDisplayName}]</strong>`}`,
       },
     });
-  }, [$fmt]);
+  }, [$fmt, groupDisplayName]);
 
   // 快捷选择，起始位置
   const [quickSelectedTabIds, setQuickSelectedTabIds] = useState<string[]>([]);

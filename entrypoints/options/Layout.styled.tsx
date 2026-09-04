@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 import type { StyledThemeProps } from '~/entrypoints/types';
 
-export const defaultSidebarWidth = 280;
 export const defaultRightPanelWidth = 400;
+export const defaultSidebarWidth = defaultRightPanelWidth;
 
 export const StyledBaseSidebarWrapper = styled.div<{
   theme: StyledThemeProps;

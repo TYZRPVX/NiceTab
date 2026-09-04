@@ -20,18 +20,16 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
     margin-right: 8px;
   }
   .tab-item-btn {
+    display: flex !important;
     flex-shrink: 0;
     margin-right: 4px;
-    visibility: hidden;
-    pointer-events: none;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
   }
   &:hover {
     border-color: var(--nt-border);
     background: var(--nt-surface-muted);
-    .tab-item-btn {
-      visibility: visible;
-      pointer-events: auto;
-    }
   }
   .img-favicon {
     margin-right: 9px;

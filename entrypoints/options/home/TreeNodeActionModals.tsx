@@ -3,6 +3,7 @@ import { Modal } from 'antd';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
+import { getDisplayGroupName, getDisplayTagName } from '~/entrypoints/common/utils';
 import MoveToModal from './MoveToModal';
 import useMoveTo from './hooks/moveTo';
 import type { RenderTreeNodeActionProps, MoveToCallbackProps } from './types';
@@ -81,10 +82,19 @@ export function RemoveActionModal({
   const removeDesc = useMemo(() => {
     const { node } = actionParams || {};
     const typeName = $fmt(`home.${node?.type || 'tag'}`);
+    const nodeName =
+      node?.type === 'tabGroup'
+        ? getDisplayGroupName({
+            groupName: node.originData?.groupName || node.title,
+            previewTitle: node.originData?.previewTitle,
+          })
+        : node
+          ? getDisplayTagName({ tagName: node.title })
+          : '';
     return $fmt({
       id: 'home.removeDesc',
       values: {
-        type: `${typeName}${node?.title ? ` <strong>[${node.title}]</strong>` : ''}`,
+        type: `${typeName}${nodeName ? ` <strong>[${nodeName}]</strong>` : ''}`,
       },
     });
   }, [actionParams?.node]);

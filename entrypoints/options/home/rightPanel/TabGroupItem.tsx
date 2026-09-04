@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import {
   RightOutlined,
@@ -6,7 +6,7 @@ import {
   CloseOutlined,
   CoffeeOutlined,
 } from '@ant-design/icons';
-import { classNames } from '~/entrypoints/common/utils';
+import { classNames, getDisplayGroupName } from '~/entrypoints/common/utils';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import DndComponent, {
@@ -61,6 +61,10 @@ export default function TabGroupItem({
 }: TabGroupItemParams) {
   const { $fmt } = useIntlUtls();
   const [collapsed, setCollapsed] = useState(group.collapsed);
+  const groupDisplayName = useMemo(
+    () => getDisplayGroupName({ groupName: group.groupName, tabList: group.tabs }),
+    [group.groupName, group.tabs],
+  );
 
   const selectedTabIds = selectedTabs.map(tab => tab.id!);
 
@@ -171,7 +175,7 @@ export default function TabGroupItem({
         <div className="collapse-icon-btn">
           {collapsed ? <RightOutlined /> : <DownOutlined />}
         </div>
-        <div className="group-name">{group.groupName}</div>
+        <div className="group-name">{groupDisplayName}</div>
         <div className="group-actions" onClick={e => e.stopPropagation()}>
           <ActionBtnList actionBtnStyle="icon" outerList={groupActions} gap={8} />
         </div>

@@ -52,6 +52,8 @@ export default function Favicon({
       className="img-favicon"
       src={renderUrl}
       $size={size}
+      loading="lazy"
+      decoding="async"
       onError={handleError}
     />
   );

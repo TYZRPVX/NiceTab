@@ -123,7 +123,7 @@ export default function Home() {
     return stateUtils.state?.home?.sidebarCollapsed || false;
   });
   const [sidebarWidth, setSidebarWidth] = useState<number>(() => {
-    return stateUtils.state?.home?.sidebarWidth || 280;
+    return stateUtils.state?.home?.sidebarWidth || defaultSidebarWidth;
   });
   const [openedTabsCollapsed, setOpenedTabsCollapsed] = useState<boolean>(() => {
     return stateUtils.state?.home?.rightPanelCollapsed || false;

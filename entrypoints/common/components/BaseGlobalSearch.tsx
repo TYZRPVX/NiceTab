@@ -20,7 +20,12 @@ import {
   ExportOutlined,
 } from '@ant-design/icons';
 import { debounce, groupBy } from 'lodash-es';
-import { pick, sendRuntimeMessage } from '~/entrypoints/common/utils';
+import {
+  getDisplayGroupName,
+  getDisplayTagName,
+  pick,
+  sendRuntimeMessage,
+} from '~/entrypoints/common/utils';
 import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls, eventEmitter } from '~/entrypoints/common/hooks/global';
 import { settingsUtils } from '~/entrypoints/common/storage';
@@ -275,8 +280,10 @@ export function useSearchAction({
               tab?.url?.toLowerCase().includes(searchText)
             ) {
               result.push({
-                ...pick(tag, ['tagId', 'tagName', 'static']),
-                ...pick(group, ['groupId', 'groupName', 'isLocked']),
+                ...pick(tag, ['tagId', 'static']),
+                tagName: getDisplayTagName(tag),
+                ...pick(group, ['groupId', 'isLocked']),
+                groupName: getDisplayGroupName(group),
                 ...pick(tab, ['tabId', 'title', 'url']),
               });
               if (result.length >= GLOBAL_SEARCH_RESULT_LIMIT) return result;

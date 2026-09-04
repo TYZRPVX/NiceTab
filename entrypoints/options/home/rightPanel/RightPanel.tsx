@@ -3,7 +3,7 @@ import { browser, Tabs } from 'wxt/browser';
 import { Empty, Checkbox, Tooltip, Typography, theme } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { CloseOutlined, CoffeeOutlined, QuestionCircleOutlined } from '@ant-design/icons';
-import { isGroupSupported } from '~/entrypoints/common/utils';
+import { getDisplayGroupName, isGroupSupported } from '~/entrypoints/common/utils';
 import { getAdminTabInfo } from '~/entrypoints/common/tabs';
 import {
   TAB_EVENTS,
@@ -34,13 +34,14 @@ export type OpenedGroupDragData = DragData & {
   selectedTabs: Tabs.Tab[];
 };
 
-export default function RightPanel(rightPanelProps: RightPanelLayoutProps) {
+function OpenedTabsContent() {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
-  const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
   const [tabGroupList, setTabGroupList] = useState<TabGroupItemProps[]>([]);
   const [selectedTabIds, setSelectedTabIds] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const tabs = useMemo(() => tabGroupList.flatMap(group => group.tabs), [tabGroupList]);
 
   const selectedTabs = useMemo(() => {
     return tabs.filter(tab => tab.id && selectedTabIds.includes(tab.id));
@@ -52,8 +53,6 @@ export default function RightPanel(rightPanelProps: RightPanelLayoutProps) {
     const allTabs = await browser.tabs.query({ currentWindow: true });
     const { tab: adminTab } = await getAdminTabInfo();
     const _tabs = allTabs.filter(tab => tab.id && tab.id !== adminTab?.id);
-    setTabs(_tabs);
-
     let groupList: TabGroupItemProps[] = [];
     if (!isGroupSupported()) {
       groupList = _tabs.map(tab => ({
@@ -62,29 +61,36 @@ export default function RightPanel(rightPanelProps: RightPanelLayoutProps) {
         tabs: [tab],
       }));
     } else {
-      groupList = _tabs.reduce<TabGroupItemProps[]>((result, tab) => {
+      const groupsById = new Map<number, TabGroupItemProps>();
+      for (const tab of _tabs) {
         const groupId = tab.groupId || -1;
         if (groupId === -1) {
-          return result.concat({ groupId: -1, groupName: '', tabs: [tab] });
+          groupList.push({ groupId: -1, groupName: '', tabs: [tab] });
+          continue;
         }
 
-        const group = result.find(item => item.groupId === groupId);
+        const group = groupsById.get(groupId);
         if (!group) {
-          return result.concat({ groupId, groupName: '', tabs: [tab] });
+          const nextGroup = { groupId, groupName: '', tabs: [tab] };
+          groupsById.set(groupId, nextGroup);
+          groupList.push(nextGroup);
+          continue;
         }
 
         group.tabs.push(tab);
-        return result;
-      }, []);
+      }
 
       if (browser.tabGroups?.get) {
-        for (const group of groupList) {
-          if (group.groupId === -1) continue;
-          const tabGroup = await browser.tabGroups.get(group.groupId);
-          group.groupName = tabGroup?.title || group.groupName;
-          group.collapsed = tabGroup?.collapsed;
-          group.color = tabGroup?.color;
-        }
+        await Promise.all(
+          groupList
+            .filter(group => group.groupId !== -1)
+            .map(async group => {
+              const tabGroup = await browser.tabGroups.get(group.groupId);
+              group.groupName = tabGroup?.title || group.groupName;
+              group.collapsed = tabGroup?.collapsed;
+              group.color = tabGroup?.color;
+            }),
+        );
       }
     }
 
@@ -259,11 +265,7 @@ export default function RightPanel(rightPanelProps: RightPanelLayoutProps) {
   }, []);
 
   return (
-    <StyledRightPanelWrapper
-      className="opened-tabs-panel"
-      {...rightPanelProps}
-      innerContent={
-        <>
+    <>
           <div className="opened-tabs-title">
             {$fmt('common.openedTabs')}
             <Tooltip
@@ -328,7 +330,10 @@ export default function RightPanel(rightPanelProps: RightPanelLayoutProps) {
                     }}
                     mainField="groupId"
                     showDragPreview
-                    previewContent={group.groupName}
+                    previewContent={getDisplayGroupName({
+                      groupName: group.groupName,
+                      tabList: group.tabs,
+                    })}
                   >
                     <TabGroupItem
                       key={~group.groupId || index}
@@ -351,8 +356,26 @@ export default function RightPanel(rightPanelProps: RightPanelLayoutProps) {
               </div>
             )}
           </div>
-        </>
-      }
+    </>
+  );
+}
+
+export default function RightPanel(rightPanelProps: RightPanelLayoutProps) {
+  const { collapsed, autoHide } = rightPanelProps;
+  const [isMounted, setIsMounted] = useState(() => !collapsed && !autoHide);
+
+  useEffect(() => {
+    setIsMounted(!collapsed && !autoHide);
+  }, [collapsed, autoHide]);
+
+  const activate = useCallback(() => setIsMounted(true), []);
+
+  return (
+    <StyledRightPanelWrapper
+      className="opened-tabs-panel"
+      {...rightPanelProps}
+      onActivate={autoHide ? activate : undefined}
+      innerContent={isMounted ? <OpenedTabsContent /> : null}
     />
   );
 }

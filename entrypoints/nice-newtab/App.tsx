@@ -4,7 +4,13 @@ import { PlusOutlined, TagOutlined } from '@ant-design/icons';
 import { ThemeProvider } from 'styled-components';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import type { TabItem } from '~/entrypoints/types';
-import { getRandomId, pick, sendRuntimeMessage } from '~/entrypoints/common/utils';
+import {
+  getDisplayGroupName,
+  getDisplayTagName,
+  getRandomId,
+  pick,
+  sendRuntimeMessage,
+} from '~/entrypoints/common/utils';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { openAdminRoutePage } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
@@ -73,10 +79,10 @@ export default function App() {
           if (g.isStarred) {
             result.push({
               tagId: tag.tagId,
-              tagName: tag.tagName,
+              tagName: getDisplayTagName(tag),
               tagStatic: tag.static,
               groupId: g.groupId,
-              groupName: g.groupName,
+              groupName: getDisplayGroupName(g),
               tabList: [...g.tabList],
             });
           }

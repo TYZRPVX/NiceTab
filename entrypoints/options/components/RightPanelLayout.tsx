@@ -40,6 +40,8 @@ export interface RightPanelLayoutProps {
   onCollapseChange?: (status: boolean) => void;
   /** 宽度变化回调 */
   onWidthChange?: (width: number) => void;
+  /** 自动隐藏面板首次悬停时触发，用于延迟加载内容。 */
+  onActivate?: () => void;
 }
 
 export default function RightPanelLayout({
@@ -53,6 +55,7 @@ export default function RightPanelLayout({
   className,
   onCollapseChange,
   onWidthChange,
+  onActivate,
 }: RightPanelLayoutProps) {
   const { width, onMouseDown, dragHandleRef } = useDragResize({
     initialWidth: initialWidth || defaultRightPanelWidth,
@@ -73,6 +76,7 @@ export default function RightPanelLayout({
           collapsed && 'collapsed',
           autoHide && 'auto-hidden',
         )}
+        onPointerEnter={autoHide ? onActivate : undefined}
       >
         <StyledHandle
           ref={dragHandleRef}
