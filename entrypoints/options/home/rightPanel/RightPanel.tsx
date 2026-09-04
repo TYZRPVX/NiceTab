@@ -373,19 +373,22 @@ function OpenedTabsContent() {
 
 export default function RightPanel(rightPanelProps: RightPanelLayoutProps) {
   const { collapsed, autoHide } = rightPanelProps;
-  const [isMounted, setIsMounted] = useState(() => !collapsed && !autoHide);
+  const hiddenUntilHover = collapsed || autoHide;
+  const [isMounted, setIsMounted] = useState(() => !hiddenUntilHover);
 
   useEffect(() => {
-    setIsMounted(!collapsed && !autoHide);
-  }, [collapsed, autoHide]);
+    setIsMounted(!hiddenUntilHover);
+  }, [hiddenUntilHover]);
 
   const activate = useCallback(() => setIsMounted(true), []);
+  const deactivate = useCallback(() => setIsMounted(false), []);
 
   return (
     <StyledRightPanelWrapper
       className="opened-tabs-panel"
       {...rightPanelProps}
-      onActivate={autoHide ? activate : undefined}
+      onActivate={hiddenUntilHover ? activate : undefined}
+      onDeactivate={hiddenUntilHover ? deactivate : undefined}
       innerContent={isMounted ? <OpenedTabsContent /> : null}
     />
   );

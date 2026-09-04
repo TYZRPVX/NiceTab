@@ -69,6 +69,8 @@ const zhCN = {
   'common.reason': '原因',
   'common.failedReason': '失败原因',
   'common.noData': '暂无',
+  'common.noOpenedTabs': '暂无可显示的标签页',
+  'common.noOpenedTabsHint': '可以显示固定标签页，或前往管理后台查看已保存内容。',
   'common.comingSoon': '敬请期待',
   'common.CopySuccess': '复制成功',
   'common.CopyFailed': '复制失败',

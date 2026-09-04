@@ -21,16 +21,48 @@ export const StyledBaseSidebarWrapper = styled.div<{
     transform: translateX(0);
     border-right: 1px solid var(--nt-border);
     background: var(--nt-page);
-    overflow: hidden;
+    overflow: visible;
     z-index: 10;
 
     &.collapsed {
+      transform: translateX(
+        calc(-1 * var(--sidebar-width, ${defaultSidebarWidth}px) + 20px)
+      );
+      cursor: pointer;
+
       .sidebar-inner-content {
         pointer-events: none;
         visibility: hidden;
         opacity: 0;
       }
-      transform: translateX(calc(-1 * var(--sidebar-width, ${defaultSidebarWidth}px)));
+      .sidebar-action-box {
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .sidebar-collapse-btn {
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      &:hover,
+      &:focus-within {
+        transform: translateX(0);
+        cursor: default;
+
+        .sidebar-inner-content {
+          pointer-events: auto;
+          visibility: visible;
+          opacity: 1;
+        }
+        .sidebar-action-box {
+          visibility: visible;
+          pointer-events: auto;
+        }
+        .sidebar-collapse-btn {
+          visibility: visible;
+          pointer-events: auto;
+        }
+      }
     }
 
     /* 拖拽期间禁用 transition，避免布局滞后于鼠标 */
@@ -51,6 +83,28 @@ export const StyledBaseSidebarWrapper = styled.div<{
       visibility: visible;
       .computing-icon {
         margin-top: 10px;
+      }
+    }
+    .sidebar-collapse-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 12;
+
+      button {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 0;
+        box-shadow: none;
+        color: var(--nt-text-secondary);
+        background: var(--nt-surface-muted);
+        place-items: center;
+      }
+      button:hover {
+        color: ${props => props.theme.colorPrimary};
+        background: var(--nt-accent-soft);
       }
     }
   }
@@ -111,34 +165,24 @@ export const StyledBaseRightPanelWrapper = styled.div<{
     transform: translateX(0);
     border-left: 1px solid var(--nt-border);
     background: var(--nt-page);
-    overflow: hidden;
+    overflow: visible;
     z-index: 10;
 
-    &.collapsed {
+    &.collapsed,
+    &.auto-hidden {
+      transform: translateX(calc(var(--panel-width, ${defaultRightPanelWidth}px) - 20px));
+      cursor: pointer;
+
       .right-panel-inner-content {
         pointer-events: none;
         visibility: hidden;
         opacity: 0;
       }
-      transform: translateX(var(--panel-width, ${defaultRightPanelWidth}px));
-    }
-
-    /* 窄窗口：仅保留边缘提示，悬停时以覆盖层方式展开。 */
-    &.auto-hidden {
-      transform: translateX(calc(var(--panel-width, ${defaultRightPanelWidth}px) - 28px));
-      cursor: pointer;
-
-      &::after {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        width: 10px;
-        content: '';
-        background: var(--nt-accent-soft);
-      }
-
       .right-panel-action-box {
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .right-panel-collapse-btn {
         visibility: hidden;
         pointer-events: none;
       }
@@ -146,17 +190,20 @@ export const StyledBaseRightPanelWrapper = styled.div<{
       &:hover,
       &:focus-within {
         cursor: default;
-        /* 展开后贴齐视口右侧，让指针始终落在面板内。 */
         transform: translateX(0);
-
-        &::after {
-          display: none;
-        }
 
         .right-panel-inner-content {
           pointer-events: auto;
           visibility: visible;
           opacity: 1;
+        }
+        .right-panel-action-box {
+          visibility: visible;
+          pointer-events: auto;
+        }
+        .right-panel-collapse-btn {
+          visibility: visible;
+          pointer-events: auto;
         }
       }
     }
@@ -177,6 +224,28 @@ export const StyledBaseRightPanelWrapper = styled.div<{
       align-items: center;
       justify-content: center;
       visibility: visible;
+    }
+    .right-panel-collapse-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 12;
+
+      button {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 0;
+        box-shadow: none;
+        color: var(--nt-text-secondary);
+        background: var(--nt-surface-muted);
+        place-items: center;
+      }
+      button:hover {
+        color: ${props => props.theme.colorPrimary};
+        background: var(--nt-accent-soft);
+      }
     }
   }
 

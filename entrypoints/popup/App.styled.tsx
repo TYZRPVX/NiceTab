@@ -125,6 +125,30 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
     padding: 12px 0;
     overflow-y: auto;
   }
+  .opened-tabs-empty {
+    flex: 1;
+    display: grid;
+    min-height: 260px;
+    padding: 24px;
+    place-items: center;
+
+    .nicetab-empty {
+      margin: 0;
+    }
+    .empty-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      color: var(--nt-text-secondary);
+      font-size: 12px;
+
+      strong {
+        color: var(--nt-text);
+        font-size: 14px;
+        font-weight: 600;
+      }
+    }
+  }
 `;
 
 export const StyledGroupWrapper = styled.div<{ $color?: string }>`

@@ -132,6 +132,15 @@ export default function Home() {
   const [viewportWidth, setViewportWidth] = useState(() => window.innerWidth);
 
   useEffect(() => {
+    stateUtils.getState('home').then(homeState => {
+      setSidebarCollapsed(!!homeState.sidebarCollapsed);
+      setSidebarWidth(homeState.sidebarWidth || defaultSidebarWidth);
+      setOpenedTabsCollapsed(!!homeState.rightPanelCollapsed);
+      setRightPanelWidth(homeState.rightPanelWidth || defaultRightPanelWidth);
+    });
+  }, []);
+
+  useEffect(() => {
     const handleResize = () => setViewportWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);

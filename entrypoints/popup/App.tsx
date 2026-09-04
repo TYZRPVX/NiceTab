@@ -1,7 +1,16 @@
 import { useContext, useCallback, useEffect, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { ThemeProvider } from 'styled-components';
-import { theme, Space, Dropdown, Button, Switch, type MenuProps, Tooltip } from 'antd';
+import {
+  theme,
+  Space,
+  Dropdown,
+  Button,
+  Switch,
+  Empty,
+  type MenuProps,
+  Tooltip,
+} from 'antd';
 import {
   DownOutlined,
   CompressOutlined,
@@ -66,6 +75,7 @@ export default function App() {
   const { version, themeTypeConfig } = NiceGlobalContext;
   const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
   const [tabGroupList, setTabGroupList] = useState<GroupListItem[]>([]);
+  const [tabsReady, setTabsReady] = useState(false);
   const [modules, setModules] = useState<PopupModuleNames[]>([]);
   const [actionBtns, setActionBtns] = useState<ActionBtnItem[]>([]);
   const [isCompact, setIsCompact] = useState(true);
@@ -216,6 +226,7 @@ export default function App() {
     }
     // console.log('groupList', groupList);
     setTabGroupList(groupList);
+    setTabsReady(true);
   }, []);
 
   const handleTabDiscard = useCallback(
@@ -336,6 +347,8 @@ export default function App() {
     );
   }
 
+  const hasOpenedTabs = tabGroupList.length > 0;
+
   return (
     <ThemeProvider theme={{ ...themeTypeConfig, ...token }}>
       <StyledContainer className="popup-container select-none">
@@ -401,7 +414,7 @@ export default function App() {
                     }
                   })}
               </div>
-              {modules.includes('openedTabs') && tabGroupList.length && (
+              {modules.includes('openedTabs') && hasOpenedTabs && (
                 <PinnedTabsHeaderMarkup isCompact={isCompact} />
               )}
             </>
@@ -493,18 +506,46 @@ export default function App() {
         </div>
 
         {/* 模块-已打开标签页列表 */}
-        {modules.includes('openedTabs') && tabGroupList.length && (
-          <div className="block-opened-tabs">
-            {tabGroupList.map((group, index) => (
-              <TabGroupItem
-                key={~group.groupId || index}
-                group={group}
-                onAction={handleTabAction}
-                onGroupAction={handleGroupAction}
-              ></TabGroupItem>
-            ))}
-          </div>
-        )}
+        {modules.includes('openedTabs') &&
+          tabsReady &&
+          (hasOpenedTabs ? (
+            <div className="block-opened-tabs">
+              {tabGroupList.map((group, index) => (
+                <TabGroupItem
+                  key={~group.groupId || index}
+                  group={group}
+                  onAction={handleTabAction}
+                  onGroupAction={handleGroupAction}
+                ></TabGroupItem>
+              ))}
+            </div>
+          ) : (
+            <div className="opened-tabs-empty">
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={
+                  <div className="empty-copy">
+                    <strong>{$fmt('common.noOpenedTabs')}</strong>
+                    <span>{$fmt('common.noOpenedTabsHint')}</span>
+                  </div>
+                }
+              >
+                <Space wrap>
+                  {!isShowPinnedTabs && (
+                    <Button onClick={() => handlePinnedSwitchChange(true)}>
+                      {$fmt('home.displayPinnedTabs')}
+                    </Button>
+                  )}
+                  <Button
+                    type="primary"
+                    onClick={() => handleQuickJump({ path: '/home' })}
+                  >
+                    {$fmt('common.openAdminTab')}
+                  </Button>
+                </Space>
+              </Empty>
+            </div>
+          ))}
       </StyledContainer>
     </ThemeProvider>
   );

@@ -1,7 +1,34 @@
 import { useCallback } from 'react';
 import { Button, Tooltip } from 'antd';
-import { DoubleRightOutlined, DoubleLeftOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+
+function SidebarPanelIcon({ position }: { position: 'left' | 'right' }) {
+  return (
+    <svg
+      aria-hidden="true"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      focusable="false"
+    >
+      <rect
+        x="3"
+        y="4"
+        width="18"
+        height="16"
+        rx="2.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <path
+        d={position === 'left' ? 'M9 4.5V19.5' : 'M15 4.5V19.5'}
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
 
 export default function ToggleSidebarBtn({
   collapsed = false,
@@ -17,20 +44,15 @@ export default function ToggleSidebarBtn({
 
   const handleToggle = useCallback(() => {
     onCollapseChange?.(!collapsed);
-  }, [collapsed]);
+  }, [collapsed, onCollapseChange]);
 
   return (
     <Tooltip title={label} placement="top" mouseEnterDelay={0.3} destroyTooltipOnHide>
-      <div
-        className="action-icon"
-        style={{
-          transform: `rotate(${position === 'left' ? 0 : 180}deg)`,
-        }}
-        onClick={handleToggle}
-      >
+      <div className="action-icon">
         <Button
           aria-label={label}
-          icon={collapsed ? <DoubleRightOutlined /> : <DoubleLeftOutlined />}
+          icon={<SidebarPanelIcon position={position} />}
+          onClick={handleToggle}
         ></Button>
       </div>
     </Tooltip>

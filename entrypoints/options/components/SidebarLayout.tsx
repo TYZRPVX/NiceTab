@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import styled from 'styled-components';
 import {
   StyledBaseSidebarWrapper,
@@ -51,6 +51,7 @@ export default function SidebarLayout({
   onCollapseChange,
   onWidthChange,
 }: SidebarLayoutProps) {
+  const [hoverExpanded, setHoverExpanded] = useState(false);
   const { width, onMouseDown, dragHandleRef } = useDragResize({
     initialWidth: initialWidth || defaultSidebarWidth,
     currWidth: sidebarWidth || defaultSidebarWidth,
@@ -59,20 +60,34 @@ export default function SidebarLayout({
     onWidthChange,
   });
 
+  useEffect(() => {
+    if (!collapsed) setHoverExpanded(false);
+  }, [collapsed]);
+
   return (
     <StyledBaseSidebarWrapper
       className={className}
       style={{ '--sidebar-width': `${width}px` } as React.CSSProperties}
     >
-      <div className={classNames('sidebar-inner-box', collapsed && 'collapsed')}>
-        <StyledHandle ref={dragHandleRef} $visible={!collapsed} onMouseDown={onMouseDown} />
-        <div className="sidebar-action-box">
-          {showCollapseBtn && (
+      <div
+        className={classNames('sidebar-inner-box', collapsed && 'collapsed')}
+        onPointerEnter={() => collapsed && setHoverExpanded(true)}
+        onPointerLeave={() => collapsed && setHoverExpanded(false)}
+      >
+        <StyledHandle
+          ref={dragHandleRef}
+          $visible={!collapsed}
+          onMouseDown={onMouseDown}
+        />
+        {showCollapseBtn && (
+          <div className="sidebar-collapse-btn">
             <ToggleSidebarBtn collapsed={collapsed} onCollapseChange={onCollapseChange} />
-          )}
-          {sideActionBox}
+          </div>
+        )}
+        <div className="sidebar-action-box">{sideActionBox}</div>
+        <div className="sidebar-inner-content">
+          {(!collapsed || hoverExpanded) && innerContent}
         </div>
-        <div className="sidebar-inner-content">{innerContent}</div>
       </div>
     </StyledBaseSidebarWrapper>
   );

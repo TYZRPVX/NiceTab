@@ -42,6 +42,8 @@ export interface RightPanelLayoutProps {
   onWidthChange?: (width: number) => void;
   /** 自动隐藏面板首次悬停时触发，用于延迟加载内容。 */
   onActivate?: () => void;
+  /** 自动隐藏面板结束悬停时触发，用于卸载内容。 */
+  onDeactivate?: () => void;
 }
 
 export default function RightPanelLayout({
@@ -56,6 +58,7 @@ export default function RightPanelLayout({
   onCollapseChange,
   onWidthChange,
   onActivate,
+  onDeactivate,
 }: RightPanelLayoutProps) {
   const { width, onMouseDown, dragHandleRef } = useDragResize({
     initialWidth: initialWidth || defaultRightPanelWidth,
@@ -76,23 +79,24 @@ export default function RightPanelLayout({
           collapsed && 'collapsed',
           autoHide && 'auto-hidden',
         )}
-        onPointerEnter={autoHide ? onActivate : undefined}
+        onPointerEnter={collapsed || autoHide ? onActivate : undefined}
+        onPointerLeave={collapsed || autoHide ? onDeactivate : undefined}
       >
         <StyledHandle
           ref={dragHandleRef}
           $visible={!collapsed && !autoHide}
           onMouseDown={onMouseDown}
         />
-        <div className="right-panel-action-box">
-          {showCollapseBtn && !autoHide && (
+        {showCollapseBtn && !autoHide && (
+          <div className="right-panel-collapse-btn">
             <ToggleSidebarBtn
               collapsed={collapsed}
               position="right"
               onCollapseChange={onCollapseChange}
             />
-          )}
-          {sideActionBox}
-        </div>
+          </div>
+        )}
+        <div className="right-panel-action-box">{sideActionBox}</div>
         <div className="right-panel-inner-content">{innerContent}</div>
       </div>
     </StyledBaseRightPanelWrapper>
