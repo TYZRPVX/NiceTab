@@ -302,18 +302,6 @@ export default function Home() {
             initialWidth={defaultSidebarWidth}
             onCollapseChange={onCollapseChange}
             onWidthChange={onSidebarWidthChange}
-            sideActionBox={
-              <>
-                <SearchTabsBtn></SearchTabsBtn>
-                {lockTagBtnVisible && (
-                  <ToggleLockedBtn
-                    isLocked={selectedTagData?.isLocked}
-                    onLockStatusChange={onLockStatusChange}
-                  ></ToggleLockedBtn>
-                )}
-                {selectedTagKey ? <SortingBtns onSort={onNameSort}></SortingBtns> : null}
-              </>
-            }
             innerContent={
               <>
                 <div className="tag-list-title">
@@ -344,6 +332,18 @@ export default function Home() {
                     {$fmt('home.tab')} ({countInfo?.tabCount})
                   </li>
                 </ul>
+                <div className="sidebar-context-actions">
+                  <SearchTabsBtn></SearchTabsBtn>
+                  {lockTagBtnVisible && (
+                    <ToggleLockedBtn
+                      isLocked={selectedTagData?.isLocked}
+                      onLockStatusChange={onLockStatusChange}
+                    ></ToggleLockedBtn>
+                  )}
+                  {selectedTagKey ? (
+                    <SortingBtns onSort={onNameSort}></SortingBtns>
+                  ) : null}
+                </div>
                 {/* 顶部操作按钮组 */}
                 <div className="sidebar-action-btns-wrapper">
                   <Space size={12}>

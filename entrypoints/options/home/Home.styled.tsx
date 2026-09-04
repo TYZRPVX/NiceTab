@@ -17,6 +17,8 @@ export const StyledSidebarWrapper = styled(SidebarLayout)<{
       flex-shrink: 0;
       display: flex;
       align-items: center;
+      min-height: 32px;
+      padding-right: 40px;
       gap: 6px;
       font-size: 15px;
       font-weight: 650;
@@ -31,6 +33,15 @@ export const StyledSidebarWrapper = styled(SidebarLayout)<{
       gap: 6px;
       color: var(--nt-text-secondary);
       font-size: 12px;
+    }
+    .sidebar-context-actions {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      min-height: 32px;
+      margin-bottom: 10px;
+      gap: 6px;
     }
     .sidebar-action-btns-wrapper {
       flex-shrink: 0;
@@ -159,6 +170,8 @@ export const StyledRightPanelWrapper = styled(RightPanelLayout)<{
       flex-shrink: 0;
       display: flex;
       align-items: center;
+      min-height: 32px;
+      padding-right: 40px;
       gap: 6px;
       font-weight: 650;
       font-size: 15px;

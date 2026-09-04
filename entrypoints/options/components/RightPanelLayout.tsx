@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import styled from 'styled-components';
 import {
   StyledBaseRightPanelWrapper,
@@ -60,6 +60,8 @@ export default function RightPanelLayout({
   onActivate,
   onDeactivate,
 }: RightPanelLayoutProps) {
+  const hiddenUntilHover = collapsed || autoHide;
+  const [hoverExpanded, setHoverExpanded] = useState(false);
   const { width, onMouseDown, dragHandleRef } = useDragResize({
     initialWidth: initialWidth || defaultRightPanelWidth,
     currWidth: panelWidth || defaultRightPanelWidth,
@@ -67,6 +69,10 @@ export default function RightPanelLayout({
     position: 'right',
     onWidthChange,
   });
+
+  useEffect(() => {
+    if (!hiddenUntilHover) setHoverExpanded(false);
+  }, [hiddenUntilHover]);
 
   return (
     <StyledBaseRightPanelWrapper
@@ -78,9 +84,24 @@ export default function RightPanelLayout({
           'right-panel-inner-box',
           collapsed && 'collapsed',
           autoHide && 'auto-hidden',
+          hoverExpanded && 'hover-expanded',
         )}
-        onPointerEnter={collapsed || autoHide ? onActivate : undefined}
-        onPointerLeave={collapsed || autoHide ? onDeactivate : undefined}
+        onPointerEnter={
+          hiddenUntilHover
+            ? () => {
+                setHoverExpanded(true);
+                onActivate?.();
+              }
+            : undefined
+        }
+        onPointerLeave={
+          hiddenUntilHover
+            ? () => {
+                setHoverExpanded(false);
+                onDeactivate?.();
+              }
+            : undefined
+        }
       >
         <StyledHandle
           ref={dragHandleRef}

@@ -28,6 +28,8 @@ export const StyledBaseSidebarWrapper = styled.div<{
       transform: translateX(
         calc(-1 * var(--sidebar-width, ${defaultSidebarWidth}px) + 20px)
       );
+      border-color: transparent;
+      background: transparent;
       cursor: pointer;
 
       .sidebar-inner-content {
@@ -44,9 +46,10 @@ export const StyledBaseSidebarWrapper = styled.div<{
         pointer-events: none;
       }
 
-      &:hover,
-      &:focus-within {
+      &.hover-expanded {
         transform: translateX(0);
+        border-color: var(--nt-border);
+        background: var(--nt-page);
         cursor: default;
 
         .sidebar-inner-content {
@@ -71,18 +74,19 @@ export const StyledBaseSidebarWrapper = styled.div<{
     }
 
     .sidebar-action-box {
-      position: absolute;
       box-sizing: border-box;
-      top: 16px;
-      right: -36px;
+      flex-shrink: 0;
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       gap: 6px;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-end;
+      min-height: 32px;
+      margin-bottom: 12px;
       visibility: visible;
+
       .computing-icon {
-        margin-top: 10px;
+        margin-left: 10px;
       }
     }
     .sidebar-collapse-btn {
@@ -171,6 +175,8 @@ export const StyledBaseRightPanelWrapper = styled.div<{
     &.collapsed,
     &.auto-hidden {
       transform: translateX(calc(var(--panel-width, ${defaultRightPanelWidth}px) - 20px));
+      border-color: transparent;
+      background: transparent;
       cursor: pointer;
 
       .right-panel-inner-content {
@@ -187,10 +193,11 @@ export const StyledBaseRightPanelWrapper = styled.div<{
         pointer-events: none;
       }
 
-      &:hover,
-      &:focus-within {
+      &.hover-expanded {
         cursor: default;
         transform: translateX(0);
+        border-color: var(--nt-border);
+        background: var(--nt-page);
 
         .right-panel-inner-content {
           pointer-events: auto;

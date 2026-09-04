@@ -70,7 +70,11 @@ export default function SidebarLayout({
       style={{ '--sidebar-width': `${width}px` } as React.CSSProperties}
     >
       <div
-        className={classNames('sidebar-inner-box', collapsed && 'collapsed')}
+        className={classNames(
+          'sidebar-inner-box',
+          collapsed && 'collapsed',
+          hoverExpanded && 'hover-expanded',
+        )}
         onPointerEnter={() => collapsed && setHoverExpanded(true)}
         onPointerLeave={() => collapsed && setHoverExpanded(false)}
       >
@@ -84,9 +88,13 @@ export default function SidebarLayout({
             <ToggleSidebarBtn collapsed={collapsed} onCollapseChange={onCollapseChange} />
           </div>
         )}
-        <div className="sidebar-action-box">{sideActionBox}</div>
         <div className="sidebar-inner-content">
-          {(!collapsed || hoverExpanded) && innerContent}
+          {(!collapsed || hoverExpanded) && (
+            <>
+              {sideActionBox && <div className="sidebar-action-box">{sideActionBox}</div>}
+              {innerContent}
+            </>
+          )}
         </div>
       </div>
     </StyledBaseSidebarWrapper>
