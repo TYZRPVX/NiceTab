@@ -204,9 +204,7 @@ export function SearchListItem({
             </StyledActionIconBtn>
           </div>
         </div>
-        <div className="tab-url" title={option.url}>
-          {option.url}
-        </div>
+        <div className="tab-url">{option.url}</div>
       </div>
     </StyledListItem>
   );

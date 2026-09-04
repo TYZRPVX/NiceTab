@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useCallback, memo, useContext } from 'react';
 import { theme, Dropdown, Tooltip } from 'antd';
-import { CloseOutlined, MenuOutlined, MoreOutlined } from '@ant-design/icons';
+import { CloseOutlined, MoreOutlined } from '@ant-design/icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { getDisplayGroupName, getDisplayTagName } from '~/entrypoints/common/utils';
@@ -250,7 +250,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
                     aria-label={$fmt('common.more')}
                     onClick={e => e.stopPropagation()}
                   >
-                    <MenuOutlined />
+                    <MoreOutlined />
                   </StyledActionIconBtn>
                 </Tooltip>
               </Dropdown>
@@ -275,7 +275,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
                     aria-label={$fmt('common.more')}
                     onClick={e => e.stopPropagation()}
                   >
-                    <MenuOutlined />
+                    <MoreOutlined />
                   </StyledActionIconBtn>
                 </Tooltip>
               </Dropdown>

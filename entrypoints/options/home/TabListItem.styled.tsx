@@ -7,8 +7,8 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
   align-items: center;
   width: 100%;
   box-sizing: border-box;
-  min-height: 34px;
-  padding: 3px 6px;
+  min-height: 36px;
+  padding: 5px 8px;
   border: 1px solid transparent;
   border-radius: var(--nt-radius-sm);
   background: ${props => props.$bgColor || ''};
@@ -17,6 +17,9 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
     border-color 0.15s ease;
   .checkbox-item {
     margin-right: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
   }
   .tab-item-btn {
     display: flex !important;
@@ -29,6 +32,12 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
   &:hover {
     border-color: var(--nt-border);
     background: var(--nt-surface-muted);
+  }
+  &:hover .checkbox-item,
+  &:focus-within .checkbox-item,
+  &.selected .checkbox-item {
+    opacity: 1;
+    pointer-events: auto;
   }
   .img-favicon {
     margin-right: 9px;

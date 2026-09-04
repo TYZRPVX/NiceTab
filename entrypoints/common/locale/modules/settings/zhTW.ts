@@ -85,7 +85,7 @@ const zhTW: Record<LocaleKey, string> = {
   "settings.tabInsertPosition.tooltip": "設定為“頂部”時，分頁將插入到分頁群組的頂部；設定为“底部”時，新分頁將插入到分頁群組的底部。",
   "settings.groupActionBtnStyle": "分頁群組和分頁操作按鈕樣式：",
   "settings.groupActionBtnsCommonlyUsed": "常用的分頁群組操作按鈕設定：",
-  "settings.groupActionBtnsCommonlyUsed.tooltip": "選中的按鈕在外層顯示，未選中的按鈕將折叠到“更多”菜單中",
+  "settings.groupActionBtnsCommonlyUsed.tooltip": "選中的按鈕優先顯示，最多顯示三個，其餘按鈕將折疊到「更多」菜單中",
   "settings.showOpenedTabCount": "是否在擴充功能圖示上選示開啟的分頁數量：",
   "settings.showPageContextMenus": "是否在網頁中顯示NiceTab右鍵菜單：",
   "settings.contextMenuConfig": "右鍵菜單設定：",

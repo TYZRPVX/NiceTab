@@ -1,9 +1,14 @@
-import { useEffect, useRef, useState, useMemo, memo } from 'react';
-import { theme, Skeleton, Modal, Space, Divider, Checkbox } from 'antd';
+import { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
+import { theme, Skeleton, Modal, Space, Divider, Checkbox, Tooltip } from 'antd';
 import type { CheckboxProps } from 'antd';
-import { LockOutlined, StarOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+  LockOutlined,
+  StarOutlined,
+  CloseOutlined,
+  ExportOutlined,
+} from '@ant-design/icons';
 import { GroupItem, TabItem } from '~/entrypoints/types';
-import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
+import ActionIconBtn from '~/entrypoints/common/components/ActionIconBtn';
 import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -13,6 +18,7 @@ import EditInput from '../components/EditInput';
 import TabListItem from './TabListItem';
 import {
   StyledGroupWrapper,
+  StyledGroupStickyHeader,
   StyledGroupHeaderRecycle,
   StyledTabActions,
   StyledTabListWrapper,
@@ -62,7 +68,7 @@ function TabGroup({
   );
 
   const tabListHeight = useMemo(() => {
-    return tabList.length * 28 || 20;
+    return tabList.length * 36 || 24;
   }, [tabList]);
 
   const groupDisplayName = useMemo(
@@ -83,7 +89,7 @@ function TabGroup({
   // 已选择的tabItem数组
   const selectedTabs = useMemo(() => {
     return tabList.filter(tab => selectedTabIds.includes(tab.tabId));
-  }, [selectedTabIds]);
+  }, [tabList, selectedTabIds]);
   // 是否全选
   const isAllChecked = useMemo(() => {
     return tabList.length > 0 && selectedTabIds.length === tabList.length;
@@ -123,16 +129,19 @@ function TabGroup({
     }
   }, [selectedTabs]);
 
-  const handleTabRemove = useCallback((tabs: TabItem[]) => {
-    setSelectedTabIds(selectedTabIds =>
-      selectedTabIds.filter(id => !tabs.some(tab => tab.tabId === id)),
-    );
-    if (onTabRemove) {
-      // 给回收站使用
-      onTabRemove(group.groupId, tabs);
-      return;
-    }
-  }, []);
+  const handleTabRemove = useCallback(
+    (tabs: TabItem[]) => {
+      setSelectedTabIds(selectedTabIds =>
+        selectedTabIds.filter(id => !tabs.some(tab => tab.tabId === id)),
+      );
+      if (onTabRemove) {
+        // 给回收站使用
+        onTabRemove(group.groupId, tabs);
+        return;
+      }
+    },
+    [group.groupId, onTabRemove],
+  );
 
   useEffect(() => {
     let timer = null;
@@ -157,108 +166,131 @@ function TabGroup({
       <StyledGroupWrapper
         className="tab-group-wrapper"
         data-gid={groupId}
-        $bgColor={selected ? token.colorPrimaryBg : token.colorBgContainer}
+        $active={selected}
         ref={groupRef}
-        style={{ paddingTop: '4px' }}
       >
         {/* 标签组 header 展示、操作区域 */}
-        <StyledGroupHeaderRecycle className="group-header select-none">
-          <div className="group-header-top">
-            {(isLocked || isStarred) && (
-              <div className="group-status-wrapper">
-                {isLocked && (
-                  <LockOutlined
-                    style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-                  />
-                )}
-                {isStarred && (
-                  <StarOutlined
-                    style={{ fontSize: '22px', color: token.colorPrimaryHover }}
-                  />
-                )}
+        <StyledGroupStickyHeader $active={selected}>
+          <StyledGroupHeaderRecycle className="group-header select-none">
+            <div className="group-header-top">
+              {(isLocked || isStarred) && (
+                <div className="group-status-wrapper">
+                  {isLocked && (
+                    <LockOutlined
+                      style={{ fontSize: '18px', color: token.colorPrimaryHover }}
+                    />
+                  )}
+                  {isStarred && (
+                    <StarOutlined
+                      style={{ fontSize: '18px', color: token.colorPrimaryHover }}
+                    />
+                  )}
+                </div>
+              )}
+              <div className="group-name-wrapper">
+                <EditInput
+                  value={groupDisplayName || UNNAMED_GROUP}
+                  disabled={!allowGroupActions.includes('rename')}
+                  maxWidth={240}
+                  fontSize={16}
+                  iconSize={16}
+                ></EditInput>
               </div>
-            )}
-            <div className="group-name-wrapper">
-              <EditInput
-                value={groupDisplayName || UNNAMED_GROUP}
-                disabled={!allowGroupActions.includes('rename')}
-                maxWidth={240}
-                fontSize={16}
-                iconSize={16}
-              ></EditInput>
+              <div className="group-info">
+                <span className="tab-count" style={{ color: ENUM_COLORS.volcano }}>
+                  {$fmt({
+                    id: 'home.tab.count',
+                    values: { count: tabList?.length || 0 },
+                  })}
+                </span>
+              </div>
             </div>
-            <div className="group-info">
-              <span className="tab-count" style={{ color: ENUM_COLORS.volcano }}>
-                {$fmt({
-                  id: 'home.tab.count',
-                  values: { count: tabList?.length || 0 },
-                })}
-              </span>
-              <span className="group-create-time">{createTime}</span>
-            </div>
-          </div>
-          <Space
-            className="group-action-btns"
-            size={0}
-            split={<Divider type="vertical" style={{ background: token.colorBorder }} />}
-          >
-            {allowGroupActions.includes('remove') && !isLocked && (
-              <span className="action-btn" onClick={() => setModalVisible(true)}>
-                {$fmt('home.tabGroup.remove')}
-              </span>
-            )}
-            {allowGroupActions.includes('recover') && (
-              <span className="action-btn" onClick={() => setRecoverModalVisible(true)}>
-                {$fmt('home.tabGroup.recover')}
-              </span>
-            )}
-          </Space>
-        </StyledGroupHeaderRecycle>
-
-        {/* tab 选择、操作区域 */}
-        {tabList?.length > 0 && !isLocked && (
-          <StyledTabActions>
-            <div className="checkall-wrapper">
-              <Checkbox
-                checked={isAllChecked}
-                indeterminate={checkAllIndeterminate}
-                onChange={handleSelectAll}
-              ></Checkbox>
-              <span
-                className="selected-count-text"
-                style={{ color: ENUM_COLORS.volcano }}
-              >
-                {`${selectedTabIds.length} / ${tabList?.length}`}
-              </span>
-            </div>
-            {selectedTabIds.length > 0 && (
-              <Space
-                className="tab-action-btns select-none"
-                size={0}
-                split={
-                  <Divider type="vertical" style={{ background: token.colorBorder }} />
-                }
-              >
-                {allowTabActions.includes('open') && (
-                  <span className="action-btn" onClick={handleTabsOpen}>
-                    {$fmt('common.open')}
-                  </span>
-                )}
-                {allowTabActions.includes('remove') && (
-                  <span
+            <div className="group-action-btns">
+              {allowGroupActions.includes('remove') && !isLocked && (
+                <Tooltip
+                  title={$fmt('home.tabGroup.remove')}
+                  placement="top"
+                  mouseEnterDelay={0.3}
+                  destroyTooltipOnHide
+                >
+                  <ActionIconBtn
                     className="action-btn"
-                    onClick={() => {
-                      setSelectedTabIds([]);
-                      handleTabRemove(selectedTabs);
-                    }}
+                    size={16}
+                    hoverColor={ENUM_COLORS.red}
+                    label={$fmt('home.tabGroup.remove')}
+                    btnStyle="icon"
+                    onClick={() => setModalVisible(true)}
                   >
-                    {$fmt('common.remove')}
-                  </span>
-                )}
-              </Space>
-            )}
-          </StyledTabActions>
-        )}
+                    <CloseOutlined />
+                  </ActionIconBtn>
+                </Tooltip>
+              )}
+              {allowGroupActions.includes('recover') && (
+                <Tooltip
+                  title={$fmt('home.tabGroup.recover')}
+                  placement="top"
+                  mouseEnterDelay={0.3}
+                  destroyTooltipOnHide
+                >
+                  <ActionIconBtn
+                    className="action-btn"
+                    size={16}
+                    label={$fmt('home.tabGroup.recover')}
+                    btnStyle="icon"
+                    onClick={() => setRecoverModalVisible(true)}
+                  >
+                    <ExportOutlined />
+                  </ActionIconBtn>
+                </Tooltip>
+              )}
+            </div>
+          </StyledGroupHeaderRecycle>
+
+          {/* tab 选择、操作区域 */}
+          {tabList?.length > 0 && !isLocked && (
+            <StyledTabActions>
+              <div className="checkall-wrapper">
+                <Checkbox
+                  checked={isAllChecked}
+                  indeterminate={checkAllIndeterminate}
+                  onChange={handleSelectAll}
+                ></Checkbox>
+                <span
+                  className="selected-count-text"
+                  style={{ color: ENUM_COLORS.volcano }}
+                >
+                  {`${selectedTabIds.length} / ${tabList?.length}`}
+                </span>
+              </div>
+              {selectedTabIds.length > 0 && (
+                <Space
+                  className="tab-action-btns select-none"
+                  size={0}
+                  split={
+                    <Divider type="vertical" style={{ background: token.colorBorder }} />
+                  }
+                >
+                  {allowTabActions.includes('open') && (
+                    <span className="action-btn" onClick={handleTabsOpen}>
+                      {$fmt('common.open')}
+                    </span>
+                  )}
+                  {allowTabActions.includes('remove') && (
+                    <span
+                      className="action-btn"
+                      onClick={() => {
+                        setSelectedTabIds([]);
+                        handleTabRemove(selectedTabs);
+                      }}
+                    >
+                      {$fmt('common.remove')}
+                    </span>
+                  )}
+                </Space>
+              )}
+            </StyledTabActions>
+          )}
+        </StyledGroupStickyHeader>
 
         {/* tab 列表 */}
         <StyledTabListWrapper
@@ -276,6 +308,7 @@ function TabGroup({
                 tag={{ isLocked: false }}
                 group={group}
                 {...tab}
+                selected={selectedTabIds.includes(tab.tabId)}
                 onRemove={handleTabRemove}
                 onChange={onTabChange}
               />

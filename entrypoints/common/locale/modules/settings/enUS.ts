@@ -97,7 +97,7 @@ const enUS: Record<LocaleKey, string> = {
   /* 展示配置 */
   'settings.groupActionBtnStyle': 'Action button style (for tab groups and tabs):',
   'settings.groupActionBtnsCommonlyUsed': 'Configure commonly used tab group action buttons:',
-  'settings.groupActionBtnsCommonlyUsed.tooltip': 'Selected buttons will be displayed prominently, while unselected ones will be collapsed into the "More" menu.',
+  'settings.groupActionBtnsCommonlyUsed.tooltip': 'Selected buttons are shown first. Up to three are displayed; the rest are collapsed into the "More" menu.',
   'settings.showOpenedTabCount': 'Display the number of open tabs on the extension icon?',
   'settings.showPageContextMenus': 'Display ContextMenu on your webpage?',
   'settings.contextMenuConfig': 'Configure ContextMenu items:',

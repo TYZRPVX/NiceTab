@@ -18,7 +18,7 @@ import {
   FolderOpenOutlined,
   FolderAddOutlined,
   QuestionCircleOutlined,
-  MenuOutlined,
+  MoreOutlined,
   ClearOutlined,
 } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -229,16 +229,6 @@ export default function Home() {
     [selectedTagKey],
   );
 
-  // 按创建时间排序
-  const onCreateTimeSort = useCallback(
-    async (sortType: string) => {
-      if (!selectedTagKey) return;
-      await tabListUtils.groupListSortbyCreateTime(sortType, selectedTagKey);
-      refreshTreeData();
-    },
-    [selectedTagKey],
-  );
-
   const lockTagBtnVisible = useMemo(() => {
     return !selectedTagData?.static;
   }, [selectedTagData]);
@@ -313,12 +303,6 @@ export default function Home() {
                   ></ToggleLockedBtn>
                 )}
                 {selectedTagKey ? <SortingBtns onSort={onNameSort}></SortingBtns> : null}
-                {selectedTagKey ? (
-                  <SortingBtns
-                    sortBy="createTime"
-                    onSort={onCreateTimeSort}
-                  ></SortingBtns>
-                ) : null}
               </>
             }
             innerContent={
@@ -413,7 +397,7 @@ export default function Home() {
                         $size="18"
                         aria-label={$fmt('common.more')}
                       >
-                        <MenuOutlined />
+                        <MoreOutlined />
                       </StyledActionIconBtn>
                     </Tooltip>
                   </Dropdown>

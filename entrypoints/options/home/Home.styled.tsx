@@ -192,22 +192,6 @@ export const StyledRightPanelWrapper = styled(RightPanelLayout)<{
 
 export const StyledGroupList = styled.div`
   min-width: 0;
-  .count-info {
-    box-sizing: border-box;
-    width: fit-content;
-    display: flex;
-    align-items: center;
-    padding: 6px 10px;
-    margin-bottom: 16px;
-    border: 1px solid var(--nt-border);
-    border-radius: 999px;
-    background: var(--nt-surface);
-    color: var(--nt-text-secondary);
-    font-size: 12px;
-    .count-item {
-      margin-right: 6px;
-    }
-  }
   .no-data {
     display: flex;
     min-height: 260px;

@@ -1,4 +1,5 @@
 import type { TreeProps } from 'antd';
+import dayjs from 'dayjs';
 import {
   PushpinOutlined,
   TagOutlined,
@@ -12,8 +13,179 @@ import {
   getLocaleMessages,
   newCreateTime,
 } from '~/entrypoints/common/utils';
-import type { TagItem } from '~/entrypoints/types';
+import type { GroupItem, TagItem } from '~/entrypoints/types';
 import type { TreeDataNodeUnion, MoveDataProps, CascaderOption } from './types';
+
+export type ListEntry =
+  | {
+      type: 'day';
+      key: string;
+      dayKey: string | null;
+    }
+  | {
+      type: 'starred';
+      key: 'starred';
+    }
+  | {
+      type: 'tag';
+      key: string;
+      tagId: string;
+    }
+  | {
+      type: 'group';
+      key: string;
+      groupId: string;
+      tagId?: string;
+    };
+
+export type RecycleGroupSource = {
+  tagId: string;
+  groupId: string;
+  createTime?: string;
+};
+
+const getCreateTimestamp = (createTime?: string) => {
+  if (!createTime?.trim()) return null;
+
+  const value = dayjs(createTime);
+  const timestamp = value.valueOf();
+  return value.isValid() && Number.isFinite(timestamp) ? timestamp : null;
+};
+
+export const getDayKey = (createTime?: string) => {
+  if (getCreateTimestamp(createTime) === null) return null;
+  return dayjs(createTime).format('YYYY-MM-DD');
+};
+
+// Sort date buckets while keeping the source order within each day.
+const sortByDayDesc = <T extends { createTime?: string }>(items: T[]) => {
+  return items
+    .map((item, index) => ({
+      item,
+      index,
+      dayKey: getDayKey(item.createTime),
+    }))
+    .sort((a, b) => {
+      if (a.dayKey === null && b.dayKey === null) return a.index - b.index;
+      if (a.dayKey === null) return 1;
+      if (b.dayKey === null) return -1;
+      return b.dayKey.localeCompare(a.dayKey) || a.index - b.index;
+    })
+    .map(({ item }) => item);
+};
+
+const sortByCreateTimeDesc = <T extends { createTime?: string }>(items: T[]) => {
+  return items
+    .map((item, index) => ({
+      item,
+      index,
+      timestamp: getCreateTimestamp(item.createTime),
+    }))
+    .sort((a, b) => {
+      if (a.timestamp === null && b.timestamp === null) return a.index - b.index;
+      if (a.timestamp === null) return 1;
+      if (b.timestamp === null) return -1;
+      return b.timestamp - a.timestamp || a.index - b.index;
+    })
+    .map(({ item }) => item);
+};
+
+const appendDateGroupedEntries = (
+  entries: ListEntry[],
+  groups: Array<{ groupId: string; createTime?: string; tagId?: string }>,
+) => {
+  let currentDayToken: string | undefined;
+
+  groups.forEach(group => {
+    const dayKey = getDayKey(group.createTime);
+    const dayToken = dayKey || '__unknown__';
+
+    if (dayToken !== currentDayToken) {
+      entries.push({
+        type: 'day',
+        key: `day:${dayToken}`,
+        dayKey,
+      });
+      currentDayToken = dayToken;
+    }
+
+    entries.push({
+      type: 'group',
+      key: group.tagId
+        ? `group:${group.tagId}:${group.groupId}`
+        : `group:${group.groupId}`,
+      groupId: group.groupId,
+      tagId: group.tagId,
+    });
+  });
+};
+
+export const getHomeListEntries = (
+  groups: Array<Pick<GroupItem, 'groupId' | 'createTime' | 'isStarred'>>,
+): ListEntry[] => {
+  const entries: ListEntry[] = [];
+  const starredGroups = groups.filter(group => group.isStarred);
+
+  if (starredGroups.length > 0) {
+    entries.push({ type: 'starred', key: 'starred' });
+    starredGroups.forEach(group => {
+      entries.push({
+        type: 'group',
+        key: `group:${group.groupId}`,
+        groupId: group.groupId,
+      });
+    });
+  }
+
+  appendDateGroupedEntries(
+    entries,
+    sortByDayDesc(groups.filter(group => !group.isStarred)),
+  );
+
+  return entries;
+};
+
+export const getRecycleListEntries = (groups: RecycleGroupSource[]): ListEntry[] => {
+  const entries: ListEntry[] = [];
+  const sortedGroups = sortByCreateTimeDesc(groups);
+  let currentDayToken: string | undefined;
+  let previousTagId: string | undefined;
+  let tagBlockIndex = 0;
+
+  sortedGroups.forEach(group => {
+    const dayKey = getDayKey(group.createTime);
+    const dayToken = dayKey || '__unknown__';
+
+    if (dayToken !== currentDayToken) {
+      entries.push({
+        type: 'day',
+        key: `day:${dayToken}`,
+        dayKey,
+      });
+      currentDayToken = dayToken;
+      previousTagId = undefined;
+    }
+
+    if (group.tagId !== previousTagId) {
+      entries.push({
+        type: 'tag',
+        key: `tag:${dayToken}:${group.tagId}:${tagBlockIndex}`,
+        tagId: group.tagId,
+      });
+      previousTagId = group.tagId;
+      tagBlockIndex += 1;
+    }
+
+    entries.push({
+      type: 'group',
+      key: `group:${group.tagId}:${group.groupId}`,
+      groupId: group.groupId,
+      tagId: group.tagId,
+    });
+  });
+
+  return entries;
+};
 
 // 生成treeData
 export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {

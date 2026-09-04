@@ -15,7 +15,7 @@ import {
   CloseOutlined,
   EditOutlined,
   QrcodeOutlined,
-  MenuOutlined,
+  MoreOutlined,
   CopyOutlined,
 } from '@ant-design/icons';
 import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
@@ -37,6 +37,8 @@ type TabItemProps = TabItem & {
   tag: Pick<TagItem, 'isLocked' | 'isStarred'>;
   group: Pick<GroupItem, 'groupId' | 'isLocked' | 'isStarred'>;
   highlight?: boolean;
+  selected?: boolean;
+  showItemActions?: boolean;
   onRemove?: (tabs: TabItem[]) => void;
   onChange?: (data: TabItem) => void;
   onCopy?: (tabs: TabItem[]) => void;
@@ -60,6 +62,8 @@ export default memo(function TabListItem({
   tag,
   group,
   highlight,
+  selected = false,
+  showItemActions = true,
   onRemove,
   onChange,
   onCopy,
@@ -237,54 +241,61 @@ export default memo(function TabListItem({
         className={classNames(
           'tab-list-item select-none',
           (tag?.isLocked || group?.isLocked) && 'locked',
+          selected && 'selected',
         )}
         ref={tabRef}
         data-id={tabId}
         $bgColor={highlight ? token.colorWarningHover : ''}
       >
-        {/* icon tab remove */}
-        <Tooltip
-          title={$fmt('common.remove')}
-          placement="top"
-          mouseEnterDelay={0.3}
-          destroyTooltipOnHide
-        >
-          <StyledActionIconBtn
-            className="tab-item-btn btn-remove"
-            $size="16"
-            aria-label={$fmt('common.remove')}
-            $hoverColor={ENUM_COLORS.red}
-            onClick={handleTabRemove}
-          >
-            <CloseOutlined />
-          </StyledActionIconBtn>
-        </Tooltip>
+        {showItemActions && (
+          <>
+            {/* icon tab remove */}
+            <Tooltip
+              title={$fmt('common.remove')}
+              placement="top"
+              mouseEnterDelay={0.3}
+              destroyTooltipOnHide
+            >
+              <StyledActionIconBtn
+                className="tab-item-btn btn-remove"
+                $size="16"
+                aria-label={$fmt('common.remove')}
+                $hoverColor={ENUM_COLORS.red}
+                onClick={handleTabRemove}
+              >
+                <CloseOutlined />
+              </StyledActionIconBtn>
+            </Tooltip>
+          </>
+        )}
         {/* checkbox */}
         <Checkbox
           className="checkbox-item"
           value={tab.tabId}
           onChange={handleSelectChange}
         ></Checkbox>
-        <Tooltip
-          title={$fmt('common.more')}
-          placement="top"
-          mouseEnterDelay={0.3}
-          destroyTooltipOnHide
-        >
-          <Dropdown
-            menu={{ items: moreItems, onClick: onMoreItemClick }}
-            trigger={['click']}
-            destroyPopupOnHide
+        {showItemActions && (
+          <Tooltip
+            title={$fmt('common.more')}
+            placement="top"
+            mouseEnterDelay={0.3}
+            destroyTooltipOnHide
           >
-            <StyledActionIconBtn
-              className="tab-item-btn btn-more"
-              $size="16"
-              aria-label={$fmt('common.more')}
+            <Dropdown
+              menu={{ items: moreItems, onClick: onMoreItemClick }}
+              trigger={['click']}
+              destroyPopupOnHide
             >
-              <MenuOutlined />
-            </StyledActionIconBtn>
-          </Dropdown>
-        </Tooltip>
+              <StyledActionIconBtn
+                className="tab-item-btn btn-more"
+                $size="16"
+                aria-label={$fmt('common.more')}
+              >
+                <MoreOutlined />
+              </StyledActionIconBtn>
+            </Dropdown>
+          </Tooltip>
+        )}
 
         {/* icon tab favicon */}
         <Favicon pageUrl={tab.url!} favIconUrl={tab.favIconUrl}></Favicon>

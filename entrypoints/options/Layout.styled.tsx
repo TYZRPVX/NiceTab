@@ -11,18 +11,16 @@ export const StyledBaseSidebarWrapper = styled.div<{
 
   .sidebar-inner-box {
     box-sizing: border-box;
-    width: calc(var(--sidebar-width, ${defaultSidebarWidth}px) - 32px);
-    height: calc(100vh - 112px);
+    width: var(--sidebar-width, ${defaultSidebarWidth}px);
+    height: calc(100vh - 64px);
     position: fixed;
-    top: 80px;
-    left: 16px;
-    padding: 16px 12px;
+    top: 64px;
+    left: 0;
+    padding: 20px 16px;
     transition: transform 0.2s ease-in-out;
     transform: translateX(0);
-    border: 1px solid var(--nt-border);
-    border-radius: var(--nt-radius-lg);
-    box-shadow: var(--nt-shadow-sm);
-    background: var(--nt-surface);
+    border-right: 1px solid var(--nt-border);
+    background: var(--nt-page);
     overflow: hidden;
     z-index: 10;
 
@@ -43,7 +41,7 @@ export const StyledBaseSidebarWrapper = styled.div<{
     .sidebar-action-box {
       position: absolute;
       box-sizing: border-box;
-      top: 0;
+      top: 16px;
       right: -36px;
       display: flex;
       flex-direction: column;
@@ -103,18 +101,16 @@ export const StyledBaseRightPanelWrapper = styled.div<{
 
   .right-panel-inner-box {
     box-sizing: border-box;
-    width: calc(var(--panel-width, ${defaultRightPanelWidth}px) - 32px);
-    height: calc(100vh - 112px);
+    width: var(--panel-width, ${defaultRightPanelWidth}px);
+    height: calc(100vh - 64px);
     position: fixed;
-    top: 80px;
-    right: 16px;
-    padding: 16px 12px;
+    top: 64px;
+    right: 0;
+    padding: 20px 16px;
     transition: transform 0.2s ease-in-out;
     transform: translateX(0);
-    border: 1px solid var(--nt-border);
-    border-radius: var(--nt-radius-lg);
-    box-shadow: var(--nt-shadow-sm);
-    background: var(--nt-surface);
+    border-left: 1px solid var(--nt-border);
+    background: var(--nt-page);
     overflow: hidden;
     z-index: 10;
 
@@ -129,9 +125,7 @@ export const StyledBaseRightPanelWrapper = styled.div<{
 
     /* 窄窗口：仅保留边缘提示，悬停时以覆盖层方式展开。 */
     &.auto-hidden {
-      transform: translateX(
-        calc(var(--panel-width, ${defaultRightPanelWidth}px) - 28px)
-      );
+      transform: translateX(calc(var(--panel-width, ${defaultRightPanelWidth}px) - 28px));
       cursor: pointer;
 
       &::after {
@@ -142,7 +136,6 @@ export const StyledBaseRightPanelWrapper = styled.div<{
         width: 10px;
         content: '';
         background: var(--nt-accent-soft);
-        border-radius: var(--nt-radius-lg) 0 0 var(--nt-radius-lg);
       }
 
       .right-panel-action-box {
@@ -154,7 +147,7 @@ export const StyledBaseRightPanelWrapper = styled.div<{
       &:focus-within {
         cursor: default;
         /* 展开后贴齐视口右侧，让指针始终落在面板内。 */
-        transform: translateX(16px);
+        transform: translateX(0);
 
         &::after {
           display: none;
@@ -176,7 +169,7 @@ export const StyledBaseRightPanelWrapper = styled.div<{
     .right-panel-action-box {
       position: absolute;
       box-sizing: border-box;
-      top: 0;
+      top: 16px;
       left: -36px;
       display: flex;
       flex-direction: column;

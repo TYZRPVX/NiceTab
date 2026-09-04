@@ -14,7 +14,6 @@ import {
   CoffeeOutlined,
   CloudSyncOutlined,
   ReloadOutlined,
-  GithubOutlined,
 } from '@ant-design/icons';
 import { sendRuntimeMessage, isGroupSupported } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
@@ -32,7 +31,6 @@ import { settingsUtils, stateUtils } from '~/entrypoints/common/storage';
 import { TAB_EVENTS, SHORTCUTS_PAGE_URL } from '~/entrypoints/common/constants';
 import type { PopupModuleNames } from '~/entrypoints/types';
 import {
-  GITHUB_URL,
   THEME_COLORS,
   ENUM_SETTINGS_PROPS,
   ENUM_ACTION_NAME,
@@ -358,17 +356,6 @@ export default function App() {
           {isCompact ? (
             <>
               <div className="compact-toolbar">
-                {/* GitHub */}
-                <Tooltip title={$fmt('common.goToGithub')} placement="bottom">
-                  <Button
-                    type="text"
-                    icon={<GithubOutlined />}
-                    onClick={() =>
-                      openNewTab(GITHUB_URL, { active: true, openToNext: true })
-                    }
-                  />
-                </Tooltip>
-
                 {/* Goto Actions */}
                 {modules.includes('goto') &&
                   quickJumpBtns
@@ -420,19 +407,6 @@ export default function App() {
             </>
           ) : (
             <>
-              {/* 该模块不会渲染，目前未配置模块时，单击扩展图标会直接发送所有标签页，不会打开popup面板 */}
-              {!modules.length && (
-                <div className="block quick-actions">
-                  <span
-                    className="action-btn"
-                    onClick={() =>
-                      openNewTab(GITHUB_URL, { active: true, openToNext: true })
-                    }
-                  >
-                    {$fmt('common.goToGithub')}
-                  </span>
-                </div>
-              )}
               {/* 模块-扩展信息 */}
               {modules.includes('extensionInfo') && (
                 <div className="block version">

@@ -25,6 +25,8 @@ import type { GroupActionName } from '../types';
 import { defaultGroupActions, groupActionOptions, type ActionOption } from '../constants';
 
 const { GROUP_ACTION_BTNS_COMMONLY_USED } = ENUM_SETTINGS_PROPS;
+const MAX_VISIBLE_GROUP_ACTIONS = 3;
+const DEFAULT_VISIBLE_GROUP_ACTIONS: GroupActionName[] = ['restore', 'lock', 'star'];
 
 export function copyLinksToClipboard(
   tabList: TabItem[],
@@ -199,9 +201,26 @@ export default function useGroupActions({
       innerList: ActionOptionItem[] = [];
 
     const groupActionBtnOptions = getGroupActionOptions();
+    const configuredCommonActions = settings[GROUP_ACTION_BTNS_COMMONLY_USED];
+    const commonActionKeys = Array.isArray(configuredCommonActions)
+      ? configuredCommonActions
+      : DEFAULT_VISIBLE_GROUP_ACTIONS;
+    const commonActionKeySet = new Set(commonActionKeys);
+    const visibleActions = groupActionBtnOptions
+      .filter(item => commonActionKeySet.has(item.key))
+      .sort((a, b) => {
+        const aIndex = DEFAULT_VISIBLE_GROUP_ACTIONS.indexOf(a.key as GroupActionName);
+        const bIndex = DEFAULT_VISIBLE_GROUP_ACTIONS.indexOf(b.key as GroupActionName);
+        if (aIndex === -1 && bIndex === -1) return 0;
+        if (aIndex === -1) return 1;
+        if (bIndex === -1) return -1;
+        return aIndex - bIndex;
+      })
+      .slice(0, MAX_VISIBLE_GROUP_ACTIONS);
+    const visibleActionKeys = new Set(visibleActions.map(item => item.key));
 
     groupActionBtnOptions.forEach(item => {
-      if (settings[GROUP_ACTION_BTNS_COMMONLY_USED]?.includes(item.key)) {
+      if (visibleActionKeys.has(item.key)) {
         outerList.push(item);
       } else {
         innerList.push(item);

@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { PRIMARY_COLOR } from '~/entrypoints/common/constants';
 import { StyledThemeProps } from '~/entrypoints/types';
 
 export const StyledEmptyBox = styled.div`
@@ -20,34 +19,34 @@ export const StyledRecycleBinWrapper = styled.div`
 export const StyledTagNode = styled.div<{ theme: StyledThemeProps }>`
   display: flex;
   align-items: center;
-  padding-left: 4px;
-  gap: 12px;
+  min-width: 0;
+  min-height: 32px;
+  padding: 0 4px;
+  gap: 8px;
   .tag-name {
-    flex-shrink: 0;
-    font-size: 20px;
+    min-width: 0;
+    overflow: hidden;
+    flex: 0 1 auto;
+    font-size: 16px;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: ${props => props.theme.colorText || '#333'};
   }
   .count {
-    margin-right: 8px;
-    font-size: 14px;
-  }
-  .tag-create-time {
-    font-size: 14px;
+    flex: 0 0 auto;
+    font-size: 12px;
     color: ${props => props.theme.colorTextTertiary || '#999'};
   }
   .action-btns {
-    padding: 0 8px;
-    border-radius: 4px;
-    background: ${props => props.theme.colorBgContainer || '#fff'};
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    gap: 4px;
+    margin-left: auto;
     .action-btn {
       display: flex;
       align-items: center;
-      font-size: 14px;
-      color: ${props => props.theme.colorTextSecondary || '#333'};
-      cursor: pointer;
-      &:hover {
-        color: ${props => props.theme.colorPrimary || PRIMARY_COLOR};
-      }
     }
   }
 `;

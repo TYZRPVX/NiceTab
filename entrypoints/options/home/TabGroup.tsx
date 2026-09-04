@@ -158,11 +158,6 @@ function TabGroup({
     [groupName, tabList],
   );
 
-  const displayCreateTime = useMemo(
-    () => createTime?.replace(/:\d{2}$/, '') || '',
-    [createTime],
-  );
-
   // 框选相关状态
   useMultiSelection({
     groupData: group,
@@ -440,7 +435,7 @@ function TabGroup({
     onAction: handleGroupAction,
   });
 
-  const selectedTabsActions: ActionOptionItem[] = useMemo(() => {
+  const selectedTabsActions = useMemo(() => {
     const actionMap = tabsActionOptions.reduce(
       (result, option) => {
         result[option.actionName] = option;
@@ -449,7 +444,7 @@ function TabGroup({
       {} as Record<TabActionName, ActionOption<'tab'>>,
     );
 
-    return [
+    const actions = [
       {
         key: 'remove',
         label: $fmt(actionMap['remove'].labelKey),
@@ -485,6 +480,12 @@ function TabGroup({
         onClick: handleSelectedTabsCopy,
       },
     ].filter(item => allowTabActions.includes(item.key as TabActionName));
+
+    const directlyVisibleKeys = new Set(['open', 'remove']);
+    return {
+      outerList: actions.filter(item => directlyVisibleKeys.has(item.key)),
+      innerList: actions.filter(item => !directlyVisibleKeys.has(item.key)),
+    };
   }, [
     $fmt,
     allowTabActions,
@@ -515,7 +516,12 @@ function TabGroup({
       >
         {/* 标签组 header + tab 操作区域（sticky 置顶） */}
         <StyledGroupStickyHeader $bgColor={token.colorBgContainer} $active={selected}>
-          <StyledGroupHeader className="group-header select-none">
+          <StyledGroupHeader
+            className={classNames(
+              'group-header select-none',
+              selectedTabIds.length > 0 && 'has-selection',
+            )}
+          >
             <div className="group-header-top">
               {(isLocked || isStarred) && (
                 <div className="group-status-wrapper">
@@ -552,9 +558,6 @@ function TabGroup({
                     values: { count: tabList?.length || 0 },
                   })}
                 </span>
-                <span className="group-create-time" title={createTime || ''}>
-                  {displayCreateTime}
-                </span>
               </div>
               {tabList.length > 0 && (
                 <Checkbox
@@ -587,7 +590,7 @@ function TabGroup({
               <div className="tab-selection-actions">
                 <ActionBtnList
                   actionBtnStyle="text"
-                  outerList={selectedTabsActions}
+                  {...selectedTabsActions}
                 ></ActionBtnList>
               </div>
             </StyledTabActions>
@@ -607,7 +610,7 @@ function TabGroup({
           <StyledTabListWrapper
             ref={tabListRef}
             className={classNames('tab-list-wrapper', isLocked && 'locked')}
-            style={{ minHeight: `${Math.max(tabListLocal.length * 28, 20)}px` }}
+            style={{ minHeight: `${Math.max(tabListLocal.length * 36, 24)}px` }}
           >
             <Checkbox.Group
               className="tab-list-checkbox-group"
@@ -642,6 +645,8 @@ function TabGroup({
                     tag={tag}
                     group={group}
                     {...tab}
+                    selected={selectedTabIds.includes(tab.tabId)}
+                    showItemActions={false}
                     highlight={
                       (tab.tabId != undefined &&
                         treeDataHook?.highlightTabId === tab.tabId) ||

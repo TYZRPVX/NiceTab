@@ -20,7 +20,8 @@ import type { TreeDataNodeTag, TreeDataNodeTabGroup, MoveToCallbackProps } from 
 import { StyledGroupList } from './Home.styled';
 import TabGroup from './TabGroup';
 import { HomeContext } from './hooks/treeData';
-import { getSelectedCounts } from './utils';
+import DayDivider from './components/DayDivider';
+import { getHomeListEntries, type ListEntry } from './utils';
 
 const ListItem = memo(
   ({ tabGroup, group }: { tabGroup: TreeDataNodeTabGroup; group: GroupItem }) => {
@@ -115,11 +116,12 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   const selectedTabGroupRef = useRef<HTMLDivElement>(null);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
 
-  const counts = useMemo(() => {
-    return getSelectedCounts(selectedTagData);
-  }, [selectedTagData]);
-
   const groups = selectedTagData?.groupList || [];
+  const listEntries = useMemo(() => getHomeListEntries(groups), [groups]);
+  const groupById = useMemo(
+    () => new Map(groups.map(group => [group.groupId, group])),
+    [groups],
+  );
   const canCreateGroup = !!selectedTagKey && !selectedTagData?.isLocked;
   const handleCreateGroup = useCallback(() => {
     if (canCreateGroup) handleTabGroupCreate(selectedTagKey!);
@@ -132,20 +134,22 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   );
 
   const initialConfig = useMemo(() => {
-    const index =
-      selectedTag?.children?.findIndex(group => group.key === selectedTabGroupKey) || 0;
+    const index = listEntries.findIndex(
+      entry => entry.type === 'group' && entry.groupId === selectedTabGroupKey,
+    );
     return {
       index: index > -1 ? index : 0,
       align: 'start',
       behavior: 'auto',
       offset: -180,
     } as FlatIndexLocationWithAlign;
-  }, [selectedTag, selectedTabGroupKey]);
+  }, [listEntries, selectedTabGroupKey]);
   const [prevSelectedTagKey, setPrevSelectedTagKey] = useState(selectedTagKey);
   const scrollHandler = useCallback(() => {
     if (virtual && virtuosoRef.current) {
-      const index =
-        selectedTag?.children?.findIndex(group => group.key === selectedTabGroupKey) || 0;
+      const index = listEntries.findIndex(
+        entry => entry.type === 'group' && entry.groupId === selectedTabGroupKey,
+      );
       virtuosoRef.current?.scrollToIndex({
         index: index > -1 ? index : 0,
         align: 'start',
@@ -166,18 +170,38 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
         body.scrollTo(0, groupTop + pagePaddingTop - window.innerHeight + 400);
       }
     }
-  }, [virtual, selectedTag, selectedTabGroupKey]);
+  }, [listEntries, selectedTabGroupKey, virtual]);
+
+  const renderListEntry = useCallback(
+    (entry: ListEntry) => {
+      if (entry.type === 'day') {
+        return <DayDivider key={entry.key} dayKey={entry.dayKey} />;
+      }
+      if (entry.type === 'starred') {
+        return <DayDivider key={entry.key} starred />;
+      }
+      if (entry.type !== 'group') return null;
+
+      const group = groupById.get(entry.groupId);
+      const tabGroup = getTreeGroup(entry.groupId);
+      return group && tabGroup ? (
+        <ListItem key={entry.key} tabGroup={tabGroup} group={group} />
+      ) : null;
+    },
+    [getTreeGroup, groupById],
+  );
 
   useEffect(() => {
     if (selectedTagKey === prevSelectedTagKey) {
       scrollHandler();
     } else {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setPrevSelectedTagKey(selectedTagKey);
         scrollHandler();
       }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [selectedTagKey, selectedTabGroupKey]);
+  }, [prevSelectedTagKey, scrollHandler, selectedTagKey]);
 
   return (
     <StyledGroupList className="main-content-wrapper">
@@ -186,16 +210,6 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
           <Typography.Text type="warning">{$fmt('home.tip.tooManyTabs')}</Typography.Text>
         </div>
       )} */}
-      <div className="count-info">
-        <span className="count-item">{$fmt('home.tag.countInfo')}：</span>
-        <span className="count-item">
-          {$fmt('home.tabGroup')} ({counts?.groupCount})
-        </span>
-        <span className="count-item">
-          {$fmt('home.tab')} ({counts?.tabCount})
-        </span>
-      </div>
-
       {!loading && groups.length === 0 ? (
         <div className="no-data">
           <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={$fmt('home.emptyTip')}>
@@ -218,22 +232,24 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
           initialTopMostItemIndex={initialConfig}
           overscan={4}
           increaseViewportBy={{ top: 320, bottom: 320 }}
-          data={groups}
-          itemContent={(_index, group) => {
-            const tabGroup = getTreeGroup(group.groupId);
-            return tabGroup ? <ListItem tabGroup={tabGroup} group={group} /> : null;
-          }}
+          data={listEntries}
+          computeItemKey={(_index, entry) => entry.key}
+          itemContent={(_index, entry) => renderListEntry(entry)}
         />
       ) : (
-        groups.map(group => {
-          const tabGroup = getTreeGroup(group.groupId);
+        listEntries.map(entry => {
+          if (entry.type !== 'group') return renderListEntry(entry);
+
+          const group = groupById.get(entry.groupId);
+          const tabGroup = getTreeGroup(entry.groupId);
           return (
+            group &&
             tabGroup && (
               <div
                 ref={tabGroup.key === selectedTabGroupKey ? selectedTabGroupRef : null}
-                key={tabGroup.key}
+                key={entry.key}
               >
-                <ListItem tabGroup={tabGroup} group={group} />
+                {renderListEntry(entry)}
               </div>
             )
           );

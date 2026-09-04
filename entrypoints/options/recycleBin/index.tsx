@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { theme, Space, Button, Modal, Empty, Alert } from 'antd';
 import { Virtuoso } from 'react-virtuoso';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -10,6 +10,12 @@ import { StyledEmptyBox, StyledRecycleBinWrapper } from './index.styled';
 import { StickyBox } from '~/entrypoints/common/components/StickyBox';
 import TagNodeMarkup from './TagNode';
 import TabGroup from '../home/TabGroupRecycle';
+import DayDivider from '../home/components/DayDivider';
+import {
+  getRecycleListEntries,
+  type ListEntry,
+  type RecycleGroupSource,
+} from '../home/utils';
 
 export default function RecycleBin() {
   const { token } = theme.useToken();
@@ -92,35 +98,57 @@ export default function RecycleBin() {
     });
   }, []);
 
-  const [totalGroupList, setTotalGroupList] = useState<GroupItem[]>([]);
-  const [index2Tag, setIndex2Tag] = useState<TagItem[]>([]);
-
-  useEffect(() => {
-    const _totalGroupList: GroupItem[] = [];
-    const _index2Tag: TagItem[] = [];
-    for (let tag of tagList) {
-      for (let group of tag?.groupList || []) {
-        _totalGroupList.push(group || {});
-        _index2Tag.push(tag || {});
-      }
-    }
-    setTotalGroupList(_totalGroupList);
-    setIndex2Tag(_index2Tag);
+  const recycleGroups = useMemo<RecycleGroupSource[]>(
+    () =>
+      tagList.flatMap(tag =>
+        (tag.groupList || []).map(group => ({
+          tagId: tag.tagId,
+          groupId: group.groupId,
+          createTime: group.createTime,
+        })),
+      ),
+    [tagList],
+  );
+  const listEntries = useMemo(
+    () => getRecycleListEntries(recycleGroups),
+    [recycleGroups],
+  );
+  const tagById = useMemo(() => new Map(tagList.map(tag => [tag.tagId, tag])), [tagList]);
+  const groupByKey = useMemo(() => {
+    const groups = new Map<string, { tag: TagItem; group: GroupItem }>();
+    tagList.forEach(tag => {
+      (tag.groupList || []).forEach(group => {
+        groups.set(`${tag.tagId}:${group.groupId}`, { tag, group });
+      });
+    });
+    return groups;
   }, [tagList]);
 
-  const ListItemMarkup = memo(({ index }: { index: number }) => {
-    const tag = index2Tag[index] || {};
-    const group = totalGroupList[index] || {};
+  const renderListEntry = useCallback(
+    (entry: ListEntry) => {
+      if (entry.type === 'day') {
+        return <DayDivider key={entry.key} dayKey={entry.dayKey} />;
+      }
+      if (entry.type === 'tag') {
+        const tag = tagById.get(entry.tagId);
+        return tag ? (
+          <TagNodeMarkup
+            key={entry.key}
+            tag={tag}
+            onRemove={getRecycleBinData}
+            onRecover={getRecycleBinData}
+          />
+        ) : null;
+      }
+      if (entry.type !== 'group' || !entry.tagId) return null;
 
-    return (
-      <>
-        <TagNodeMarkup
-          tag={tag}
-          onRemove={getRecycleBinData}
-          onRecover={getRecycleBinData}
-        />
+      const record = groupByKey.get(`${entry.tagId}:${entry.groupId}`);
+      if (!record) return null;
+
+      const { tag, group } = record;
+      return (
         <TabGroup
-          key={group.groupId}
+          key={entry.key}
           {...group}
           canDrag={false}
           canDrop={false}
@@ -131,9 +159,18 @@ export default function RecycleBin() {
           onTabChange={(tabItem: TabItem) => handleTabItemChange(tag, group, tabItem)}
           onTabRemove={handleTabItemRemove}
         />
-      </>
-    );
-  });
+      );
+    },
+    [
+      getRecycleBinData,
+      groupByKey,
+      handleTabGroupRecover,
+      handleTabGroupRemove,
+      handleTabItemChange,
+      handleTabItemRemove,
+      tagById,
+    ],
+  );
 
   return (
     <StyledRecycleBinWrapper className="recycle-bin-wrapper">
@@ -141,14 +178,14 @@ export default function RecycleBin() {
         <Space className="header-action-btns">
           <Button
             type="primary"
-            disabled={!totalGroupList?.length}
+            disabled={!recycleGroups.length}
             onClick={() => setRecoverModalVisible(true)}
           >
             {$fmt('home.recoverAll')}
           </Button>
           <Button
             type="primary"
-            disabled={!totalGroupList?.length}
+            disabled={!recycleGroups.length}
             onClick={() => setConfirmModalVisible(true)}
           >
             {$fmt('home.clearAll')}
@@ -162,13 +199,14 @@ export default function RecycleBin() {
         </Space>
       </StickyBox>
 
-      {totalGroupList?.length > 0 ? (
+      {recycleGroups.length > 0 ? (
         <Virtuoso
           useWindowScroll
           overscan={12}
           increaseViewportBy={{ top: 1000, bottom: 1000 }}
-          data={totalGroupList}
-          itemContent={index => <ListItemMarkup index={index} />}
+          data={listEntries}
+          computeItemKey={(_index, entry) => entry.key}
+          itemContent={(_index, entry) => renderListEntry(entry)}
         />
       ) : (
         <StyledEmptyBox className="no-data">

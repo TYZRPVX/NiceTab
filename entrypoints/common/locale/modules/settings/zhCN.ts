@@ -95,7 +95,7 @@ const zhCN = {
   /* 展示配置 */
   'settings.groupActionBtnStyle': '标签组和标签页操作按钮样式：',
   'settings.groupActionBtnsCommonlyUsed': '常用的标签组操作按钮配置：',
-  'settings.groupActionBtnsCommonlyUsed.tooltip': '选中的按钮在外层展示，未选中的按钮将折叠到“更多”菜单中',
+  'settings.groupActionBtnsCommonlyUsed.tooltip': '选中的按钮优先展示，最多显示三个，其余按钮将折叠到“更多”菜单中',
   'settings.showOpenedTabCount': '是否在扩展图标上显示打开的标签页数量：',
   'settings.showPageContextMenus': '是否在网页中显示NiceTab右键菜单：',
   'settings.contextMenuConfig': '右键菜单配置：',

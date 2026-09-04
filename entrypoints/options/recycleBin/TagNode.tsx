@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { theme, Flex, Space, Modal, Divider } from 'antd';
-import { TagOutlined } from '@ant-design/icons';
+import { Modal, Tooltip } from 'antd';
+import { DeleteOutlined, ExportOutlined, TagOutlined } from '@ant-design/icons';
 import { TagItem } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { recycleUtils } from '~/entrypoints/common/storage';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
+import ActionIconBtn from '~/entrypoints/common/components/ActionIconBtn';
 import { StyledTagNode } from './index.styled';
 
 export default function TagNode({
@@ -16,7 +17,6 @@ export default function TagNode({
   onRemove: () => void;
   onRecover: () => void;
 }) {
-  const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const [removeModalVisible, setRemoveModalVisible] = useState<boolean>(false);
   const [recoverModalVisible, setRecoverModalVisible] = useState<boolean>(false);
@@ -36,8 +36,7 @@ export default function TagNode({
 
   /* 删除弹窗、确认、取消 */
   // 删除弹窗
-  const openConfirmModal = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const openConfirmModal = () => {
     setRemoveModalVisible(true);
   };
 
@@ -55,8 +54,7 @@ export default function TagNode({
 
   /* 还原弹窗、确认、取消 */
   // 删除弹窗
-  const openRecoverModal = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const openRecoverModal = () => {
     setRecoverModalVisible(true);
   };
 
@@ -78,28 +76,47 @@ export default function TagNode({
       <div className="tag-name">
         {tag.static ? $fmt('home.stagingArea') : tag.tagName}
       </div>
-      <Flex align="center">
-        <span className="count" style={{ color: ENUM_COLORS.volcano }}>
-          {$fmt({
-            id: 'home.tabGroup.count',
-            values: { count: tag?.groupList?.length || 0 },
-          })}
-        </span>
-        <span className="tag-create-time">{tag.createTime}</span>
-      </Flex>
-      <Space
-        className="action-btns"
-        size={0}
-        align="center"
-        split={<Divider type="vertical" style={{ background: token.colorBorder }} />}
-      >
-        <span className="action-btn" onClick={openConfirmModal}>
-          {$fmt('home.tag.remove')}
-        </span>
-        <span className="action-btn" onClick={openRecoverModal}>
-          {$fmt('home.tag.recover')}
-        </span>
-      </Space>
+      <span className="count" style={{ color: ENUM_COLORS.volcano }}>
+        {$fmt({
+          id: 'home.tabGroup.count',
+          values: { count: tag?.groupList?.length || 0 },
+        })}
+      </span>
+      <div className="action-btns">
+        <Tooltip
+          title={$fmt('home.tag.remove')}
+          placement="top"
+          mouseEnterDelay={0.3}
+          destroyTooltipOnHide
+        >
+          <ActionIconBtn
+            className="action-btn"
+            size={16}
+            hoverColor={ENUM_COLORS.red}
+            label={$fmt('home.tag.remove')}
+            btnStyle="icon"
+            onClick={openConfirmModal}
+          >
+            <DeleteOutlined />
+          </ActionIconBtn>
+        </Tooltip>
+        <Tooltip
+          title={$fmt('home.tag.recover')}
+          placement="top"
+          mouseEnterDelay={0.3}
+          destroyTooltipOnHide
+        >
+          <ActionIconBtn
+            className="action-btn"
+            size={16}
+            label={$fmt('home.tag.recover')}
+            btnStyle="icon"
+            onClick={openRecoverModal}
+          >
+            <ExportOutlined />
+          </ActionIconBtn>
+        </Tooltip>
+      </div>
 
       {/* 删除提示 */}
       {removeModalVisible && (
