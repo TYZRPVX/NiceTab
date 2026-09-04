@@ -117,23 +117,21 @@ const StyledPageContainer = styled.div<{
   .header-navbar {
     position: fixed;
     top: 0;
-    bottom: 0;
     left: 0;
     right: 0;
     z-index: 10;
     display: flex;
     align-items: center;
     height: 64px;
+    box-sizing: border-box;
     border-bottom: 1px solid var(--nt-border);
-    background: color-mix(in srgb, var(--nt-surface) 94%, transparent);
-    backdrop-filter: blur(12px);
+    background: var(--nt-surface);
 
     .logo {
       display: grid;
       place-items: center;
-      width: 64px;
+      width: 72px;
       height: 100%;
-      border-right: 1px solid var(--nt-border);
       color: var(--nt-text);
 
       svg {
@@ -143,7 +141,33 @@ const StyledPageContainer = styled.div<{
     }
     .navbar-menu {
       flex: 1;
-      margin-left: 8px;
+      min-width: 0;
+      margin-left: 4px;
+      border-bottom: 0;
+      background: transparent;
+
+      &.nicetab-menu-horizontal {
+        line-height: normal;
+        border-bottom: 0;
+        background: transparent;
+      }
+      .nicetab-menu-item {
+        display: flex;
+        align-items: center;
+        height: 40px;
+        margin-inline: 2px;
+        padding-inline: 12px;
+        border-radius: 20px;
+      }
+      .nicetab-menu-item::after {
+        display: none;
+      }
+      .nicetab-menu-item:hover {
+        background: var(--nt-surface-muted);
+      }
+      .nicetab-menu-item-selected {
+        background: var(--nt-accent-soft);
+      }
     }
     .menu-right {
       display: flex;
@@ -485,7 +509,6 @@ function AppLayout() {
           </div>
           <Menu
             className="navbar-menu"
-            theme="light"
             mode="horizontal"
             defaultSelectedKeys={['home']}
             selectedKeys={selectedKeys}

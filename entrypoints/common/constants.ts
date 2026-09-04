@@ -48,24 +48,21 @@ export const ENUM_COLORS = {
 
 export const THEME_COLOR_NAMES: ThemeColors[] = [
   'blue',
-  'cyan',
-  'volcano',
-  'orange',
-  'red',
-  'green',
   'purple',
-  'magenta',
-  'gold',
-  'lime',
+  'cyan',
+  'green',
+  'volcano',
+];
+// Focused high-contrast theme palette. Semantic colors above remain unchanged.
+export const THEME_COLORS: ColorItem[] = [
+  { key: 'blue', color: '#1D4ED8' },
+  { key: 'purple', color: '#7C3AED' },
+  { key: 'cyan', color: '#007F8B' },
+  { key: 'green', color: '#16803A' },
+  { key: 'volcano', color: '#DC2644' },
 ];
 // 主色
-export const PRIMARY_COLOR = ENUM_COLORS.blue;
-export const THEME_COLORS: ColorItem[] = THEME_COLOR_NAMES.map(name => {
-  return {
-    key: name,
-    color: ENUM_COLORS?.[name],
-  };
-});
+export const PRIMARY_COLOR = THEME_COLORS[0].color;
 
 // 主题类型
 export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {

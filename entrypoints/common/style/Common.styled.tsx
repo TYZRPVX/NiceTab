@@ -101,20 +101,21 @@ export const StyledColorItem = styled.div`
   position: relative;
   width: 24px;
   height: 24px;
-  border-radius: 4px;
+  box-sizing: border-box;
+  border: 2px solid var(--nt-surface);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--nt-border);
   cursor: pointer;
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+  &:hover {
+    transform: translateY(-1px);
+  }
   &.active {
-    &:after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: -6px;
-      width: 4px;
-      height: 4px;
-      border-radius: 2px;
-      background: red;
-    }
+    box-shadow:
+      0 0 0 2px var(--nt-surface),
+      0 0 0 4px currentColor;
   }
 `;
 
@@ -123,7 +124,7 @@ export const GlobalStyle = createGlobalStyle`
     --bg-color: ${props => props.theme.colorBgContainer || '#fff'};
     --nt-page: ${props =>
       props.theme.type === 'light'
-        ? '#f6f8fc'
+        ? '#fff'
         : props.theme.colorBgLayout || props.theme.colorBgContainer || '#141414'};
     --nt-surface: ${props => props.theme.colorBgContainer || '#fff'};
     --nt-surface-muted: ${props => props.theme.colorFillAlter || '#f3f5f8'};

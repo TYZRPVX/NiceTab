@@ -19,7 +19,7 @@ export default function ColorList({
   const { token } = theme.useToken();
   const isActive = useCallback(
     (item: ColorItem) => {
-      return token?.[`${item.key}6`] === token?.colorPrimary;
+      return item.color.toLowerCase() === token.colorPrimary?.toLowerCase();
     },
     [token],
   );
@@ -30,7 +30,7 @@ export default function ColorList({
         <StyledColorItem
           className={classNames('color-item', isActive(item) && 'active')}
           key={item.key}
-          style={{ background: item.color }}
+          style={{ background: item.color, color: item.color }}
           onClick={() => onItemClick?.(item.color)}
         ></StyledColorItem>
       ))}

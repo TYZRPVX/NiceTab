@@ -1,6 +1,6 @@
 // import { storage } from 'wxt/storage';
 import type { ThemeProps } from '~/entrypoints/types';
-import { PRIMARY_COLOR } from '../constants';
+import { PRIMARY_COLOR, THEME_COLORS } from '../constants';
 
 export default class ThemeUtils {
   storageKey: `local:${string}` = 'local:theme';
@@ -10,7 +10,16 @@ export default class ThemeUtils {
   themeData = this.defaultTheme;
   async getThemeData() {
     const theme = await storage.getItem<ThemeProps>(this.storageKey);
-    return theme || this.defaultTheme;
+    if (!theme) return this.defaultTheme;
+
+    const isCurrentColor = THEME_COLORS.some(
+      item => item.color.toLowerCase() === theme.colorPrimary?.toLowerCase(),
+    );
+    if (isCurrentColor) return theme;
+
+    const normalizedTheme = { ...theme, colorPrimary: PRIMARY_COLOR };
+    await storage.setItem(this.storageKey, normalizedTheme);
+    return normalizedTheme;
   }
   async setThemeData(theme: Partial<ThemeProps>) {
     const themeData = await this.getThemeData();
