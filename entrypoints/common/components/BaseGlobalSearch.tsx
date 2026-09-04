@@ -7,6 +7,7 @@ import {
   Space,
   Switch,
   Modal,
+  Tooltip,
   type InputRef,
   type RefSelectProps,
   type SelectProps,
@@ -595,25 +596,39 @@ export const GlobalSearchBox = forwardRef(
               </span>
               {selectedItems.length > 0 && (
                 <Space>
-                  <ActionIconBtn
-                    className="action-btn btn-remove"
-                    label={$fmt('common.remove')}
-                    btnStyle="icon"
-                    size={16}
-                    hoverColor={ENUM_COLORS.red}
-                    onClick={() => handleBatchAction('remove')}
+                  <Tooltip
+                    title={$fmt('common.remove')}
+                    placement="top"
+                    mouseEnterDelay={0.3}
+                    destroyTooltipOnHide
                   >
-                    <DeleteOutlined />
-                  </ActionIconBtn>
-                  <ActionIconBtn
-                    className="action-btn btn-open"
-                    label={$fmt('common.open')}
-                    btnStyle="icon"
-                    size={16}
-                    onClick={() => handleBatchAction('open')}
+                    <ActionIconBtn
+                      className="action-btn btn-remove"
+                      label={$fmt('common.remove')}
+                      btnStyle="icon"
+                      size={16}
+                      hoverColor={ENUM_COLORS.red}
+                      onClick={() => handleBatchAction('remove')}
+                    >
+                      <DeleteOutlined />
+                    </ActionIconBtn>
+                  </Tooltip>
+                  <Tooltip
+                    title={$fmt('common.open')}
+                    placement="top"
+                    mouseEnterDelay={0.3}
+                    destroyTooltipOnHide
                   >
-                    <ExportOutlined />
-                  </ActionIconBtn>
+                    <ActionIconBtn
+                      className="action-btn btn-open"
+                      label={$fmt('common.open')}
+                      btnStyle="icon"
+                      size={16}
+                      onClick={() => handleBatchAction('open')}
+                    >
+                      <ExportOutlined />
+                    </ActionIconBtn>
+                  </Tooltip>
                 </Space>
               )}
             </>
@@ -838,15 +853,19 @@ export const GlobalSearchPanel = forwardRef<
       };
     }, []);
 
-    useImperativeHandle(ref, () => ({
-      open: () => {
-        setVisible(true);
-      },
-      close: () => {
-        closePanel();
-      },
-      refreshData: () => searchBoxRef.current?.refreshData(),
-    }), [closePanel]);
+    useImperativeHandle(
+      ref,
+      () => ({
+        open: () => {
+          setVisible(true);
+        },
+        close: () => {
+          closePanel();
+        },
+        refreshData: () => searchBoxRef.current?.refreshData(),
+      }),
+      [closePanel],
+    );
 
     return (
       <Modal

@@ -9,11 +9,15 @@ export const StyledGroupWrapper = styled.div<{ $bgColor?: string; $active?: bool
   box-sizing: border-box;
   padding: 14px 12px 12px;
   margin-bottom: 16px;
-  border: 1px solid ${props => (props.$active ? props.theme.colorPrimaryBorder : 'var(--nt-border)')};
+  border: 1px solid
+    ${props => (props.$active ? props.theme.colorPrimaryBorder : 'var(--nt-border)')};
   border-radius: var(--nt-radius-md);
   box-shadow: var(--nt-shadow-sm);
   background: ${props => props.$bgColor || '#fff'};
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 
   &::before {
     position: absolute;
@@ -32,7 +36,10 @@ export const StyledGroupWrapper = styled.div<{ $bgColor?: string; $active?: bool
     box-shadow: var(--nt-shadow-md);
   }
 `;
-export const StyledGroupStickyHeader = styled.div<{ $bgColor?: string; $active?: boolean }>`
+export const StyledGroupStickyHeader = styled.div<{
+  $bgColor?: string;
+  $active?: boolean;
+}>`
   position: sticky;
   top: 76px;
   z-index: 3;
@@ -42,7 +49,8 @@ export const StyledGroupStickyHeader = styled.div<{ $bgColor?: string; $active?:
 `;
 
 export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
-  padding: 0;
+  min-width: 0;
+  padding: 0 4px;
   .group-header-top {
     display: flex;
     align-items: center;
@@ -51,9 +59,12 @@ export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
     .group-status-wrapper {
       display: flex;
       align-items: center;
+      flex-shrink: 0;
       gap: 4px;
     }
     .group-name-wrapper {
+      width: 0;
+      flex: 1 1 auto;
       min-width: 0;
       margin-right: 4px;
       .text-readonly {
@@ -64,6 +75,7 @@ export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
     .group-info {
       display: flex;
       align-items: center;
+      flex: 0 1 auto;
       min-width: 0;
       gap: 8px;
       color: var(--nt-text-secondary);
@@ -85,6 +97,10 @@ export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
     }
   }
   .group-action-btns {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    min-width: 0;
     margin-top: 6px;
     font-size: 14px;
   }
@@ -165,6 +181,11 @@ export const StyledTabListWrapper = styled.div`
     margin-top: 12px;
     cursor: pointer;
     color: ${props => props.theme.colorTextSecondary || '#666'};
+  }
+  .no-data {
+    display: flex;
+    justify-content: center;
+    padding: 48px 16px;
   }
 `;
 

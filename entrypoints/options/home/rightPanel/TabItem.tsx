@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useEffect } from 'react';
 import { Tabs } from 'wxt/browser';
-import { Checkbox } from 'antd';
+import { Checkbox, Popconfirm, Tooltip } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { CloseOutlined, CoffeeOutlined, PushpinFilled } from '@ant-design/icons';
 import { classNames } from '~/entrypoints/common/utils';
@@ -26,6 +26,7 @@ export default function TabItem({
 }: TabItemProps) {
   const { $fmt } = useIntlUtls();
   const tabRef = useRef<HTMLDivElement>(null);
+  const tabTitle = tab.title || tab.url || '';
   const handleAction = useCallback(
     (event: React.MouseEvent<HTMLElement, MouseEvent>, action: TabActions) => {
       if (action === 'discard' || action === 'remove') {
@@ -66,36 +67,69 @@ export default function TabItem({
         tab.discarded && 'discarded',
         highlighted && 'highlighted',
       )}
-      title={tab.title}
     >
       <Checkbox value={tab.id} onChange={handleSelectChange} />
 
       {tab.pinned && <PushpinFilled />}
       <Favicon pageUrl={tab.url!} favIconUrl={tab.favIconUrl}></Favicon>
-      <span className="tab-item-title" onClick={event => handleAction(event, 'active')}>
-        {tab.title}
-      </span>
+      <Tooltip
+        title={tabTitle}
+        placement="topLeft"
+        mouseEnterDelay={0.3}
+        destroyTooltipOnHide
+      >
+        <span className="tab-item-title" onClick={event => handleAction(event, 'active')}>
+          {tabTitle}
+        </span>
+      </Tooltip>
 
       {!tab.active && (
-        <StyledActionIconBtn
-          className={classNames('action-icon-btn', tab.discarded && 'disabled')}
-          $size={16}
+        <Tooltip
           title={$fmt(tab.discarded ? 'common.hibernated' : 'common.hibernate')}
-          onClick={event => handleAction(event, 'discard')}
+          placement="top"
+          mouseEnterDelay={0.3}
+          destroyTooltipOnHide
         >
-          <CoffeeOutlined />
-        </StyledActionIconBtn>
+          <StyledActionIconBtn
+            className={classNames('action-icon-btn', tab.discarded && 'disabled')}
+            $size={16}
+            aria-label={$fmt(tab.discarded ? 'common.hibernated' : 'common.hibernate')}
+            onClick={event => handleAction(event, 'discard')}
+          >
+            <CoffeeOutlined />
+          </StyledActionIconBtn>
+        </Tooltip>
       )}
 
-      <StyledActionIconBtn
-        className="action-icon-btn"
-        $size={16}
-        $hoverColor="red"
-        title={$fmt('common.remove')}
-        onClick={event => handleAction(event, 'remove')}
+      <Popconfirm
+        title={$fmt('home.removeTitle')}
+        description={$fmt({
+          id: 'home.tab.removeSelected',
+          values: { count: 1 },
+        })}
+        okText={$fmt('common.remove')}
+        cancelText={$fmt('common.cancel')}
+        okButtonProps={{ danger: true }}
+        onConfirm={() => onAction('remove', tab)}
       >
-        <CloseOutlined />
-      </StyledActionIconBtn>
+        <span className="action-btn-confirm-target">
+          <Tooltip
+            title={$fmt('common.remove')}
+            placement="top"
+            mouseEnterDelay={0.3}
+            destroyTooltipOnHide
+          >
+            <StyledActionIconBtn
+              className="action-icon-btn"
+              $size={16}
+              $hoverColor="red"
+              aria-label={$fmt('common.remove')}
+            >
+              <CloseOutlined />
+            </StyledActionIconBtn>
+          </Tooltip>
+        </span>
+      </Popconfirm>
     </StyledTabItem>
   );
 }

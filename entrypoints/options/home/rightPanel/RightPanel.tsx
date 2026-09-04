@@ -197,6 +197,16 @@ function OpenedTabsContent() {
         label: $fmt('common.remove'),
         icon: <CloseOutlined />,
         hoverColor: ENUM_COLORS.red,
+        confirm: {
+          title: $fmt('home.removeTitle'),
+          description: $fmt({
+            id: 'home.tab.removeSelected',
+            values: { count: selectedTabIds.length },
+          }),
+          okText: $fmt('common.remove'),
+          cancelText: $fmt('common.cancel'),
+          okButtonProps: { danger: true },
+        },
         onClick: handleBatchRemove,
       },
     ];
@@ -266,96 +276,97 @@ function OpenedTabsContent() {
 
   return (
     <>
-          <div className="opened-tabs-title">
-            {$fmt('common.openedTabs')}
-            <Tooltip
-              color={token.colorBgElevated}
-              destroyTooltipOnHide
-              title={<Typography.Text>{$fmt('home.tip.multiSelection')}</Typography.Text>}
-              styles={{ root: { maxWidth: '300px', width: '300px' } }}
-            >
-              <StyledActionIconBtn className="btn-tips">
-                <QuestionCircleOutlined />
-              </StyledActionIconBtn>
-            </Tooltip>
-          </div>
+      <div className="opened-tabs-title">
+        {$fmt('common.openedTabs')}
+        <Tooltip
+          color={token.colorBgElevated}
+          destroyTooltipOnHide
+          title={<Typography.Text>{$fmt('home.tip.multiSelection')}</Typography.Text>}
+          styles={{ root: { maxWidth: '300px', width: '300px' } }}
+        >
+          <StyledActionIconBtn className="btn-tips" aria-label={$fmt('common.tips')}>
+            <QuestionCircleOutlined />
+          </StyledActionIconBtn>
+        </Tooltip>
+      </div>
 
-          {/* 全选和批量操作区域 */}
-          {tabs.length > 0 && (
-            <StyledOpenedTabsActions>
-              <div className="checkall-wrapper">
-                <Checkbox
-                  checked={isAllChecked}
-                  indeterminate={checkAllIndeterminate}
-                  onChange={handleSelectAll}
-                />
-                <span
-                  className="selected-count-text"
-                >
-                  {`${selectedTabIds.length} / ${tabs.length}`}
-                </span>
-              </div>
-              {selectedTabIds.length > 0 && (
-                <ActionBtnList
-                  actionBtnStyle="icon"
-                  outerList={selectedTabsActions}
-                  gap={10}
-                />
-              )}
-            </StyledOpenedTabsActions>
+      {/* 全选和批量操作区域 */}
+      {tabs.length > 0 && (
+        <StyledOpenedTabsActions>
+          <div className="checkall-wrapper">
+            <Checkbox
+              checked={isAllChecked}
+              indeterminate={checkAllIndeterminate}
+              onChange={handleSelectAll}
+            />
+            <span className="selected-count-text">
+              {`${selectedTabIds.length} / ${tabs.length}`}
+            </span>
+          </div>
+          {selectedTabIds.length > 0 && (
+            <ActionBtnList
+              actionBtnStyle="icon"
+              outerList={selectedTabsActions}
+              gap={10}
+            />
           )}
+        </StyledOpenedTabsActions>
+      )}
 
-          <div className="opened-tabs-list">
-            {tabGroupList?.length > 0 || loading ? (
-              <Checkbox.Group
-                className="tab-list-checkbox-group"
-                value={selectedTabIds}
-                onChange={setSelectedTabIds}
+      <div className="opened-tabs-list">
+        {tabGroupList?.length > 0 || loading ? (
+          <Checkbox.Group
+            className="tab-list-checkbox-group"
+            value={selectedTabIds}
+            onChange={setSelectedTabIds}
+          >
+            {tabGroupList.map((group, index) => (
+              <DndComponent<OpenedGroupDragData>
+                key={`opened-group-${index}`}
+                canDrag={group.groupId !== -1}
+                canDrop={false}
+                dndKey={dndKey}
+                data={{
+                  ...group,
+                  index,
+                  groupId: group.groupId,
+                  dndKey,
+                  from: 'opened-tab-group',
+                  selectedValues: selectedTabIds,
+                  selectedGroup: group,
+                  selectedTabs,
+                }}
+                mainField="groupId"
+                showDragPreview
+                previewContent={getDisplayGroupName({
+                  groupName: group.groupName,
+                  tabList: group.tabs,
+                })}
               >
-                {tabGroupList.map((group, index) => (
-                  <DndComponent<OpenedGroupDragData>
-                    key={`opened-group-${index}`}
-                    canDrag={group.groupId !== -1}
-                    canDrop={false}
-                    dndKey={dndKey}
-                    data={{
-                      ...group,
-                      index,
-                      groupId: group.groupId,
-                      dndKey,
-                      from: 'opened-tab-group',
-                      selectedValues: selectedTabIds,
-                      selectedGroup: group,
-                      selectedTabs,
-                    }}
-                    mainField="groupId"
-                    showDragPreview
-                    previewContent={getDisplayGroupName({
-                      groupName: group.groupName,
-                      tabList: group.tabs,
-                    })}
-                  >
-                    <TabGroupItem
-                      key={~group.groupId || index}
-                      group={group}
-                      selectedTabs={selectedTabs}
-                      quickSelectedTabIds={quickSelectedTabIds}
-                      draggableState={draggableState}
-                      draggingTabItem={draggingTabItem}
-                      onAction={handleTabAction}
-                      onQuickSelect={handleTabQuickSelect}
-                      onDragStateChange={handleDragStateChange}
-                      onGroupAction={handleGroupAction}
-                    />
-                  </DndComponent>
-                ))}
-              </Checkbox.Group>
-            ) : (
-              <div className="no-data">
-                <Empty description={$fmt('home.emptyTip')}></Empty>
-              </div>
-            )}
+                <TabGroupItem
+                  key={~group.groupId || index}
+                  group={group}
+                  selectedTabs={selectedTabs}
+                  quickSelectedTabIds={quickSelectedTabIds}
+                  draggableState={draggableState}
+                  draggingTabItem={draggingTabItem}
+                  onAction={handleTabAction}
+                  onQuickSelect={handleTabQuickSelect}
+                  onDragStateChange={handleDragStateChange}
+                  onGroupAction={handleGroupAction}
+                />
+              </DndComponent>
+            ))}
+          </Checkbox.Group>
+        ) : (
+          <div className="no-data">
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={$fmt('home.emptyTip')}
+            ></Empty>
           </div>
+        )}
+      </div>
     </>
   );
 }

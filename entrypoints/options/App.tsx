@@ -33,7 +33,6 @@ import {
   SyncOutlined,
   TranslationOutlined,
   RestOutlined,
-  GithubOutlined,
   MoonOutlined,
   DesktopOutlined,
   SunOutlined,
@@ -64,14 +63,17 @@ import {
   SHORTCUTS_PAGE_URL,
 } from '~/entrypoints/common/constants';
 import { actionHandler } from '../common/contextMenus';
-import { GlobalContext, useIntlUtls, eventEmitter } from '~/entrypoints/common/hooks/global';
+import {
+  GlobalContext,
+  useIntlUtls,
+  eventEmitter,
+} from '~/entrypoints/common/hooks/global';
 import useMenus from '~/entrypoints/common/hooks/menu';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import useUpdate from '~/entrypoints/common/hooks/update';
 import usePermission from '~/entrypoints/common/hooks/getPermission';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import {
-  GITHUB_URL,
   LANGUAGE_OPTIONS,
   THEME_COLORS,
   defaultThemeType,
@@ -455,7 +457,8 @@ function AppLayout() {
       setSettingsSaveAction(action);
     };
     eventEmitter.on('settings:save-action-change', handleSettingsSaveActionChange);
-    return () => eventEmitter.off('settings:save-action-change', handleSettingsSaveActionChange);
+    return () =>
+      eventEmitter.off('settings:save-action-change', handleSettingsSaveActionChange);
   }, []);
 
   useEffect(() => {
@@ -531,7 +534,11 @@ function AppLayout() {
               arrow={false}
               fresh
             >
-              <StyledActionIconBtn $size={18}>
+              <StyledActionIconBtn
+                $size={18}
+                aria-label={$fmt('common.theme')}
+                title={$fmt('common.theme')}
+              >
                 <IconTheme></IconTheme>
               </StyledActionIconBtn>
             </Tooltip>
@@ -539,6 +546,7 @@ function AppLayout() {
             <StyledActionIconBtn
               $size={18}
               title={$fmt('common.toggleThemeType')}
+              aria-label={$fmt('common.toggleThemeType')}
               onClick={handleThemeTypeChange}
             >
               {NiceGlobalContext.themeType === 'light' && <SunOutlined />}
@@ -554,7 +562,11 @@ function AppLayout() {
               }}
               placement="bottomRight"
             >
-              <StyledActionIconBtn $size={18}>
+              <StyledActionIconBtn
+                $size={18}
+                title={$fmt('common.language')}
+                aria-label={$fmt('common.language')}
+              >
                 <TranslationOutlined />
               </StyledActionIconBtn>
             </Dropdown>
@@ -565,18 +577,14 @@ function AppLayout() {
                 onClick: handleExtActionClick,
               }}
             >
-              <StyledActionIconBtn $size={18}>
+              <StyledActionIconBtn
+                $size={18}
+                title={$fmt('common.actions')}
+                aria-label={$fmt('common.actions')}
+              >
                 <MenuOutlined />
               </StyledActionIconBtn>
             </Dropdown>
-            {/* github */}
-            <StyledActionIconBtn
-              $size={18}
-              title={$fmt('common.goToGithub')}
-              onClick={() => openNewTab(GITHUB_URL, { active: true, openToNext: true })}
-            >
-              <GithubOutlined />
-            </StyledActionIconBtn>
           </Space>
         </div>
         <div className="main-content">
@@ -591,6 +599,7 @@ function AppLayout() {
             shape="circle"
             icon={<ToTopOutlined />}
             title={$fmt('common.backToTop')}
+            aria-label={$fmt('common.backToTop')}
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           />
 
@@ -598,6 +607,7 @@ function AppLayout() {
             shape="circle"
             icon={<SearchOutlined />}
             title={$fmt('home.searchTabAndUrl')}
+            aria-label={$fmt('home.searchTabAndUrl')}
             onClick={openGlobalSearchPanel}
           />
 
@@ -621,6 +631,7 @@ function AppLayout() {
               shape="circle"
               icon={<SendOutlined />}
               title={$fmt('common.sendAllTabs')}
+              aria-label={$fmt('common.sendAllTabs')}
               onClick={handleSendAllTabs}
             />
           )}

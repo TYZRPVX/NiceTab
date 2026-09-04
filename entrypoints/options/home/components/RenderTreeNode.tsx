@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useCallback, memo, useContext } from 'react';
-import { theme, Dropdown } from 'antd';
+import { theme, Dropdown, Tooltip } from 'antd';
 import { CloseOutlined, MenuOutlined, MoreOutlined } from '@ant-design/icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
@@ -238,14 +238,21 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
                 trigger={['click']}
                 destroyPopupOnHide
               >
-                <StyledActionIconBtn
-                  className="btn-more"
-                  $size="14"
+                <Tooltip
                   title={$fmt('common.more')}
-                  onClick={e => e.stopPropagation()}
+                  placement="top"
+                  mouseEnterDelay={0.3}
+                  destroyTooltipOnHide
                 >
-                  <MenuOutlined />
-                </StyledActionIconBtn>
+                  <StyledActionIconBtn
+                    className="btn-more"
+                    $size="14"
+                    aria-label={$fmt('common.more')}
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <MenuOutlined />
+                  </StyledActionIconBtn>
+                </Tooltip>
               </Dropdown>
             )}
 
@@ -256,27 +263,41 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
                 trigger={['click']}
                 destroyPopupOnHide
               >
-                <StyledActionIconBtn
-                  className="btn-more"
-                  $size="14"
+                <Tooltip
                   title={$fmt('common.more')}
-                  onClick={e => e.stopPropagation()}
+                  placement="top"
+                  mouseEnterDelay={0.3}
+                  destroyTooltipOnHide
                 >
-                  <MenuOutlined />
-                </StyledActionIconBtn>
+                  <StyledActionIconBtn
+                    className="btn-more"
+                    $size="14"
+                    aria-label={$fmt('common.more')}
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <MenuOutlined />
+                  </StyledActionIconBtn>
+                </Tooltip>
               </Dropdown>
             )}
 
             {!isLocked && !isStaticTag && (
-              <StyledActionIconBtn
-                className="btn-remove"
-                $size="14"
+              <Tooltip
                 title={$fmt('common.remove')}
-                $hoverColor={ENUM_COLORS.red}
-                onClick={onRemoveClick}
+                placement="top"
+                mouseEnterDelay={0.3}
+                destroyTooltipOnHide
               >
-                <CloseOutlined />
-              </StyledActionIconBtn>
+                <StyledActionIconBtn
+                  className="btn-remove"
+                  $size="14"
+                  aria-label={$fmt('common.remove')}
+                  $hoverColor={ENUM_COLORS.red}
+                  onClick={onRemoveClick}
+                >
+                  <CloseOutlined />
+                </StyledActionIconBtn>
+              </Tooltip>
             )}
           </span>
         </StyledTreeNodeItem>

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { browser, Tabs } from 'wxt/browser';
+import { Tooltip } from 'antd';
 import {
   RightOutlined,
   DownOutlined,
@@ -65,6 +66,10 @@ export default function TabGroupItem({
     () => getDisplayGroupName({ groupName: group.groupName, tabList: group.tabs }),
     [group.groupName, group.tabs],
   );
+  const collapseLabel = $fmt({
+    id: collapsed ? 'home.expand' : 'home.collapse',
+    values: { name: groupDisplayName },
+  });
 
   const selectedTabIds = selectedTabs.map(tab => tab.id!);
 
@@ -80,9 +85,12 @@ export default function TabGroupItem({
   }, [group.tabs]);
 
   useEffect(() => {
-    setTimeout(() => {
-      autoFocus();
-    }, 30);
+    setCollapsed(group.collapsed);
+  }, [group.collapsed]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(autoFocus, 30);
+    return () => window.clearTimeout(timer);
   }, [autoFocus]);
 
   // 分组级批量操作
@@ -119,10 +127,20 @@ export default function TabGroupItem({
         label: $fmt('common.remove'),
         icon: <CloseOutlined />,
         hoverColor: ENUM_COLORS.red,
+        confirm: {
+          title: $fmt('home.removeTitle'),
+          description: $fmt({
+            id: 'home.tab.removeSelected',
+            values: { count: group.tabs.length },
+          }),
+          okText: $fmt('common.remove'),
+          cancelText: $fmt('common.cancel'),
+          okButtonProps: { danger: true },
+        },
         onClick: handleGroupRemove,
       },
     ];
-  }, [group]);
+  }, [$fmt, group, handleGroupDiscard, handleGroupRemove]);
 
   // 如果是未分组的标签（groupId === -1），直接渲染标签项列表
   if (group.groupId === -1) {
@@ -171,11 +189,30 @@ export default function TabGroupItem({
       className={classNames(collapsed && 'collapsed')}
       $color={group.color}
     >
-      <div className="group-header" onClick={onToggle}>
-        <div className="collapse-icon-btn">
-          {collapsed ? <RightOutlined /> : <DownOutlined />}
-        </div>
-        <div className="group-name">{groupDisplayName}</div>
+      <div
+        className="group-header"
+        onClick={onToggle}
+        aria-expanded={!collapsed}
+        aria-label={collapseLabel}
+      >
+        <Tooltip
+          title={collapseLabel}
+          placement="top"
+          mouseEnterDelay={0.3}
+          destroyTooltipOnHide
+        >
+          <div className="collapse-icon-btn">
+            {collapsed ? <RightOutlined /> : <DownOutlined />}
+          </div>
+        </Tooltip>
+        <Tooltip
+          title={groupDisplayName}
+          placement="topLeft"
+          mouseEnterDelay={0.3}
+          destroyTooltipOnHide
+        >
+          <div className="group-name">{groupDisplayName}</div>
+        </Tooltip>
         <div className="group-actions" onClick={e => e.stopPropagation()}>
           <ActionBtnList actionBtnStyle="icon" outerList={groupActions} gap={8} />
         </div>
@@ -183,7 +220,6 @@ export default function TabGroupItem({
       <div className="tab-list">
         {group.tabs?.map((tab, index) => {
           const tabKey = String(tab.id ?? `opened-${group.groupId}-${index}`);
-          const tabTitle = tab.title || tab.url || '';
 
           return (
             <DndComponent<OpenedTabsDragData>
@@ -208,7 +244,7 @@ export default function TabGroupItem({
               mainField="id"
               onDragStateChange={value => onDragStateChange?.(value, tab)}
             >
-              <div className="tab-list-item" title={tabTitle}>
+              <div className="tab-list-item">
                 <i className="group-color-flag"></i>
                 <TabItem
                   key={tab.id}

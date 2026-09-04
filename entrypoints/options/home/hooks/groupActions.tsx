@@ -10,10 +10,11 @@ import {
   BlockOutlined,
   SortAscendingOutlined,
   SortDescendingOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined,
+  RetweetOutlined,
 } from '@ant-design/icons';
 import copyToClipboard from 'copy-to-clipboard';
-import { LuFolderUp, LuFolderDown } from 'react-icons/lu';
-import { IconRepeat } from '~/entrypoints/common/components/icon/CustomIcon';
 import { ENUM_SETTINGS_PROPS, ENUM_COLORS } from '~/entrypoints/common/constants';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
@@ -111,13 +112,13 @@ export default function useGroupActions({
       {
         key: 'addGroupBefore',
         label: $fmt(actionMap['addGroupBefore'].labelKey),
-        icon: <LuFolderUp />,
+        icon: <ArrowUpOutlined />,
         onClick: () => onAction('addGroupBefore', groupId),
       },
       {
         key: 'addGroupAfter',
         label: $fmt(actionMap['addGroupAfter'].labelKey),
-        icon: <LuFolderDown />,
+        icon: <ArrowDownOutlined />,
         onClick: () => onAction('addGroupAfter', groupId),
       },
       {
@@ -151,7 +152,7 @@ export default function useGroupActions({
         key: 'clone',
         label: $fmt(actionMap['clone'].labelKey),
         disabled: tagLocked,
-        icon: <IconRepeat />,
+        icon: <RetweetOutlined />,
         onClick: () => onAction('clone', groupId),
       },
       {

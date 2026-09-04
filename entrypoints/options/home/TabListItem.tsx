@@ -8,6 +8,7 @@ import {
   Modal,
   QRCode,
   Typography,
+  Tooltip,
 } from 'antd';
 import type { MenuProps, CheckboxProps } from 'antd';
 import {
@@ -24,13 +25,9 @@ import { openNewTab } from '~/entrypoints/common/tabs';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
-import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { getOSInfo } from '~/entrypoints/common/utils';
-import {
-  StyledTabItemWrapper,
-  StyledTabTitle,
-  StyledTabItemTooltip,
-} from './TabListItem.styled';
+import { StyledTabItemWrapper, StyledTabTitle } from './TabListItem.styled';
 import Favicon from '~/entrypoints/common/components/Favicon';
 import TabItemEditModal from './TabItemEditModal';
 
@@ -55,31 +52,6 @@ const {
 } = ENUM_SETTINGS_PROPS;
 const osInfo = getOSInfo();
 
-// 标签页tooltip内容
-const TabItemTooltipMarkup = memo(function TabItemTooltipMarkup({
-  tab,
-}: {
-  tab: TabItem;
-}) {
-  const { $fmt } = useIntlUtls();
-  return (
-    <StyledTabItemTooltip>
-      <div className="tooltip-item tooltip-title">
-        <span className="label">{$fmt('common.name')}:</span>
-        <span className="name" title={tab.title}>
-          {tab.title}
-        </span>
-      </div>
-      <div className="tooltip-item tooltip-url">
-        <span className="label">{$fmt('common.url')}:</span>
-        <a className="link" href={tab.url} target="_blank" title={tab.url}>
-          {tab.url}
-        </a>
-      </div>
-    </StyledTabItemTooltip>
-  );
-});
-
 export default memo(function TabListItem({
   tabId,
   title,
@@ -96,10 +68,7 @@ export default memo(function TabListItem({
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const [removeModal, removeContextHolder] = Modal.useModal();
-  const [tooltipSwitch, setTooltipSwitch] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [tooltipVisible, setTooltipVisible] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
 
   const tabRef = useRef<HTMLDivElement>(null);
 
@@ -156,7 +125,6 @@ export default memo(function TabListItem({
       if (settings[DELETE_AFTER_RESTORE] && !group?.isLocked) {
         onRemove?.([tab]);
       }
-      setTooltipVisible(false);
     },
     [tab, group.isLocked, onRemove],
   );
@@ -252,11 +220,6 @@ export default memo(function TabListItem({
     [onQuickSelect],
   );
 
-  const draggingListener = (value: boolean) => {
-    setIsDragging(value);
-    if (value) setTooltipVisible(false);
-  };
-
   const scrollToTab = useCallback(() => {
     if (highlight && tabRef.current) {
       setTimeout(() => {
@@ -267,18 +230,6 @@ export default memo(function TabListItem({
   useEffect(() => {
     scrollToTab();
   }, []);
-
-  // 标签页 tooltip （已弃用-代码暂时保留）
-  // useEffect(() => {
-  //   const _toolTipswitch = !!settingsUtils?.settings?.[SHOW_TAB_TITLE_TOOLTIP];
-  //   setTooltipSwitch(_toolTipswitch);
-  //   if (_toolTipswitch) {
-  //     eventEmitter.on('home:is-dragging', draggingListener);
-  //   }
-  //   return () => {
-  //     eventEmitter.off('home:is-dragging', draggingListener);
-  //   };
-  // }, []);
 
   return (
     <>
@@ -292,46 +243,54 @@ export default memo(function TabListItem({
         $bgColor={highlight ? token.colorWarningHover : ''}
       >
         {/* icon tab remove */}
-        <StyledActionIconBtn
-          className="tab-item-btn btn-remove"
-          $size="16"
+        <Tooltip
           title={$fmt('common.remove')}
-          $hoverColor={ENUM_COLORS.red}
-          onClick={handleTabRemove}
+          placement="top"
+          mouseEnterDelay={0.3}
+          destroyTooltipOnHide
         >
-          <CloseOutlined />
-        </StyledActionIconBtn>
+          <StyledActionIconBtn
+            className="tab-item-btn btn-remove"
+            $size="16"
+            aria-label={$fmt('common.remove')}
+            $hoverColor={ENUM_COLORS.red}
+            onClick={handleTabRemove}
+          >
+            <CloseOutlined />
+          </StyledActionIconBtn>
+        </Tooltip>
         {/* checkbox */}
         <Checkbox
           className="checkbox-item"
           value={tab.tabId}
           onChange={handleSelectChange}
         ></Checkbox>
-        <Dropdown
-          menu={{ items: moreItems, onClick: onMoreItemClick }}
-          trigger={['click']}
-          destroyPopupOnHide
+        <Tooltip
+          title={$fmt('common.more')}
+          placement="top"
+          mouseEnterDelay={0.3}
+          destroyTooltipOnHide
         >
-          <StyledActionIconBtn
-            className="tab-item-btn btn-more"
-            $size="16"
-            title={$fmt('common.more')}
+          <Dropdown
+            menu={{ items: moreItems, onClick: onMoreItemClick }}
+            trigger={['click']}
+            destroyPopupOnHide
           >
-            <MenuOutlined />
-          </StyledActionIconBtn>
-        </Dropdown>
+            <StyledActionIconBtn
+              className="tab-item-btn btn-more"
+              $size="16"
+              aria-label={$fmt('common.more')}
+            >
+              <MenuOutlined />
+            </StyledActionIconBtn>
+          </Dropdown>
+        </Tooltip>
 
         {/* icon tab favicon */}
         <Favicon pageUrl={tab.url!} favIconUrl={tab.favIconUrl}></Favicon>
         {/* tab title */}
         <StyledTabTitle className="tab-item-title">
-          <a
-            className="link"
-            href={tab.url}
-            title={tab.title}
-            draggable={false}
-            onClick={onTabOpen}
-          >
+          <a className="link" href={tab.url} draggable={false} onClick={onTabOpen}>
             {tab.title}
           </a>
         </StyledTabTitle>

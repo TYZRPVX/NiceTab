@@ -90,6 +90,16 @@ export default function TabGroupItem({ group, onAction, onGroupAction }: GroupIt
         label: $fmt('common.remove'),
         icon: <CloseOutlined />,
         hoverColor: ENUM_COLORS.red,
+        confirm: {
+          title: $fmt('home.removeTitle'),
+          description: $fmt({
+            id: 'home.tab.removeSelected',
+            values: { count: group.tabs.length },
+          }),
+          okText: $fmt('common.remove'),
+          cancelText: $fmt('common.cancel'),
+          okButtonProps: { danger: true },
+        },
         onClick: handleGroupRemove,
       },
     ];

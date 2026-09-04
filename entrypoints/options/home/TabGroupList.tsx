@@ -1,12 +1,20 @@
-import { memo, useMemo, useContext } from 'react';
-import { Typography } from 'antd';
+import {
+  memo,
+  useMemo,
+  useContext,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { Button, Empty } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import {
   Virtuoso,
   VirtuosoHandle,
   type FlatIndexLocationWithAlign,
 } from 'react-virtuoso';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import { settingsUtils } from '~/entrypoints/common/storage';
 import type { GroupItem } from '~/entrypoints/types';
 import type { TreeDataNodeTag, TreeDataNodeTabGroup, MoveToCallbackProps } from './types';
 import { StyledGroupList } from './Home.styled';
@@ -96,7 +104,14 @@ const ListItem = memo(
 export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   const { $fmt } = useIntlUtls();
   const { treeDataHook } = useContext(HomeContext);
-  const { selectedTagKey, selectedTabGroupKey, selectedTag, selectedTagData } = treeDataHook;
+  const {
+    loading,
+    selectedTagKey,
+    selectedTabGroupKey,
+    selectedTag,
+    selectedTagData,
+    handleTabGroupCreate,
+  } = treeDataHook;
   const selectedTabGroupRef = useRef<HTMLDivElement>(null);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
 
@@ -105,11 +120,14 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   }, [selectedTagData]);
 
   const groups = selectedTagData?.groupList || [];
+  const canCreateGroup = !!selectedTagKey && !selectedTagData?.isLocked;
+  const handleCreateGroup = useCallback(() => {
+    if (canCreateGroup) handleTabGroupCreate(selectedTagKey!);
+  }, [canCreateGroup, handleTabGroupCreate, selectedTagKey]);
   const getTreeGroup = useCallback(
     (groupId: React.Key) =>
       selectedTag?.children?.find(group => group.key === groupId) as
-        | TreeDataNodeTabGroup
-        | undefined,
+        TreeDataNodeTabGroup | undefined,
     [selectedTag],
   );
 
@@ -178,7 +196,22 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
         </span>
       </div>
 
-      {virtual ? (
+      {!loading && groups.length === 0 ? (
+        <div className="no-data">
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={$fmt('home.emptyTip')}>
+            {canCreateGroup && (
+              <Button
+                type="primary"
+                size="small"
+                icon={<PlusOutlined />}
+                onClick={handleCreateGroup}
+              >
+                {$fmt('home.createTabGroup')}
+              </Button>
+            )}
+          </Empty>
+        </div>
+      ) : virtual ? (
         <Virtuoso
           ref={virtuosoRef}
           useWindowScroll

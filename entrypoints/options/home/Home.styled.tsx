@@ -90,7 +90,9 @@ export const StyledSidebarWrapper = styled(SidebarLayout)<{
           min-height: 30px;
           padding: 3px 6px;
           border-radius: var(--nt-radius-sm);
-          transition: background-color 0.15s ease, color 0.15s ease;
+          transition:
+            background-color 0.15s ease,
+            color 0.15s ease;
         }
         .nicetab-tree-node-content-wrapper:hover {
           background: var(--nt-surface-muted);
@@ -161,11 +163,15 @@ export const StyledRightPanelWrapper = styled(RightPanelLayout)<{
       font-weight: 650;
       font-size: 15px;
       margin-bottom: 8px;
+      .btn-tips {
+        color: var(--nt-text-tertiary);
+      }
     }
 
     .opened-tabs-list {
       flex: 1;
       height: 0;
+      min-width: 0;
       overflow-y: auto;
       .no-data {
         display: flex;
@@ -173,16 +179,19 @@ export const StyledRightPanelWrapper = styled(RightPanelLayout)<{
         justify-content: center;
         align-items: center;
         height: 100%;
+        padding: 16px;
       }
     }
     .tab-list-checkbox-group {
       width: 100%;
+      min-width: 0;
       display: block;
     }
   }
 `;
 
 export const StyledGroupList = styled.div`
+  min-width: 0;
   .count-info {
     box-sizing: border-box;
     width: fit-content;
@@ -198,6 +207,13 @@ export const StyledGroupList = styled.div`
     .count-item {
       margin-right: 6px;
     }
+  }
+  .no-data {
+    display: flex;
+    min-height: 260px;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 16px;
   }
 `;
 

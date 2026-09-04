@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { theme, Input } from 'antd';
+import { theme, Input, Tooltip } from 'antd';
 import type { InputProps, InputRef } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -15,14 +15,24 @@ const StyledWrapper = styled.div<{
 }>`
   display: flex;
   align-items: center;
+  width: 100%;
+  min-width: 0;
   max-width: ${props => (props.$maxWidth ? `${props.$maxWidth}px` : '100%')};
   gap: 4px;
   .text-readonly {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    flex: 0 1 auto;
+    min-width: 0;
     font-size: ${props => props.$fontSize || 14}px;
     ${StyledEllipsis}
   }
   input {
     width: 100%;
+  }
+  .edit-button {
+    flex: 0 0 auto;
   }
 `;
 
@@ -114,11 +124,17 @@ export default function EditInput({
         />
       ) : (
         <>
-          <span className="text-readonly" title={displayValue || innerValue}>
-            {displayValue || innerValue}
-          </span>
+          <Tooltip
+            title={displayValue || innerValue}
+            placement="topLeft"
+            mouseEnterDelay={0.3}
+            destroyTooltipOnHide
+          >
+            <span className="text-readonly">{displayValue || innerValue}</span>
+          </Tooltip>
           {visible && (
             <StyledActionIconBtn
+              className="edit-button"
               $size={iconSize}
               $hoverColor={token.colorPrimaryHover}
               title={$fmt('common.edit')}

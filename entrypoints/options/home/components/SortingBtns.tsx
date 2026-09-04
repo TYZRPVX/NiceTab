@@ -1,5 +1,5 @@
 import { type ReactNode, useMemo } from 'react';
-import { Button } from 'antd';
+import { Button, Tooltip } from 'antd';
 import {
   SortAscendingOutlined,
   SortDescendingOutlined,
@@ -7,10 +7,6 @@ import {
   // ArrowDownOutlined,
 } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
-import {
-  IconTimeAscending,
-  IconTimeDescending,
-} from '~/entrypoints/common/components/icon/CustomIcon';
 
 export default function SortingBtns({
   sortBy = 'name',
@@ -45,14 +41,14 @@ export default function SortingBtns({
             id: 'common.ascending',
             values: { sortBy: $fmt('home.tabGroup.createTime') },
           }),
-          icon: <IconTimeAscending />,
+          icon: <SortAscendingOutlined />,
         },
         descending: {
           title: $fmt({
             id: 'common.descending',
             values: { sortBy: $fmt('home.tabGroup.createTime') },
           }),
-          icon: <IconTimeDescending />,
+          icon: <SortDescendingOutlined />,
         },
       };
     }
@@ -60,20 +56,32 @@ export default function SortingBtns({
 
   return (
     <>
-      <div
-        className="action-icon"
+      <Tooltip
         title={config?.ascending?.title || $fmt('common.ascending')}
-        onClick={() => onSort?.('ascending')}
+        placement="top"
+        mouseEnterDelay={0.3}
+        destroyTooltipOnHide
       >
-        <Button icon={config?.ascending?.icon || <SortAscendingOutlined />}></Button>
-      </div>
-      <div
-        className="action-icon"
+        <div className="action-icon" onClick={() => onSort?.('ascending')}>
+          <Button
+            aria-label={config?.ascending?.title || $fmt('common.ascending')}
+            icon={config?.ascending?.icon || <SortAscendingOutlined />}
+          ></Button>
+        </div>
+      </Tooltip>
+      <Tooltip
         title={config?.descending?.title || $fmt('common.descending')}
-        onClick={() => onSort?.('descending')}
+        placement="top"
+        mouseEnterDelay={0.3}
+        destroyTooltipOnHide
       >
-        <Button icon={config?.descending?.icon || <SortDescendingOutlined />}></Button>
-      </div>
+        <div className="action-icon" onClick={() => onSort?.('descending')}>
+          <Button
+            aria-label={config?.descending?.title || $fmt('common.descending')}
+            icon={config?.descending?.icon || <SortDescendingOutlined />}
+          ></Button>
+        </div>
+      </Tooltip>
     </>
   );
 }

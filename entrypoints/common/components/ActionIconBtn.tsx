@@ -1,3 +1,4 @@
+import { useCallback, type KeyboardEvent } from 'react';
 import type { ActionBtnStyle } from '~/entrypoints/types';
 import { classNames } from '~/entrypoints/common/utils';
 import {
@@ -31,13 +32,26 @@ export default function ActionIconBtn({
     onClick?.();
   }, [disabled, onClick]);
 
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLElement>) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      event.currentTarget.click();
+    },
+    [handleClick],
+  );
+
   return btnStyle === 'icon' ? (
     <StyledActionIconBtn
       className={classNames(className, disabled && 'disabled')}
-      title={label}
       $size={size}
       $hoverColor={hoverColor}
+      role="button"
+      tabIndex={disabled ? -1 : 0}
+      aria-label={label}
+      aria-disabled={disabled || undefined}
       onClick={handleClick}
+      onKeyDown={handleKeyDown}
     >
       {children}
     </StyledActionIconBtn>

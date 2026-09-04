@@ -36,12 +36,15 @@ export const StyledActionIconBtn = styled.i<{
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   width: ${props => `${+(props.$size || 16) + 2}px`};
   height: ${props => `${+(props.$size || 16) + 2}px`};
+  border-radius: 6px;
   font-size: ${props => `${props.$size || 14}px`};
   transition:
     transform 0.2s,
-    color 0.2s;
+    color 0.2s,
+    background-color 0.2s;
   cursor: pointer;
   transform: scale(1);
   ${props =>
@@ -53,10 +56,16 @@ export const StyledActionIconBtn = styled.i<{
       : `
         color: ${props.$color || props.theme.colorTextSecondary || '#666'};
         &:hover {
-          transform: scale(${props.$hoverScale || 1.2});
+          transform: scale(${props.$hoverScale || 1.08});
           color: ${props.$hoverColor || props.theme.colorPrimary || '#666'};
+          background: var(--nt-surface-muted);
         }
       `};
+
+  &:focus-visible {
+    outline: 2px solid ${props => props.theme.colorPrimary};
+    outline-offset: 2px;
+  }
 
   &.disabled {
     transform: scale(1);
@@ -76,6 +85,11 @@ export const StyledActionTextBtn = styled.span<{
   cursor: pointer;
   &:hover {
     color: ${props => props.$hoverColor || props.theme.colorPrimary || '#666'};
+  }
+  &:focus-visible {
+    outline: 2px solid ${props => props.theme.colorPrimary};
+    outline-offset: 2px;
+    border-radius: 4px;
   }
   &.disabled {
     ${StyleBtnDisabled}

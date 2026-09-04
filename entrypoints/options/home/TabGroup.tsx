@@ -8,9 +8,9 @@ import {
   ExportOutlined,
   SendOutlined,
   CopyOutlined,
+  RetweetOutlined,
 } from '@ant-design/icons';
 import copyToClipboard from 'copy-to-clipboard';
-import { IconRepeat } from '~/entrypoints/common/components/icon/CustomIcon';
 import { GroupItem, TabItem, ActionBtnStyle } from '~/entrypoints/types';
 import {
   ENUM_COLORS,
@@ -480,7 +480,7 @@ function TabGroup({
       {
         key: 'clone',
         label: $fmt(actionMap['clone'].labelKey),
-        icon: <IconRepeat />,
+        icon: <RetweetOutlined />,
         disabled: tagLocked || isLocked,
         onClick: handleSelectedTabsCopy,
       },
@@ -514,10 +514,7 @@ function TabGroup({
         ref={groupRef}
       >
         {/* 标签组 header + tab 操作区域（sticky 置顶） */}
-        <StyledGroupStickyHeader
-          $bgColor={token.colorBgContainer}
-          $active={selected}
-        >
+        <StyledGroupStickyHeader $bgColor={token.colorBgContainer} $active={selected}>
           <StyledGroupHeader className="group-header select-none">
             <div className="group-header-top">
               {(isLocked || isStarred) && (
@@ -646,7 +643,8 @@ function TabGroup({
                     group={group}
                     {...tab}
                     highlight={
-                      (tab.tabId != undefined && treeDataHook?.highlightTabId === tab.tabId) ||
+                      (tab.tabId != undefined &&
+                        treeDataHook?.highlightTabId === tab.tabId) ||
                       quickSelectedTabIds.includes(tab.tabId)
                     }
                     onRemove={handleTabRemove}

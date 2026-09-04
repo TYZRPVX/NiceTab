@@ -14,15 +14,13 @@ import {
   type MenuProps,
 } from 'antd';
 import {
-  // FolderOutlined,
-  // FolderOpenOutlined,
-  // FolderAddOutlined,
+  FolderOutlined,
+  FolderOpenOutlined,
+  FolderAddOutlined,
   QuestionCircleOutlined,
   MenuOutlined,
   ClearOutlined,
 } from '@ant-design/icons';
-// import { BiFolder, BiFolderOpen, BiFolderPlus } from 'react-icons/bi';
-import { LuFolderClosed, LuFolderOpen, LuFolderPlus } from 'react-icons/lu';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useGlobalSelectionBox, {
   StyledSelectionBox,
@@ -142,9 +140,7 @@ export default function Home() {
   const autoHideOpenedTabs =
     !openedTabsCollapsed &&
     viewportWidth <
-      (sidebarCollapsed ? 0 : sidebarWidth) +
-        rightPanelWidth +
-        minimumMainContentWidth;
+      (sidebarCollapsed ? 0 : sidebarWidth) + rightPanelWidth + minimumMainContentWidth;
   const effectiveOpenedTabsCollapsed = openedTabsCollapsed || autoHideOpenedTabs;
 
   const onCollapseChange = (status: boolean) => {
@@ -329,13 +325,20 @@ export default function Home() {
               <>
                 <div className="tag-list-title">
                   {$fmt('home.tabGroupList')}
-                  <StyledActionIconBtn
-                    className="btn-help"
+                  <Tooltip
                     title={$fmt('home.helpInfo')}
-                    onClick={() => setHelpDrawerVisible(true)}
+                    placement="top"
+                    mouseEnterDelay={0.3}
+                    destroyTooltipOnHide
                   >
-                    <QuestionCircleOutlined />
-                  </StyledActionIconBtn>
+                    <StyledActionIconBtn
+                      className="btn-help"
+                      aria-label={$fmt('home.helpInfo')}
+                      onClick={() => setHelpDrawerVisible(true)}
+                    >
+                      <QuestionCircleOutlined />
+                    </StyledActionIconBtn>
+                  </Tooltip>
                 </div>
                 <ul className="count-info">
                   <li>
@@ -351,39 +354,68 @@ export default function Home() {
                 {/* 顶部操作按钮组 */}
                 <div className="sidebar-action-btns-wrapper">
                   <Space size={12}>
-                    <StyledActionIconBtn
+                    <Tooltip
                       title={$fmt('home.collapseAll')}
-                      $size="20"
-                      onClick={() => toggleExpand(false)}
+                      placement="top"
+                      mouseEnterDelay={0.3}
+                      destroyTooltipOnHide
                     >
-                      <LuFolderClosed />
-                      {/* <FolderOutlined /> */}
-                    </StyledActionIconBtn>
-                    <StyledActionIconBtn
+                      <StyledActionIconBtn
+                        $size="20"
+                        aria-label={$fmt('home.collapseAll')}
+                        onClick={() => toggleExpand(false)}
+                      >
+                        <FolderOutlined />
+                      </StyledActionIconBtn>
+                    </Tooltip>
+                    <Tooltip
                       title={$fmt('home.expandAll')}
-                      $size="20"
-                      onClick={() => toggleExpand(true)}
+                      placement="top"
+                      mouseEnterDelay={0.3}
+                      destroyTooltipOnHide
                     >
-                      <LuFolderOpen />
-                      {/* <FolderOpenOutlined /> */}
-                    </StyledActionIconBtn>
-                    <StyledActionIconBtn
+                      <StyledActionIconBtn
+                        $size="20"
+                        aria-label={$fmt('home.expandAll')}
+                        onClick={() => toggleExpand(true)}
+                      >
+                        <FolderOpenOutlined />
+                      </StyledActionIconBtn>
+                    </Tooltip>
+                    <Tooltip
                       title={$fmt('home.addTag')}
-                      $size="20"
-                      onClick={handleTagCreate}
+                      placement="top"
+                      mouseEnterDelay={0.3}
+                      destroyTooltipOnHide
                     >
-                      <LuFolderPlus />
-                      {/* <FolderAddOutlined /> */}
-                    </StyledActionIconBtn>
+                      <StyledActionIconBtn
+                        $size="20"
+                        aria-label={$fmt('home.addTag')}
+                        onClick={handleTagCreate}
+                      >
+                        <FolderAddOutlined />
+                      </StyledActionIconBtn>
+                    </Tooltip>
                   </Space>
 
                   <Dropdown
                     menu={{ items: moreItems, onClick: onMoreItemClick }}
                     placement="bottomLeft"
                   >
-                    <StyledActionIconBtn className="btn-more" $size="18">
-                      <MenuOutlined />
-                    </StyledActionIconBtn>
+                    <Tooltip
+                      title={$fmt('common.more')}
+                      placement="top"
+                      mouseEnterDelay={0.3}
+                      destroyTooltipOnHide
+                    >
+                      <StyledActionIconBtn
+                        className="btn-more"
+                        $size="18"
+                        aria-label={$fmt('common.more')}
+                      >
+                        <MenuOutlined />
+                      </StyledActionIconBtn>
+                    </Tooltip>
                   </Dropdown>
                 </div>
 

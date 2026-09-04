@@ -11,10 +11,6 @@ import {
 } from '@ant-design/icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { type ActionOptionItem } from '~/entrypoints/common/components/ActionBtnList';
-import {
-  IconTimeAscending,
-  IconTimeDescending,
-} from '~/entrypoints/common/components/icon/CustomIcon';
 import type { TagActionName } from '../types';
 import { tagActionOptions, type ActionOption } from '../constants';
 
@@ -113,7 +109,7 @@ export default function useTagActions({
           id: 'common.ascending',
           values: { sortBy: $fmt('home.tabGroup.createTime') },
         }),
-        icon: <IconTimeAscending />,
+        icon: <SortAscendingOutlined />,
         disabled: isLocked,
         onClick: () => onAction('sortByCreateTimeAsc', tagId),
       },
@@ -123,7 +119,7 @@ export default function useTagActions({
           id: 'common.descending',
           values: { sortBy: $fmt('home.tabGroup.createTime') },
         }),
-        icon: <IconTimeDescending />,
+        icon: <SortDescendingOutlined />,
         disabled: isLocked,
         onClick: () => onAction('sortByCreateTimeDesc', tagId),
       },
