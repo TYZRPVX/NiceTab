@@ -26,6 +26,16 @@ import {
 } from '~/entrypoints/common/storage';
 import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 
+const THEMED_FAVICON_ID = 'nicetab-theme-favicon';
+
+export function applyDocumentFavicon(themeType: 'light' | 'dark') {
+  const favicon = document.getElementById(THEMED_FAVICON_ID) as HTMLLinkElement | null;
+  if (!favicon) return;
+
+  const href = browser.runtime.getURL(`icon/favicon-${themeType}-32.png`);
+  if (favicon.href !== href) favicon.href = href;
+}
+
 export default function Root({
   pageContext = 'optionsPage',
   children,
@@ -117,6 +127,20 @@ export default function Root({
   }, [pageContext, localeCustom]);
 
   useEffect(() => {
+    if (!hasReady || pageContext === 'contentScriptPage') return;
+
+    const effectiveTheme = themeTypeConfig.type === 'dark' ? 'dark' : 'light';
+    applyDocumentFavicon(effectiveTheme);
+    void browser.runtime
+      .sendMessage({
+        msgType: 'theme:effective-change',
+        data: { theme: effectiveTheme },
+        targetPageContext: 'background',
+      })
+      .catch(() => undefined);
+  }, [hasReady, pageContext, themeTypeConfig.type]);
+
+  useEffect(() => {
     initData();
     getManifest();
     browser.runtime.onMessage.addListener(messageListener);
@@ -131,6 +155,7 @@ export default function Root({
     return () => {
       settingsUnwatch();
       themeUnwatch();
+      browser.runtime.onMessage.removeListener(messageListener);
     };
   }, []);
 

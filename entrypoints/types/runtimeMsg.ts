@@ -15,6 +15,9 @@ export type RuntimeMsgType =
   | 'setPrimaryColor'
   | 'setThemeData'
   | 'setThemeType'
+  | 'theme:effective-change'
+  | 'theme:request-system-preference'
+  | 'theme:system-preference'
   | 'setLocale'
   | 'openAdminRoutePage'
   | 'reloadAllAdminPage'
@@ -39,6 +42,22 @@ export interface RuntimeMsgSetThemeType {
   msgType: 'setThemeType';
   data: {
     themeType: ThemeTypes;
+  };
+}
+export interface RuntimeMsgEffectiveThemeChange {
+  msgType: 'theme:effective-change';
+  data: {
+    theme: 'light' | 'dark';
+  };
+}
+export interface RuntimeMsgRequestSystemThemePreference {
+  msgType: 'theme:request-system-preference';
+  data: {};
+}
+export interface RuntimeMsgSystemThemePreference {
+  msgType: 'theme:system-preference';
+  data: {
+    theme: 'light' | 'dark';
   };
 }
 export interface RuntimeMsgSetLocale {
@@ -84,6 +103,9 @@ export type RuntimeMsgBaseProps =
   | RuntimeMsgSetPrimaryColor
   | RuntimeMsgSetThemeData
   | RuntimeMsgSetThemeType
+  | RuntimeMsgEffectiveThemeChange
+  | RuntimeMsgRequestSystemThemePreference
+  | RuntimeMsgSystemThemePreference
   | RuntimeMsgSetLocale
   | RuntimeMsgOpenAdminRoutePage
   | RuntimeMsgReloadAllAdminPage
@@ -107,25 +129,31 @@ export type SendRuntimeMessageBaseProps<T extends RuntimeMsgType> =
       ? RuntimeMsgSetThemeData
       : T extends 'setThemeType'
         ? RuntimeMsgSetThemeType
-        : T extends 'setLocale'
-          ? RuntimeMsgSetLocale
-          : T extends 'openAdminRoutePage'
-            ? RuntimeMsgOpenAdminRoutePage
-            : T extends 'reloadAllAdminPage'
-              ? RuntimeMsgReloadAllAdminPage
-              : T extends 'reloadOtherAdminPage'
-                ? RuntimeMsgReloadOtherAdminPage
-                : T extends 'sync:sync-status-change--gist'
-                  ? RuntimeMsgSyncStatusChangeGist
-                  : T extends 'sync:sync-status-change--webdav'
-                    ? RuntimeMsgSyncStatusChangeWebdav
-                    : T extends 'sendTabsActionStart'
-                      ? RuntimeMsgSendTabsActionStart
-                      : T extends 'sendTabsActionConfirm'
-                        ? RuntimeMsgSendTabsActionConfirm
-                        : T extends 'sendAllTabsFromCommandPage'
-                          ? RuntimeMsgSendAllTabsFromCommandPage
-                          : never;
+        : T extends 'theme:effective-change'
+          ? RuntimeMsgEffectiveThemeChange
+          : T extends 'theme:request-system-preference'
+            ? RuntimeMsgRequestSystemThemePreference
+            : T extends 'theme:system-preference'
+              ? RuntimeMsgSystemThemePreference
+              : T extends 'setLocale'
+                ? RuntimeMsgSetLocale
+                : T extends 'openAdminRoutePage'
+                  ? RuntimeMsgOpenAdminRoutePage
+                  : T extends 'reloadAllAdminPage'
+                    ? RuntimeMsgReloadAllAdminPage
+                    : T extends 'reloadOtherAdminPage'
+                      ? RuntimeMsgReloadOtherAdminPage
+                      : T extends 'sync:sync-status-change--gist'
+                        ? RuntimeMsgSyncStatusChangeGist
+                        : T extends 'sync:sync-status-change--webdav'
+                          ? RuntimeMsgSyncStatusChangeWebdav
+                          : T extends 'sendTabsActionStart'
+                            ? RuntimeMsgSendTabsActionStart
+                            : T extends 'sendTabsActionConfirm'
+                              ? RuntimeMsgSendTabsActionConfirm
+                              : T extends 'sendAllTabsFromCommandPage'
+                                ? RuntimeMsgSendAllTabsFromCommandPage
+                                : never;
 
 // sendRuntimeMessage params
 export type SendRuntimeMessageParams<T extends RuntimeMsgType = any> =

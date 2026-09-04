@@ -55,6 +55,7 @@ import styled, { ThemeProvider } from 'styled-components';
 import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
 import { IconTheme } from '~/entrypoints/common/components/icon/CustomIcon';
+import BrandMark from '~/entrypoints/common/components/BrandMark';
 import ColorList from '~/entrypoints/common/components/ColorList.tsx';
 import { pick, sendRuntimeMessage } from '~/entrypoints/common/utils';
 import {
@@ -126,10 +127,17 @@ const StyledPageContainer = styled.div<{
     backdrop-filter: blur(12px);
 
     .logo {
+      display: grid;
+      place-items: center;
       width: 64px;
       height: 100%;
       border-right: 1px solid var(--nt-border);
-      background: url('/icon/logo.svg') no-repeat center / 25px 25px;
+      color: var(--nt-text);
+
+      svg {
+        width: 28px;
+        height: 28px;
+      }
     }
     .navbar-menu {
       flex: 1;
@@ -469,7 +477,9 @@ function AppLayout() {
       <StyledPageContainer $widthType={pageWidthType} className="page-container">
         <GlobalStyle />
         <div className="header-navbar select-none">
-          <div className="logo" aria-label="Nice Tab"></div>
+          <div className="logo">
+            <BrandMark />
+          </div>
           <Menu
             className="navbar-menu"
             theme="light"

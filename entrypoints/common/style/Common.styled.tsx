@@ -114,6 +114,7 @@ export const GlobalStyle = createGlobalStyle`
     --nt-surface: ${props => props.theme.colorBgContainer || '#fff'};
     --nt-surface-muted: ${props => props.theme.colorFillAlter || '#f3f5f8'};
     --nt-border: ${props => props.theme.colorBorderSecondary || props.theme.colorBorder || '#e6eaf0'};
+    --nt-text: ${props => props.theme.colorText || '#1d2939'};
     --nt-text-secondary: ${props => props.theme.colorTextSecondary || '#667085'};
     --nt-text-tertiary: ${props => props.theme.colorTextTertiary || '#98a2b3'};
     --nt-accent-soft: ${props => props.theme.colorPrimaryBg || '#eff6ff'};

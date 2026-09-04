@@ -5,6 +5,18 @@ import yargsParser from 'yargs-parser';
 const args = yargsParser(process.argv.slice(2));
 
 const isFirefox = args.b === 'firefox';
+const actionDefaultIcons = {
+  16: 'icon/16.png',
+  32: 'icon/32.png',
+};
+const firefoxThemeIcons = [
+  { size: 16, light: 'icon/16-light.png', dark: 'icon/16-dark.png' },
+  { size: 32, light: 'icon/32-light.png', dark: 'icon/32-dark.png' },
+];
+const action = {
+  default_icon: actionDefaultIcons,
+  ...(isFirefox ? { theme_icons: firefoxThemeIcons } : {}),
+};
 
 export default defineConfig({
   // entrypointLoader: 'jiti',
@@ -27,7 +39,7 @@ export default defineConfig({
       'unlimitedStorage',
       'alarms',
       'scripting',
-      ...(isFirefox ? [] : ['tabGroups', 'commands', 'favicon']),
+      ...(isFirefox ? [] : ['tabGroups', 'commands', 'favicon', 'offscreen']),
     ],
     optional_permissions: [
       ...(isFirefox ? ["tabGroups"] : []),
@@ -54,6 +66,9 @@ export default defineConfig({
         }
       }
     } as UserManifest['browser_specific_settings'] : {},
+    ...(isFirefox
+      ? { browser_action: action as UserManifest['browser_action'] }
+      : { action: action as UserManifest['action'] }),
     commands: {
       'action:openAdminTab': {
         suggested_key: {

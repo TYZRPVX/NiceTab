@@ -24,6 +24,95 @@ import {
 } from '~/entrypoints/common/constants';
 import type { RuntimeMessageEventProps } from '~/entrypoints/types';
 
+type EffectiveTheme = 'light' | 'dark';
+type OffscreenApi = {
+  createDocument: (options: {
+    url: string;
+    reasons: ['MATCH_MEDIA'];
+    justification: string;
+  }) => Promise<void>;
+};
+
+let systemTheme: EffectiveTheme = 'light';
+let creatingOffscreenDocument: Promise<void> | undefined;
+
+function isFirefoxBuild() {
+  const manifest = browser.runtime.getManifest() as {
+    browser_specific_settings?: { gecko?: unknown };
+  };
+  return Boolean(manifest.browser_specific_settings?.gecko);
+}
+
+function getOffscreenApi(): OffscreenApi | undefined {
+  return (
+    globalThis as typeof globalThis & { chrome?: { offscreen?: OffscreenApi } }
+  ).chrome?.offscreen;
+}
+
+function actionIconPaths(theme: EffectiveTheme) {
+  return {
+    16: `icon/16-${theme}.png`,
+    32: `icon/32-${theme}.png`,
+  };
+}
+
+// Firefox selects manifest theme_icons itself. Chromium needs a runtime update.
+async function applyActionIcon(theme: EffectiveTheme) {
+  if (isFirefoxBuild()) return;
+  await browser[BROWSER_ACTION_API_NAME].setIcon?.({ path: actionIconPaths(theme) });
+}
+
+function requestSystemTheme() {
+  return browser.runtime
+    .sendMessage({
+      msgType: 'theme:request-system-preference',
+      data: {},
+      targetPageContext: 'background',
+    })
+    .catch(() => undefined);
+}
+
+async function ensureSystemThemeObserver() {
+  if (isFirefoxBuild()) return;
+
+  const offscreen = getOffscreenApi();
+  if (!offscreen) return;
+
+  if (!creatingOffscreenDocument) {
+    creatingOffscreenDocument = offscreen
+      .createDocument({
+        url: 'offscreen.html',
+        reasons: ['MATCH_MEDIA'],
+        justification: 'Observe the system color scheme for the NiceTab toolbar icon.',
+      })
+      .catch(error => {
+        // The document may outlive a restarted service worker.
+        if (!/single offscreen document/i.test(String(error))) {
+          console.warn('Could not create the system theme observer.', error);
+        }
+      })
+      .finally(() => {
+        creatingOffscreenDocument = undefined;
+      });
+  }
+
+  await creatingOffscreenDocument;
+  await requestSystemTheme();
+}
+
+async function refreshActionIcon() {
+  if (isFirefoxBuild()) return;
+
+  const settings = await settingsUtils.getSettings();
+  if (settings.themeType === 'auto') {
+    void ensureSystemThemeObserver();
+    await applyActionIcon(systemTheme);
+    return;
+  }
+
+  await applyActionIcon(settings.themeType === 'dark' ? 'dark' : 'light');
+}
+
 const {
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
@@ -197,11 +286,13 @@ export default defineBackground(() => {
   initTabEventListener();
   // 初始化 popup 交互
   initPopup();
+  void refreshActionIcon();
   initSettingsStorageListener(async (settings, oldSettings) => {
     initTabEventListener();
     initPopup();
     initNewTabRedirectListener();
     autoSyncAlarm.checkReset(settings, oldSettings);
+    void refreshActionIcon();
   });
 
   initTabListStorageListener(async () => {
@@ -249,6 +340,7 @@ export default defineBackground(() => {
     console.log('browser.runtime.onInstalled');
     await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
 
+    void refreshActionIcon();
     startup();
   });
   browser.runtime.onStartup.addListener(async () => {
@@ -266,6 +358,7 @@ export default defineBackground(() => {
     }
     await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
 
+    void refreshActionIcon();
     startup();
   });
   browser.windows.onCreated.addListener(async () => {
@@ -316,6 +409,19 @@ export default defineBackground(() => {
     } else if (msgType === 'setThemeType') {
       if (targetPageContext === 'contentScriptPage') {
         tabUtils.sendTabMessage({ msgType: 'setThemeType', data });
+      }
+      void refreshActionIcon();
+    } else if (msgType === 'theme:effective-change') {
+      if (data?.theme === 'light' || data?.theme === 'dark') {
+        await applyActionIcon(data.theme);
+      }
+    } else if (msgType === 'theme:system-preference') {
+      if (data?.theme === 'light' || data?.theme === 'dark') {
+        systemTheme = data.theme;
+        const settings = await settingsUtils.getSettings();
+        if (settings.themeType === 'auto') {
+          await applyActionIcon(systemTheme);
+        }
       }
     } else if (msgType === 'setLocale') {
       if (targetPageContext === 'contentScriptPage') {
