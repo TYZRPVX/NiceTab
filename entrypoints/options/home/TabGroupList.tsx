@@ -7,6 +7,7 @@ import {
 } from 'react-virtuoso';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { settingsUtils } from '~/entrypoints/common/storage';
+import type { GroupItem } from '~/entrypoints/types';
 import type { TreeDataNodeTag, TreeDataNodeTabGroup, MoveToCallbackProps } from './types';
 import { StyledGroupList } from './Home.styled';
 import TabGroup from './TabGroup';
@@ -14,7 +15,7 @@ import { HomeContext } from './hooks/treeData';
 import { getSelectedCounts } from './utils';
 
 const ListItem = memo(
-  ({ tabGroup }: { tabGroup: TreeDataNodeTabGroup; virtual?: boolean }) => {
+  ({ tabGroup, group }: { tabGroup: TreeDataNodeTabGroup; group: GroupItem }) => {
     const { treeDataHook } = useContext(HomeContext);
     const {
       // selectedTagKey,
@@ -76,7 +77,7 @@ const ListItem = memo(
         // refreshKey={
         //   !virtual && tabGroup.key === selectedTabGroupKey ? refreshKey : undefined
         // }
-        {...tabGroup?.originData}
+        {...group}
         // actionBtnStyle={settings.groupActionBtnStyle || 'icon'}
         actionBtnStyle="icon"
         onChange={data => handleTabGroupChange(tabGroup, data)}
@@ -95,13 +96,22 @@ const ListItem = memo(
 export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   const { $fmt } = useIntlUtls();
   const { treeDataHook } = useContext(HomeContext);
-  const { selectedTagKey, selectedTabGroupKey, selectedTag, refreshKey } = treeDataHook;
+  const { selectedTagKey, selectedTabGroupKey, selectedTag, selectedTagData } = treeDataHook;
   const selectedTabGroupRef = useRef<HTMLDivElement>(null);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
 
   const counts = useMemo(() => {
-    return getSelectedCounts(selectedTag?.originData);
-  }, [selectedTag?.originData]);
+    return getSelectedCounts(selectedTagData);
+  }, [selectedTagData]);
+
+  const groups = selectedTagData?.groupList || [];
+  const getTreeGroup = useCallback(
+    (groupId: React.Key) =>
+      selectedTag?.children?.find(group => group.key === groupId) as
+        | TreeDataNodeTabGroup
+        | undefined,
+    [selectedTag],
+  );
 
   const initialConfig = useMemo(() => {
     const index =
@@ -173,23 +183,28 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
           ref={virtuosoRef}
           useWindowScroll
           initialTopMostItemIndex={initialConfig}
-          overscan={12}
-          increaseViewportBy={{ top: 1200, bottom: 1200 }}
-          data={selectedTag?.children || []}
-          itemContent={(index, tabGroup) => <ListItem tabGroup={tabGroup}></ListItem>}
+          overscan={4}
+          increaseViewportBy={{ top: 320, bottom: 320 }}
+          data={groups}
+          itemContent={(_index, group) => {
+            const tabGroup = getTreeGroup(group.groupId);
+            return tabGroup ? <ListItem tabGroup={tabGroup} group={group} /> : null;
+          }}
         />
       ) : (
-        (selectedTag?.children as TreeDataNodeTabGroup[])?.map(
-          (tabGroup: TreeDataNodeTabGroup) =>
-            tabGroup?.originData && (
+        groups.map(group => {
+          const tabGroup = getTreeGroup(group.groupId);
+          return (
+            tabGroup && (
               <div
                 ref={tabGroup.key === selectedTabGroupKey ? selectedTabGroupRef : null}
                 key={tabGroup.key}
               >
-                <ListItem tabGroup={tabGroup} virtual={virtual}></ListItem>
+                <ListItem tabGroup={tabGroup} group={group} />
               </div>
-            ),
-        )
+            )
+          );
+        })
       )}
     </StyledGroupList>
   );

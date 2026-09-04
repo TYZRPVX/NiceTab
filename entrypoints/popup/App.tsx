@@ -44,9 +44,6 @@ import TabGroupItem, { type GroupListItem } from './TabGroupItem';
 import { type TabActions } from './TabItem';
 import { StyledContainer } from './App.styled';
 
-import { initFaviconApiData } from '~/entrypoints/common/utils/favicon';
-initFaviconApiData();
-
 interface ActionBtnItem {
   key: string;
   label: string;

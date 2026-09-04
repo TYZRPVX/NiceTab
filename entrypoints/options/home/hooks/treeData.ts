@@ -80,6 +80,19 @@ export function useTreeData() {
     return tag as TreeDataNodeTag;
   }, [treeData, selectedTagKey]);
 
+  const selectedTagData = useMemo(
+    () => tagList.find(tag => tag.tagId === selectedTagKey),
+    [tagList, selectedTagKey],
+  );
+
+  const getTabGroupData = useCallback(
+    (tagId: React.Key, groupId: React.Key) =>
+      tagList
+        .find(tag => tag.tagId === tagId)
+        ?.groupList.find(group => group.groupId === groupId),
+    [tagList],
+  );
+
   // 点击更多选项
   const handleMoreItemClick = async (action: string) => {
     if (action === 'clear') {
@@ -219,7 +232,7 @@ export function useTreeData() {
   // 打开分类下所有的标签组
   const handleTagRestore = useCallback(
     async (tagId: React.Key) => {
-      const tag = treeData.find(t => t.key === tagId) as TreeDataNodeTag;
+      const tag = tagList.find(item => item.tagId === tagId);
       if (!tag) return;
 
       const settings = await settingsUtils.getSettings();
@@ -228,8 +241,8 @@ export function useTreeData() {
 
       // let hasDeletedGroups = false;
 
-      for (const tabGroup of (tag.children || []) as TreeDataNodeTabGroup[]) {
-        const { groupName, tabList = [], isLocked } = tabGroup?.originData || {};
+      for (const tabGroup of tag.groupList) {
+        const { groupName, tabList = [], isLocked } = tabGroup;
 
         const asGroup =
           (groupName === UNNAMED_GROUP && settings?.[UNNAMED_GROUP_RESTORE_AS_GROUP]) ||
@@ -242,7 +255,7 @@ export function useTreeData() {
         );
 
         if (deleteAfterRestore && !isLocked) {
-          await tabListUtils.removeTabGroup(tagId, tabGroup.key);
+          await tabListUtils.removeTabGroup(tagId, tabGroup.groupId);
           // hasDeletedGroups = true;
         }
       }
@@ -251,7 +264,7 @@ export function useTreeData() {
         refreshTreeData();
       }
     },
-    [treeData],
+    [tagList],
   );
 
 
@@ -260,11 +273,10 @@ export function useTreeData() {
     async (tabGroup: TreeDataNodeTabGroup) => {
       const tagKey = tabGroup.parentKey;
       if (!tabGroup.key || !tagKey) return;
-      const tag = treeData.find(tag => tag.key === tagKey) as TreeDataNodeTag;
       await tabListUtils.removeTabGroup(tagKey, tabGroup.key);
       refreshTreeData();
     },
-    [treeData],
+    [],
   );
   // 创建标签组
   const handleTabGroupCreate = useCallback(
@@ -343,9 +355,10 @@ export function useTreeData() {
   const handleTabGroupRestore = useCallback(
     async (tabGroup: TreeDataNodeTabGroup) => {
       const tagKey = tabGroup.parentKey;
-      const tag = treeData.find(tag => tag.key === tagKey) as TreeDataNodeTag;
+      const group = getTabGroupData(tagKey, tabGroup.key);
+      if (!group) return;
       const settings = await settingsUtils.getSettings();
-      const { groupName, tabList = [], isLocked } = tabGroup?.originData || {};
+      const { groupName, tabList = [], isLocked } = group;
       const discard = settings?.[DISCARD_WHEN_OPEN_TABS];
 
       const asGroup =
@@ -359,11 +372,11 @@ export function useTreeData() {
       );
 
       if (settings?.[DELETE_AFTER_RESTORE] && !isLocked) {
-        await tabListUtils.removeTabGroup(tag.key, tabGroup.key);
+        await tabListUtils.removeTabGroup(tagKey, tabGroup.key);
         refreshTreeData();
       }
     },
-    [treeData],
+    [getTabGroupData],
   );
   // 打开标签页
   const handleTabsOpen = useCallback(
@@ -603,7 +616,7 @@ export function useTreeData() {
     let _targetIndex = targetIndex;
     if (['opened2group', 'tab2group'].includes(actionType)) {
       const settings = await settingsUtils.getSettings();
-      const targetTabListLength = targetData.nodeData?.tabList?.length || 0;
+      const targetTabListLength = targetData.nodeData?.tabCount || 0;
       _targetIndex = settings[TAB_INSERT_POSITION] === 'bottom' ? targetTabListLength : 0;
     }
 
@@ -686,7 +699,7 @@ export function useTreeData() {
   const handleHotkeyAction = useCallback(
     async ({ action }: { action: string }) => {
       if (!selectedTagKey) return;
-      if (selectedTag.originData.isLocked) return;
+      if (selectedTagData?.isLocked) return;
       if (selectedTabGroupKey) {
         await tabListUtils.tabGroupMove(
           action === 'moveUp' ? 'up' : 'down',
@@ -722,12 +735,13 @@ export function useTreeData() {
         // if (action === 'moveUp' && tagIndex === 0 || action === 'moveDown' && tagIndex === treeData.length - 1) return;
         if (action === 'moveUp') {
           if (tagIndex === 0) return;
-          const prevTagData = treeData[tagIndex - 1]?.originData as TagItem;
+          const prevTagData = (treeData[tagIndex - 1] as TreeDataNodeTag | undefined)
+            ?.originData;
           // 中转站始终在第一位
-          if (tagIndex === 1 && prevTagData.static) return;
+          if (tagIndex === 1 && prevTagData?.static) return;
         } else if (action === 'moveDown') {
           if (tagIndex === treeData.length - 1) return;
-          const firstTagData = treeData[0]?.originData as TagItem;
+          const firstTagData = (treeData[0] as TreeDataNodeTag | undefined)?.originData;
           // 中转站始终在第一位
           if (tagIndex === 0 && firstTagData?.static) return;
         }
@@ -744,7 +758,7 @@ export function useTreeData() {
         );
       }
     },
-    [treeData, selectedTagKey, selectedTabGroupKey, handleSelect],
+    [treeData, selectedTagKey, selectedTabGroupKey, selectedTagData, handleSelect],
   );
 
   useEffect(() => {
@@ -799,6 +813,7 @@ export function useTreeData() {
     expandedKeys,
     setExpandedKeys,
     selectedTag,
+    selectedTagData,
     refreshKey,
     highlightTabId,
     setHighlightTabId,

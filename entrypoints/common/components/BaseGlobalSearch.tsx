@@ -43,6 +43,7 @@ import { eventEmitter as homeEventEmitter } from '~/entrypoints/options/home/hoo
 
 const { GLOBAL_SEARCH_DELETE_AFTER_OPEN, DISCARD_WHEN_OPEN_TABS, OPENING_TABS_ORDER } =
   ENUM_SETTINGS_PROPS;
+const GLOBAL_SEARCH_RESULT_LIMIT = 500;
 
 export type SearchListItemProps = Pick<TagItem, 'tagId' | 'tagName' | 'static'> &
   Pick<GroupItem, 'groupId' | 'groupName' | 'isLocked'> &
@@ -260,7 +261,7 @@ export function useSearchAction({
         />
       ),
     }));
-  }, [filterList, selectedTabIds, actionMode, onAction]);
+  }, [filterList, selectedTabIds, actionMode, handleAction]);
 
   const getFilterList = useCallback(
     (searchText: string) => {
@@ -278,6 +279,7 @@ export function useSearchAction({
                 ...pick(group, ['groupId', 'groupName', 'isLocked']),
                 ...pick(tab, ['tabId', 'title', 'url']),
               });
+              if (result.length >= GLOBAL_SEARCH_RESULT_LIMIT) return result;
             }
           }
         }
@@ -353,6 +355,8 @@ export function useSearchAction({
   useEffect(() => {
     initData();
   }, [initData]);
+
+  useEffect(() => () => debounceSearch.cancel(), [debounceSearch]);
 
   return {
     options,
@@ -452,6 +456,12 @@ const StyledBatchActionHeader = styled.div`
 
 export interface GlobalSearchBoxHandle {
   focus: () => void;
+  refreshData: () => void;
+}
+
+export interface GlobalSearchPanelHandle {
+  open: () => void;
+  close: () => void;
   refreshData: () => void;
 }
 
@@ -645,16 +655,29 @@ const modalStyles = {
   },
 };
 
-export const GlobalSearchPanel = forwardRef(
+export const GlobalSearchPanel = forwardRef<
+  GlobalSearchPanelHandle,
+  {
+    pageContext?: PageContextType;
+    tagList?: TagItem[];
+    onAction?: ActionCallbackFn;
+    listenRuntime?: boolean;
+    onClose?: () => void;
+  }
+>(
   (
     {
       pageContext = 'optionsPage',
       tagList,
       onAction,
+      listenRuntime = true,
+      onClose,
     }: {
       pageContext?: PageContextType;
       tagList?: TagItem[];
       onAction?: ActionCallbackFn;
+      listenRuntime?: boolean;
+      onClose?: () => void;
     },
     ref,
   ) => {
@@ -664,9 +687,14 @@ export const GlobalSearchPanel = forwardRef(
     const searchBoxRef = useRef<GlobalSearchBoxHandle>(null);
     const [listHeight, setListHeight] = useState<number>(window.innerHeight * 0.5);
 
+    const closePanel = useCallback(() => {
+      setVisible(false);
+      onClose?.();
+    }, [onClose]);
+
     const handleAction: ActionCallbackFn = useCallback(
       async (type, option) => {
-        setVisible(false);
+        closePanel();
 
         const { tagId, groupId, isLocked, tabId, title, url } = option || {};
 
@@ -706,7 +734,7 @@ export const GlobalSearchPanel = forwardRef(
           });
         }, 200);
       },
-      [onAction],
+      [closePanel, onAction, pageContext],
     );
 
     const handleBatchAction: BatchActionCallbackFn = useCallback(
@@ -725,15 +753,11 @@ export const GlobalSearchPanel = forwardRef(
         }
 
         if (type === 'open') {
-          setVisible(false);
+          closePanel();
         }
       },
-      [pageContext],
+      [closePanel, pageContext],
     );
-
-    const handleClose = useCallback(() => {
-      setVisible(false);
-    }, []);
 
     const debounceResize = useMemo(
       () =>
@@ -752,10 +776,10 @@ export const GlobalSearchPanel = forwardRef(
       (event: KeyboardEvent) => {
         if (event.key === 'Escape' && visible) {
           event.stopPropagation(); // 阻止事件冒泡
-          handleClose();
+          closePanel();
         }
       },
-      [visible, handleClose],
+      [visible, closePanel],
     );
 
     const messageListener = useCallback(
@@ -779,11 +803,12 @@ export const GlobalSearchPanel = forwardRef(
     }, []);
 
     useEffect(() => {
+      if (!listenRuntime) return;
       browser.runtime.onMessage.addListener(messageListener);
       return () => {
         browser.runtime.onMessage.removeListener(messageListener);
       };
-    }, [messageListener]);
+    }, [listenRuntime, messageListener]);
 
     // 监听按键
     useEffect(() => {
@@ -811,9 +836,10 @@ export const GlobalSearchPanel = forwardRef(
         setVisible(true);
       },
       close: () => {
-        setVisible(false);
+        closePanel();
       },
-    }));
+      refreshData: () => searchBoxRef.current?.refreshData(),
+    }), [closePanel]);
 
     return (
       <Modal
@@ -829,20 +855,22 @@ export const GlobalSearchPanel = forwardRef(
         open={visible}
         style={{ maxWidth: '1000px' }}
         styles={modalStyles}
-        onCancel={handleClose}
+        onCancel={closePanel}
       >
-        <StyledGlobalSearchBox className="global-search-panel" height={listHeight + 90}>
-          <GlobalSearchBox
-            ref={searchBoxRef}
-            tagList={tagList}
-            inputWidth="100%"
-            listWidth={true}
-            listHeight={listHeight || 450}
-            open
-            onAction={handleAction}
-            onBatchAction={handleBatchAction}
-          ></GlobalSearchBox>
-        </StyledGlobalSearchBox>
+        {visible && (
+          <StyledGlobalSearchBox className="global-search-panel" height={listHeight + 90}>
+            <GlobalSearchBox
+              ref={searchBoxRef}
+              tagList={tagList}
+              inputWidth="100%"
+              listWidth={true}
+              listHeight={listHeight || 450}
+              open
+              onAction={handleAction}
+              onBatchAction={handleBatchAction}
+            ></GlobalSearchBox>
+          </StyledGlobalSearchBox>
+        )}
       </Modal>
     );
   },

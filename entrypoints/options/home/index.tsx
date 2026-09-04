@@ -84,6 +84,7 @@ export default function Home() {
     countInfo,
     selectedTagKey,
     selectedTag,
+    selectedTagData,
     handleMoreItemClick,
     toggleExpand,
     refreshTreeData,
@@ -108,7 +109,7 @@ export default function Home() {
         multiSelectContainerRef.current ||
         document.getElementById('tab-group-list-panel') ||
         document.body,
-      isAllowed: isAllowed && !selectedTag.originData?.isLocked,
+      isAllowed: isAllowed && !selectedTagData?.isLocked,
       disabledSelectors: [
         '.tab-list-item',
         '.checkall-wrapper',
@@ -190,14 +191,14 @@ export default function Home() {
   // 是否开启虚拟滚动（数据量大时开启虚拟滚动）
   const virtualMap = useMemo(() => {
     // const settings = settingsUtils.settings || {};
-    const { groupCount = 0, tabCount = 0 } = getSelectedCounts(selectedTag.originData);
+    const { groupCount = 0, tabCount = 0 } = getSelectedCounts(selectedTagData);
     // console.log('virtualMap', groupCount, tabCount);
     return {
-      tree: (countInfo?.groupCount || 0) > 200 || groupCount > 30,
+      tree: (countInfo?.groupCount || 0) > 120 || groupCount > 20,
       // tabList: tabCount > (settings?.[TAB_COUNT_THRESHOLD] || 300),
-      tabList: tabCount > 100,
+      tabList: groupCount > 12 || tabCount > 50,
     };
-  }, [selectedTag.originData, countInfo?.groupCount]);
+  }, [selectedTagData, countInfo?.groupCount]);
 
   const moreItems: MenuProps['items'] = useMemo(
     () => [
@@ -243,8 +244,8 @@ export default function Home() {
   );
 
   const lockTagBtnVisible = useMemo(() => {
-    return !selectedTag.originData?.static;
-  }, [selectedTag.originData]);
+    return !selectedTagData?.static;
+  }, [selectedTagData]);
 
   const onLockStatusChange = async (status: boolean) => {
     const selectedKeys = await stateUtils.getHomeSelectedKeys();
@@ -311,7 +312,7 @@ export default function Home() {
                 <SearchTabsBtn></SearchTabsBtn>
                 {lockTagBtnVisible && (
                   <ToggleLockedBtn
-                    isLocked={selectedTag?.originData?.isLocked}
+                    isLocked={selectedTagData?.isLocked}
                     onLockStatusChange={onLockStatusChange}
                   ></ToggleLockedBtn>
                 )}

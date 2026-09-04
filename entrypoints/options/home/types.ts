@@ -2,13 +2,23 @@ import type { TreeDataNode } from 'antd';
 import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 import type { DragData } from '~/entrypoints/common/components/DndComponent';
 
+export type TreeGroupMeta = Omit<GroupItem, 'tabList'> & {
+  tabCount: number;
+  previewTitle?: string;
+};
+
+export type TreeTagMeta = Omit<TagItem, 'groupList'> & {
+  groupCount: number;
+  tabCount: number;
+};
+
 export type TreeDataNodeTabGroup = TreeDataNode & {
   type: 'tabGroup';
   parentKey: string;
   parentData?: Partial<TagItem>;
   title: string;
   icon?: React.ReactNode;
-  originData: GroupItem;
+  originData: TreeGroupMeta;
   children?: Array<TreeDataNode & { originData?: TabItem }>;
 };
 export type TreeDataNodeTag = TreeDataNode & {
@@ -16,7 +26,7 @@ export type TreeDataNodeTag = TreeDataNode & {
   parentKey?: string;
   title: string;
   icon?: React.ReactNode;
-  originData: TagItem;
+  originData: TreeTagMeta;
   children?: Array<TreeDataNodeTabGroup>;
 };
 export type TreeDataNodeUnion = TreeDataNodeTag | TreeDataNodeTabGroup;

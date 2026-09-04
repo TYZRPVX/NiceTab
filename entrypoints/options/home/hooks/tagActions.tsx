@@ -15,7 +15,6 @@ import {
   IconTimeAscending,
   IconTimeDescending,
 } from '~/entrypoints/common/components/icon/CustomIcon';
-import type { GroupItem } from '~/entrypoints/types';
 import type { TagActionName } from '../types';
 import { tagActionOptions, type ActionOption } from '../constants';
 
@@ -23,7 +22,7 @@ interface UseTagActionsProps {
   tagId: string;
   isStatic?: boolean;
   isLocked?: boolean;
-  groupList?: GroupItem[];
+  groupCount?: number;
   allowTagActions?: TagActionName[];
   onAction: (actionName: TagActionName, tagId: string) => void;
 }
@@ -36,7 +35,7 @@ export default function useTagActions({
   tagId,
   isStatic = false,
   isLocked = false,
-  groupList = [],
+  groupCount = 0,
   allowTagActions = [],
   onAction,
 }: UseTagActionsProps): UseTagActionsReturn {
@@ -78,7 +77,7 @@ export default function useTagActions({
         key: 'restore',
         label: $fmt('home.tag.open'),
         icon: <ExportOutlined />,
-        disabled: !groupList.length,
+        disabled: !groupCount,
         onClick: () => onAction('restore', tagId),
       },
       {

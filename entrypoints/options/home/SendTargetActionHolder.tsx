@@ -1,20 +1,33 @@
-import { useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useCallback, useEffect, forwardRef, useImperativeHandle, useState } from 'react';
 import { message } from 'antd';
 import { sendRuntimeMessage } from '~/entrypoints/common/utils';
 import type {
   SendTabMsgEventProps,
   SendTargetProps,
   SendTabMsgOpenSendTargetModal,
+  SendTabMsgCallbackMessage,
   PageContextType,
 } from '~/entrypoints/types';
 import SendTargetModal from '~/entrypoints/options/home/SendTargetModal';
 
 export interface SendTargetActionHolderProps {
   show?: (data: SendTabMsgOpenSendTargetModal['data']) => void;
+  showCallbackMessage?: (data: SendTabMsgCallbackMessage['data']) => void;
 }
 
 export default forwardRef(
-  ({ pageContext = 'optionsPage' }: { pageContext?: PageContextType }, ref) => {
+  (
+    {
+      pageContext = 'optionsPage',
+      listenRuntime = true,
+      onClose,
+    }: {
+      pageContext?: PageContextType;
+      listenRuntime?: boolean;
+      onClose?: () => void;
+    },
+    ref,
+  ) => {
     const [messageApi, contextHolder] = message.useMessage();
     const [sendTargetModalVisible, setSendTargetModalVisible] = useState(false);
     const [actionName, setActionName] = useState<string>('');
@@ -28,7 +41,17 @@ export default forwardRef(
     const handleClose = useCallback(() => {
       setSendTargetModalVisible(false);
       setActionName('');
-    }, []);
+      onClose?.();
+    }, [onClose]);
+
+    const showCallbackMessage = useCallback(
+      (data: SendTabMsgCallbackMessage['data']) => {
+        const msgKey = 'sendTargetActionCallback';
+        message.destroy(msgKey);
+        messageApi.open({ key: msgKey, ...data });
+      },
+      [messageApi],
+    );
 
     const handleSend = useCallback(
       async (targetData: SendTargetProps) => {
@@ -50,15 +73,15 @@ export default forwardRef(
         setActionName(data?.actionName || '');
         setSendTargetModalVisible(true);
       } else if (msgType === 'action:callback-message') {
-        const msgKey = 'sendTargetActionCallback';
-        message.destroy(msgKey);
-        messageApi.open({ key: msgKey, ...data });
+        showCallbackMessage(data);
       }
     };
 
     useEffect(() => {
+      if (!listenRuntime) return;
       browser.runtime.onMessage.addListener(messageListener);
-    }, []);
+      return () => browser.runtime.onMessage.removeListener(messageListener);
+    }, [listenRuntime, messageListener]);
 
     useImperativeHandle(
       ref,
@@ -66,6 +89,7 @@ export default forwardRef(
         show: data => {
           handleOpen(data);
         },
+        showCallbackMessage,
       }),
     );
 

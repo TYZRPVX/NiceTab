@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
-import { theme, message, Modal, Checkbox, Spin, Skeleton } from 'antd';
+import { theme, message, Modal, Checkbox, Button } from 'antd';
 import type { CheckboxProps } from 'antd';
 import {
   DeleteOutlined,
@@ -89,7 +89,7 @@ type TabGroupProps = GroupItem & {
   onMoveTo?: ({ moveData, targetData, selected }: MoveToCallbackProps) => void;
 };
 
-const blockSize = 50;
+const initialTabRenderLimit = 80;
 
 function TabGroup({
   tagId,
@@ -141,6 +141,7 @@ function TabGroup({
   useEffect(() => {
     const tabIds = tabList.map(item => item.tabId);
     setSelectedTabIds(ids => ids.filter(id => tabIds.includes(id)));
+    setVisibleTabCount(initialTabRenderLimit);
   }, [tabList]);
 
   const tag = useMemo(() => {
@@ -503,39 +504,10 @@ function TabGroup({
     openMoveToModal,
   ]);
 
-  /* 下面是分段加载相关 */
-  const [rendering, setRendering] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const tabListHeight = useMemo(() => {
-    return tabList.length * 28 || 20;
-  }, [tabList]);
-
-  const [blockIndex, setBlockIndex] = useState<number>(1);
+  const [visibleTabCount, setVisibleTabCount] = useState(initialTabRenderLimit);
   const tabListLocal = useMemo(() => {
-    return tabList.slice(0, 10 + blockIndex * blockSize);
-  }, [tabList, blockIndex]);
-
-  const timerRef = useRef<{ timer: NodeJS.Timeout | string | number | undefined }>({
-    timer: undefined,
-  });
-  const recursion = (index: number = 1) => {
-    if (10 + index * blockSize >= tabList.length) {
-      setLoading(false);
-      return;
-    }
-    timerRef.current.timer = setTimeout(() => {
-      setBlockIndex(index => index + 1);
-      recursion(index + 1);
-    }, 30);
-  };
-
-  useEffect(() => {
-    setRendering(false);
-    recursion();
-    return () => {
-      clearTimeout(timerRef.current.timer);
-    };
-  }, []);
+    return tabList.slice(0, visibleTabCount);
+  }, [tabList, visibleTabCount]);
 
   return (
     <>
@@ -643,59 +615,61 @@ function TabGroup({
           <StyledTabListWrapper
             ref={tabListRef}
             className={classNames('tab-list-wrapper', isLocked && 'locked')}
-            style={{ minHeight: `${tabListHeight}px` }}
+            style={{ minHeight: `${Math.max(tabListLocal.length * 28, 20)}px` }}
           >
-            {rendering ? (
-              <Skeleton title={false} paragraph={{ rows: 3 }}></Skeleton>
-            ) : (
-              <Spin spinning={loading} size="large">
-                <Checkbox.Group
-                  className="tab-list-checkbox-group"
-                  value={selectedTabIds}
-                  disabled={tagLocked || isLocked}
-                  onChange={setSelectedTabIds}
+            <Checkbox.Group
+              className="tab-list-checkbox-group"
+              value={selectedTabIds}
+              disabled={tagLocked || isLocked}
+              onChange={setSelectedTabIds}
+            >
+              {tabListLocal.map((tab, index) => (
+                <DndComponent<DndTabItemProps>
+                  canDrag={canDrag && !tagLocked && !isLocked}
+                  key={tab.tabId || index}
+                  data={{
+                    ...tab,
+                    index,
+                    groupId,
+                    dndKey,
+                    from: 'tab-list',
+                    selectedValues: selectedTabIds,
+                    isDragging:
+                      draggableState.type !== idleState.type &&
+                      selectedTabIds.includes(tab.tabId) &&
+                      selectedTabIds.includes(draggingTabItem?.tabId!),
+                  }}
+                  dndKey={dndKey}
+                  mainField="tabId"
+                  onDragStateChange={handleDragStateChange}
+                  onDrop={handleTabItemDrop}
+                  onSourceDrop={handleSourceTabItemDrop}
                 >
-                  {tabListLocal.map((tab, index) => (
-                    <DndComponent<DndTabItemProps>
-                      canDrag={canDrag && !tagLocked && !isLocked}
-                      key={tab.tabId || index}
-                      data={{
-                        ...tab,
-                        index,
-                        groupId,
-                        dndKey,
-                        from: 'tab-list',
-                        selectedValues: selectedTabIds,
-                        isDragging:
-                          draggableState.type !== idleState.type &&
-                          selectedTabIds.includes(tab.tabId) &&
-                          selectedTabIds.includes(draggingTabItem?.tabId!),
-                      }}
-                      dndKey={dndKey}
-                      mainField="tabId"
-                      onDragStateChange={handleDragStateChange}
-                      onDrop={handleTabItemDrop}
-                      onSourceDrop={handleSourceTabItemDrop}
-                    >
-                      <TabListItem
-                        key={tab.tabId || index}
-                        tag={tag}
-                        group={group}
-                        {...tab}
-                        highlight={
-                          (tab.tabId != undefined &&
-                            treeDataHook?.highlightTabId === tab.tabId) ||
-                          quickSelectedTabIds.includes(tab.tabId)
-                        }
-                        onRemove={handleTabRemove}
-                        onChange={handleTabChange}
-                        onCopy={handleTabCopy}
-                        onQuickSelect={handleTabQuickSelect}
-                      />
-                    </DndComponent>
-                  ))}
-                </Checkbox.Group>
-              </Spin>
+                  <TabListItem
+                    key={tab.tabId || index}
+                    tag={tag}
+                    group={group}
+                    {...tab}
+                    highlight={
+                      (tab.tabId != undefined && treeDataHook?.highlightTabId === tab.tabId) ||
+                      quickSelectedTabIds.includes(tab.tabId)
+                    }
+                    onRemove={handleTabRemove}
+                    onChange={handleTabChange}
+                    onCopy={handleTabCopy}
+                    onQuickSelect={handleTabQuickSelect}
+                  />
+                </DndComponent>
+              ))}
+            </Checkbox.Group>
+            {tabListLocal.length < tabList.length && (
+              <Button
+                className="show-rest-btn"
+                type="link"
+                onClick={() => setVisibleTabCount(count => count + initialTabRenderLimit)}
+              >
+                {$fmt('common.showMore')} ({tabList.length - tabListLocal.length})
+              </Button>
             )}
           </StyledTabListWrapper>
         </DropComponent>

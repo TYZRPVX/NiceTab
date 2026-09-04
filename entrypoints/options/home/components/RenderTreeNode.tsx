@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useCallback, memo } from 'react';
+import React, { useMemo, useRef, useCallback, memo, useContext } from 'react';
 import { theme, Dropdown } from 'antd';
 import { CloseOutlined, MenuOutlined, MoreOutlined } from '@ant-design/icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -11,7 +11,7 @@ import type { RenderTreeNodeProps, TagActionName, GroupActionName } from '../typ
 import useGroupActions from '../hooks/groupActions';
 import useTagActions from '../hooks/tagActions';
 import { StyledTreeNodeItem } from '../Home.styled';
-import { type TreeDataHookProps } from '../hooks/treeData';
+import { HomeContext, type TreeDataHookProps } from '../hooks/treeData';
 import { eventEmitter as homeEventEmitter } from '../hooks/homeCustomEvent';
 
 // 渲染 treeNode 节点
@@ -19,6 +19,8 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
   const nodeRef = useRef<HTMLDivElement>(null);
+  const { treeDataHook } = useContext(HomeContext);
+  const { tagList } = treeDataHook;
   const unnamedNodeName = node.type === 'tag' ? UNNAMED_TAG : UNNAMED_GROUP;
 
   const treeNodeDisplayName = useMemo(() => {
@@ -28,11 +30,11 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
     const isGeneratedName = /^G_\d{8}_\d{2}:\d{2}:\d{2}_\d+$/.test(groupName);
     if (!isGeneratedName) return groupName;
 
-    const tabList = node.originData?.tabList || [];
-    const firstTabTitle = tabList.find(item => item.title?.trim())?.title?.trim();
+    const { previewTitle, tabCount } = node.originData;
+    const firstTabTitle = previewTitle;
     if (!firstTabTitle) return groupName;
 
-    const title = tabList.length > 1 ? `${firstTabTitle} +${tabList.length - 1}` : firstTabTitle;
+    const title = tabCount > 1 ? `${firstTabTitle} +${tabCount - 1}` : firstTabTitle;
     const time = node.originData?.createTime?.match(/\d{2}:\d{2}/)?.[0];
     return time ? `${title} · ${time}` : title;
   }, [node, unnamedNodeName]);
@@ -68,13 +70,23 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
     [node, onAction],
   );
 
+  const getTabList = useCallback(() => {
+    if (node.type !== 'tabGroup') return [];
+    return (
+      tagList
+        .find(tag => tag.tagId === node.parentKey)
+        ?.groupList.find(group => group.groupId === node.key)?.tabList || []
+    );
+  }, [node, tagList]);
+
   const { groupActions } = useGroupActions({
     groupId,
     tagId,
     tagLocked: node.type === 'tabGroup' && !!node.parentData?.isLocked,
     isLocked: node.type === 'tabGroup' && !!node.originData?.isLocked,
     isStarred: node.type === 'tabGroup' && !!node.originData?.isStarred,
-    tabList: node.type === 'tabGroup' ? node.originData?.tabList : undefined,
+    tabCount: node.type === 'tabGroup' ? node.originData?.tabCount : 0,
+    getTabList,
     allowGroupActions: defaultGroupActions,
     onAction: onGroupAction,
   });
@@ -108,7 +120,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
     tagId: tagId as string,
     isStatic: node.type === 'tag' && !!node.originData?.static,
     isLocked: node.type === 'tag' && !!node.originData?.isLocked,
-    groupList: node.type === 'tag' ? node.originData?.groupList : [],
+    groupCount: node.type === 'tag' ? node.originData?.groupCount : 0,
     allowTagActions: defaultTagActions,
     onAction: onTagAction,
   });
@@ -138,14 +150,6 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
   const onTabItemDrop: TreeDataHookProps['handleTabItemDrop'] = useCallback(
     params => {
       const from = params?.sourceData?.from || 'tab-list';
-      let targetGroupLength = 0;
-      let targetTabListLength = 0;
-      if (node.type === 'tabGroup') {
-        targetTabListLength = node?.originData?.tabList?.length || 0;
-      } else if (node.type === 'tag') {
-        targetGroupLength = node?.originData?.groupList?.length || 0;
-      }
-
       const _params = { ...params };
 
       if (from === 'tab-list') {

@@ -49,6 +49,8 @@ interface UseGroupActionsProps {
   isLocked?: boolean;
   isStarred?: boolean;
   tabList?: TabItem[];
+  tabCount?: number;
+  getTabList?: () => TabItem[];
   allowGroupActions?: GroupActionName[];
   onAction: (actionName: GroupActionName, groupId: string) => void;
 }
@@ -68,6 +70,8 @@ export default function useGroupActions({
   isLocked,
   isStarred,
   tabList = [],
+  tabCount = tabList.length,
+  getTabList,
   allowGroupActions = defaultGroupActions,
   onAction,
 }: UseGroupActionsProps): UseGroupActionsReturn {
@@ -75,8 +79,8 @@ export default function useGroupActions({
   const { $message } = useContext(GlobalContext);
 
   const handleCopyLinks = useCallback(() => {
-    copyLinksToClipboard(tabList, $message, $fmt);
-  }, [tabList, $message, $fmt]);
+    copyLinksToClipboard(getTabList?.() || tabList, $message, $fmt);
+  }, [getTabList, tabList, $message, $fmt]);
 
   const getGroupActionOptions = useCallback(() => {
     const actionMap = groupActionOptions.reduce(
@@ -101,7 +105,7 @@ export default function useGroupActions({
         key: 'restore',
         label: $fmt(actionMap['restore'].labelKey),
         icon: <ExportOutlined />,
-        disabled: !tabList.length,
+        disabled: !tabCount,
         onClick: () => onAction('restore', groupId),
       },
       {

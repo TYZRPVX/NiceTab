@@ -12,21 +12,32 @@ import type { TreeDataNodeUnion, MoveDataProps, CascaderOption } from './types';
 
 // 生成treeData
 export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
-  return tagList.map(tag => ({
-    type: 'tag',
-    key: tag.tagId,
-    title: tag.tagName,
-    isLeaf: false,
-    icon: tag.static ? (
-      <PushpinOutlined />
-    ) : tag.isLocked ? (
-      <LockOutlined />
-    ) : (
-      <TagOutlined />
-    ),
-    originData: { ...tag, createTime: newCreateTime(tag.createTime) },
-    children: tag?.groupList?.map(group => {
-      return {
+  return tagList.map(tag => {
+    const { groupList, ...tagMeta } = tag;
+    const tabCount = groupList.reduce((count, group) => count + group.tabList.length, 0);
+
+    return {
+      type: 'tag',
+      key: tag.tagId,
+      title: tag.tagName,
+      isLeaf: false,
+      icon: tag.static ? (
+        <PushpinOutlined />
+      ) : tag.isLocked ? (
+        <LockOutlined />
+      ) : (
+        <TagOutlined />
+      ),
+      originData: {
+        ...tagMeta,
+        createTime: newCreateTime(tag.createTime),
+        groupCount: groupList.length,
+        tabCount,
+      },
+      children: groupList.map(group => {
+        const { tabList, ...groupMeta } = group;
+        const previewTitle = tabList.find(item => item.title?.trim())?.title?.trim();
+        return {
         type: 'tabGroup',
         parentKey: tag.tagId,
         parentData: { isLocked: tag.isLocked, isStarred: tag.isStarred },
@@ -40,14 +51,20 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
         ) : (
           <ProductOutlined />
         ),
-        originData: { ...group, createTime: newCreateTime(group.createTime) },
-      };
-    }),
-  }));
+          originData: {
+            ...groupMeta,
+            createTime: newCreateTime(group.createTime),
+            tabCount: tabList.length,
+            previewTitle,
+          },
+        };
+      }),
+    };
+  });
 };
 
 // 获取当前分类下的标签组和标签组页数量
-export const getSelectedCounts = (tag: TagItem) => {
+export const getSelectedCounts = (tag?: Pick<TagItem, 'groupList'>) => {
   const groupCount = tag?.groupList?.length || 0;
   let tabCount = 0;
   tag?.groupList?.forEach(group => {

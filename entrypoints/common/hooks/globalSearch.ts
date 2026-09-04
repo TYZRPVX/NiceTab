@@ -3,6 +3,7 @@ import { useCallback, useRef } from 'react';
 export interface GlobalSearchHandle {
   open: () => void;
   close: () => void;
+  refreshData: () => void;
 }
 
 export function useGlobalSearchPanel() {

@@ -37,7 +37,7 @@ export default function Favicon({
         return;
       }
 
-      const url = favIconUrl || (await getFaviconUrl(pageUrl));
+      const url = favIconUrl || getFaviconUrl(pageUrl);
       if (!cancelled) setRenderUrl(url || faviconDefaultImage);
     };
 

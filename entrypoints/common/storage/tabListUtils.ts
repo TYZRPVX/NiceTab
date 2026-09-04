@@ -1394,7 +1394,7 @@ export default class TabListUtils {
     // 入参 targetData 类型为 DragData，需要获取 tagList 中对应的分类数据，数据类型为 TagItem
     let _targetData = tagList[targetTagIndex];
     let targetGroupIndex = 0;
-    let targetGroupLength = targetData.nodeData?.groupList?.length || 0;
+    let targetGroupLength = _targetData?.groupList?.length || 0;
 
     if (targetData.nodeType === 'tag') {
       // 如果是 'make-child'，则说明拖拽到当前的分类节点

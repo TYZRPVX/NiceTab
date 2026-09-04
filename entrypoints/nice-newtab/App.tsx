@@ -5,7 +5,6 @@ import { ThemeProvider } from 'styled-components';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import type { TabItem } from '~/entrypoints/types';
 import { getRandomId, pick, sendRuntimeMessage } from '~/entrypoints/common/utils';
-import { initFaviconApiData } from '~/entrypoints/common/utils/favicon';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { openAdminRoutePage } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
@@ -19,7 +18,6 @@ import { StyledNewTabContainer, StyledGroupHeader, StyledAddTabBtn } from './App
 import TabListItem from './TabListItem';
 import SearchEngine from './SearchEngine';
 
-initFaviconApiData();
 
 const { CONFIRM_BEFORE_DELETING_TABS } = ENUM_SETTINGS_PROPS;
 
