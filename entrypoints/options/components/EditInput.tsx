@@ -19,13 +19,30 @@ const StyledWrapper = styled.div<{
   min-width: 0;
   max-width: ${props => (props.$maxWidth ? `${props.$maxWidth}px` : '100%')};
   gap: 4px;
+  font-family: inherit;
+  font-size: ${props => props.$fontSize || 14}px;
+  font-weight: inherit;
+  line-height: 1.5;
+  height: calc(1.5em + 2px);
+  letter-spacing: inherit;
+  color: inherit;
+
+  && .text-readonly,
+  && input {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 0 4px;
+  }
   .text-readonly {
     display: block;
     width: auto;
     max-width: 100%;
     flex: 0 1 auto;
     min-width: 0;
-    font-size: ${props => props.$fontSize || 14}px;
+    border: 1px solid transparent;
     ${StyledEllipsis}
   }
   input {

@@ -7,8 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Button, Empty } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Empty } from 'antd';
 import {
   Virtuoso,
   VirtuosoHandle,
@@ -111,7 +110,6 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
     selectedTabGroupKey,
     selectedTag,
     selectedTagData,
-    handleTabGroupCreate,
   } = treeDataHook;
   const selectedTabGroupRef = useRef<HTMLDivElement>(null);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
@@ -122,10 +120,6 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
     () => new Map(groups.map(group => [group.groupId, group])),
     [groups],
   );
-  const canCreateGroup = !!selectedTagKey && !selectedTagData?.isLocked;
-  const handleCreateGroup = useCallback(() => {
-    if (canCreateGroup) handleTabGroupCreate(selectedTagKey!);
-  }, [canCreateGroup, handleTabGroupCreate, selectedTagKey]);
   const getTreeGroup = useCallback(
     (groupId: React.Key) =>
       selectedTag?.children?.find(group => group.key === groupId) as
@@ -212,18 +206,7 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
       )} */}
       {!loading && groups.length === 0 ? (
         <div className="no-data">
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={$fmt('home.emptyTip')}>
-            {canCreateGroup && (
-              <Button
-                type="primary"
-                size="small"
-                icon={<PlusOutlined />}
-                onClick={handleCreateGroup}
-              >
-                {$fmt('home.createTabGroup')}
-              </Button>
-            )}
-          </Empty>
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={$fmt('home.emptyTip')} />
         </div>
       ) : virtual ? (
         <Virtuoso

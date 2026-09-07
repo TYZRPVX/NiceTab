@@ -191,7 +191,6 @@ function TabGroup({
                 <EditInput
                   value={groupDisplayName || UNNAMED_GROUP}
                   disabled={!allowGroupActions.includes('rename')}
-                  maxWidth={240}
                   fontSize={16}
                   iconSize={16}
                 ></EditInput>

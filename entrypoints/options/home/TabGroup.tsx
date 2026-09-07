@@ -543,7 +543,6 @@ function TabGroup({
                   disabled={
                     !allowGroupActions.includes('rename') || tagLocked || isLocked
                   }
-                  maxWidth={360}
                   fontSize={17}
                   iconSize={16}
                   onValueChange={value =>

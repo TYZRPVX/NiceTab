@@ -13,6 +13,7 @@ export const StyledSidebarWrapper = styled(SidebarLayout)<{
     flex-direction: column;
   }
   .sidebar-inner-content {
+    padding-top: 44px;
     padding-right: 10px;
     padding-bottom: 30px;
     overflow: auto;

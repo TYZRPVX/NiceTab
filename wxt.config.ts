@@ -19,11 +19,25 @@ const action = {
 };
 
 export default defineConfig({
+  // Keep development files from overwriting the standalone extension.
+  outDirTemplate: '{{browser}}-mv{{manifestVersion}}{{modeSuffix}}',
   // entrypointLoader: 'jiti',
   // extensionApi: 'chrome',
   modules: ['@wxt-dev/module-react'],
-  vite: () => ({
+  vite: ({ mode }) => ({
     plugins: [svgr({ svgrOptions: { icon: true } })],
+    build: {
+      minify: mode === 'production' ? 'esbuild' : false,
+      cssMinify: mode === 'production',
+      sourcemap: mode !== 'production' ? 'inline' : false,
+    },
+    esbuild:
+      mode === 'production'
+        ? {
+            drop: ['debugger'],
+            pure: ['console.log', 'console.debug'],
+          }
+        : undefined,
   }),
   runner: {
     binaries: {

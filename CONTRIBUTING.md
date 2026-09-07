@@ -39,6 +39,19 @@
 - Start the dev server:  
   `pnpm run dev`
 
+### Use Chrome Without the Dev Server
+
+1. Run `pnpm build` to create the standalone extension.
+2. Open `chrome://extensions` and enable Developer mode.
+3. Load unpacked from `.output/chrome-mv3`, or reload the existing extension using that folder.
+4. Use `chrome-extension://<extension-id>/command.html?action=sendAllTabs` with the ID shown there.
+
+The standalone build works after the terminal closes. Run `pnpm build` and reload
+the extension to apply later source changes.
+
+`pnpm dev` writes to `.output/chrome-mv3-dev`. This version requires the dev server;
+its pages load scripts from localhost. It does not overwrite the standalone build.
+
 ### File Export Requirement
 
 Important: Each `.js .ts .tsx` file must have an `export default` statement. Otherwise, you'll encounter errors when running the local service.

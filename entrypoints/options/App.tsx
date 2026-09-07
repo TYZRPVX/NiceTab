@@ -31,7 +31,6 @@ import {
   SettingOutlined,
   ImportOutlined,
   SyncOutlined,
-  TranslationOutlined,
   RestOutlined,
   MoonOutlined,
   DesktopOutlined,
@@ -53,14 +52,13 @@ import {
 import styled, { ThemeProvider } from 'styled-components';
 import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
-import { IconTheme } from '~/entrypoints/common/components/icon/CustomIcon';
 import BrandMark from '~/entrypoints/common/components/BrandMark';
-import ColorList from '~/entrypoints/common/components/ColorList.tsx';
 import { pick, sendRuntimeMessage } from '~/entrypoints/common/utils';
 import {
   ENUM_ACTION_NAME,
   ENUM_SETTINGS_PROPS,
   SHORTCUTS_PAGE_URL,
+  defaultThemeType,
 } from '~/entrypoints/common/constants';
 import { actionHandler } from '../common/contextMenus';
 import {
@@ -73,11 +71,6 @@ import { settingsUtils } from '~/entrypoints/common/storage';
 import useUpdate from '~/entrypoints/common/hooks/update';
 import usePermission from '~/entrypoints/common/hooks/getPermission';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
-import {
-  LANGUAGE_OPTIONS,
-  THEME_COLORS,
-  defaultThemeType,
-} from '~/entrypoints/common/constants';
 import {
   openNewTab,
   discardOtherTabs,
@@ -109,6 +102,7 @@ import { useGlobalSearchPanel } from '~/entrypoints/common/hooks/globalSearch';
 import { type LocaleKeys } from '~/entrypoints/common/locale';
 
 const { SHOW_SEND_TARGET_MODAL } = ENUM_SETTINGS_PROPS;
+const themeTypes: ThemeTypes[] = ['light', 'dark', 'auto'];
 
 const StyledPageContainer = styled.div<{
   theme: StyledThemeProps;
@@ -278,8 +272,6 @@ const router = createHashRouter([
   },
 ]);
 
-const themeTypes: ThemeTypes[] = ['light', 'dark', 'auto'];
-
 type SettingsSaveAction = {
   hasChanged: boolean;
   onSave: () => void;
@@ -293,14 +285,14 @@ function AppLayout() {
   const { updateDetail, updateReload } = useUpdate();
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [settingsSaveAction, setSettingsSaveAction] = useState<SettingsSaveAction>();
-  const { $fmt, locale } = useIntlUtls();
+  const { $fmt } = useIntlUtls();
   const { urlParams, setSearchParams } = useUrlParams();
   const sendTargetActionRef = useRef<SendTargetActionHolderProps>();
 
   const { isFirefoxTabGroupSupported, hasTabGroupsPermission, getTabGroupsPermission } =
     usePermission();
 
-  const { version, themeTypeConfig, pageWidthType, $message } = NiceGlobalContext;
+  const { themeTypeConfig, pageWidthType, $message } = NiceGlobalContext;
   const navs = useMemo(() => {
     return navsTemplate.map(item => {
       return { ...item, label: $fmt(item.label) };
@@ -308,6 +300,15 @@ function AppLayout() {
   }, [$fmt]);
 
   const { globalSearchPanelRef, open: openGlobalSearchPanel } = useGlobalSearchPanel();
+
+  const handleThemeTypeChange = () => {
+    const currentThemeType = NiceGlobalContext.themeType || defaultThemeType;
+    const currentIndex = themeTypes.indexOf(currentThemeType);
+    const themeType = themeTypes[(currentIndex + 1) % themeTypes.length];
+
+    NiceGlobalContext.setThemeType(themeType);
+    sendRuntimeMessage({ msgType: 'setThemeType', data: { themeType } });
+  };
 
   // 导航菜单
   const onSelect = useCallback(
@@ -319,29 +320,6 @@ function AppLayout() {
     },
     [navs, navigate],
   );
-  const handleThemeTypeChange = () => {
-    const currThemeType = NiceGlobalContext.themeType || defaultThemeType;
-    let index = themeTypes.indexOf(currThemeType);
-    const themeType = themeTypes[(index + 1) % 3];
-
-    NiceGlobalContext.setThemeType(themeType);
-    sendRuntimeMessage({ msgType: 'setThemeType', data: { themeType } });
-  };
-  // 切换主题
-  const handleThemeChange = (color: string) => {
-    const themeData = { colorPrimary: color };
-    NiceGlobalContext.setThemeData(themeData);
-    sendRuntimeMessage({ msgType: 'setPrimaryColor', data: themeData });
-  };
-  // 切换语言
-  const handleLocaleChange = useCallback(({ key }: { key: string }) => {
-    const option = LANGUAGE_OPTIONS.find(item => item.key === key) || {
-      locale: 'zh-CN',
-    };
-    NiceGlobalContext.setLocale(option.locale);
-    sendRuntimeMessage({ msgType: 'setLocale', data: { locale: option.locale } });
-  }, []);
-
   const handleSendAllTabs = useCallback(async () => {
     // 这里之所以没有直接使用 strategyHandler 方法，是因为在 option 页面中发送消息，本页面是不会监听到 runtimeMessage 消息的
     const settings = await settingsUtils.getSettings();
@@ -539,33 +517,6 @@ function AppLayout() {
           )}
 
           <Space className="menu-right select-none" align="center" size="middle">
-            <div>
-              {$fmt('common.version')}: {version}
-            </div>
-            {/* theme */}
-            <Tooltip
-              placement="bottom"
-              color={token.colorBgElevated}
-              title={
-                <ColorList
-                  colors={THEME_COLORS}
-                  gap={12}
-                  style={{ padding: '6px' }}
-                  onItemClick={handleThemeChange}
-                />
-              }
-              arrow={false}
-              fresh
-            >
-              <StyledActionIconBtn
-                $size={18}
-                aria-label={$fmt('common.theme')}
-                title={$fmt('common.theme')}
-              >
-                <IconTheme></IconTheme>
-              </StyledActionIconBtn>
-            </Tooltip>
-            {/* theme type */}
             <StyledActionIconBtn
               $size={18}
               title={$fmt('common.toggleThemeType')}
@@ -576,23 +527,6 @@ function AppLayout() {
               {NiceGlobalContext.themeType === 'dark' && <MoonOutlined />}
               {NiceGlobalContext.themeType === 'auto' && <DesktopOutlined />}
             </StyledActionIconBtn>
-            {/* language */}
-            <Dropdown
-              menu={{
-                items: LANGUAGE_OPTIONS,
-                selectedKeys: [locale],
-                onClick: handleLocaleChange,
-              }}
-              placement="bottomRight"
-            >
-              <StyledActionIconBtn
-                $size={18}
-                title={$fmt('common.language')}
-                aria-label={$fmt('common.language')}
-              >
-                <TranslationOutlined />
-              </StyledActionIconBtn>
-            </Dropdown>
             {/* ext actions */}
             <Dropdown
               menu={{

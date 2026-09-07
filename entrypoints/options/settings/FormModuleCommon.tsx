@@ -1,9 +1,16 @@
+import { useContext } from 'react';
 import { Form, Radio } from 'antd';
 import { DesktopOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
 import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
-import { ENUM_SETTINGS_PROPS, LANGUAGE_OPTIONS } from '~/entrypoints/common/constants';
-import { useIntlUtls } from '~/entrypoints/common/hooks/global';
+import ColorList from '~/entrypoints/common/components/ColorList';
+import {
+  ENUM_SETTINGS_PROPS,
+  LANGUAGE_OPTIONS,
+  THEME_COLORS,
+} from '~/entrypoints/common/constants';
+import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { sendRuntimeMessage } from '~/entrypoints/common/utils';
 
 const {
   LANGUAGE,
@@ -19,7 +26,14 @@ export default function FormModuleCommon(
   props: FormItemProps & { form: FormInstance<SettingsProps> },
 ) {
   const { $fmt } = useIntlUtls();
+  const NiceGlobalContext = useContext(GlobalContext);
   const { form, ...formItemProps } = props;
+
+  const handleThemeChange = (color: string) => {
+    const themeData = { colorPrimary: color };
+    NiceGlobalContext.setThemeData(themeData);
+    sendRuntimeMessage({ msgType: 'setPrimaryColor', data: themeData });
+  };
 
   return (
     <Form.Item noStyle {...formItemProps}>
@@ -52,6 +66,9 @@ export default function FormModuleCommon(
             <DesktopOutlined /> {$fmt('common.auto')}
           </Radio>
         </Radio.Group>
+      </Form.Item>
+      <Form.Item label={$fmt('common.theme')}>
+        <ColorList colors={THEME_COLORS} gap={12} onItemClick={handleThemeChange} />
       </Form.Item>
       {/* 启动浏览器时是否自动打开NiceTab管理后台 */}
       <Form.Item<SettingsProps>

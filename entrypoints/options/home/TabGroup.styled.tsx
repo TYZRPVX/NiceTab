@@ -59,10 +59,9 @@ export const StyledGroupHeader = styled.div<{ theme: StyledThemeProps }>`
       flex: 1 1 auto;
       min-width: 0;
       margin-right: 4px;
-      .text-readonly {
-        font-weight: 650;
-        letter-spacing: -0.01em;
-      }
+      font-weight: 600;
+      letter-spacing: normal;
+      color: var(--nt-text);
     }
     .group-info {
       display: flex;
