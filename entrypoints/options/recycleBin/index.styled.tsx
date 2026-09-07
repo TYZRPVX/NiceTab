@@ -8,11 +8,41 @@ export const StyledEmptyBox = styled.div`
 `;
 
 export const StyledRecycleBinWrapper = styled.div`
-  .header-action-btns {
+  .recycle-toolbar {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 16px 0;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 12px 0;
+    padding: 12px 0;
+  }
+  .recycle-summary,
+  .recycle-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .recycle-summary {
+    min-width: 0;
+    color: var(--nt-text-secondary);
+    font-size: 12px;
+    strong {
+      color: var(--nt-text);
+      font-size: 15px;
+      font-weight: 600;
+    }
+  }
+  .recycle-actions {
+    flex-shrink: 0;
+  }
+  @media (max-width: 640px) {
+    .recycle-toolbar {
+      align-items: stretch;
+      flex-direction: column;
+    }
+    .recycle-actions button {
+      flex: 1;
+    }
   }
 `;
 

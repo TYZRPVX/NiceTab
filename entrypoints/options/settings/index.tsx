@@ -6,7 +6,7 @@ import { isEqual, debounce } from 'lodash-es';
 import { useBlocker } from 'react-router-dom';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
 import type { SettingsProps, TimeRange } from '~/entrypoints/types';
-import { settingsUtils } from '~/entrypoints/common/storage';
+import { recycleUtils, settingsUtils } from '~/entrypoints/common/storage';
 import {
   ENUM_SETTINGS_PROPS,
   defaultLanguage,
@@ -31,10 +31,7 @@ import FormModuleOtherActions from './FormModuleOtherActions';
 import FormModuleDisplay from './FormModuleDisplay';
 import FormModuleNewtab from './FormModuleNewtab';
 import FormModuleSync from './FormModuleSync';
-import {
-  StyledSidebarWrapper,
-  StyledMainWrapper,
-} from './Settings.styled';
+import { StyledSidebarWrapper, StyledMainWrapper } from './Settings.styled';
 
 const { LANGUAGE, AUTO_SYNC_TIME_RANGES } = ENUM_SETTINGS_PROPS;
 
@@ -136,6 +133,7 @@ export default function Settings() {
     form.setFieldsValue(newSettings);
 
     await settingsUtils.setSettings(newSettings);
+    await recycleUtils.checkAndClear();
     NiceGlobalContext.setSettings(newSettings);
     sendRuntimeMessage({ msgType: 'setLocale', data: { locale: newSettings.language } });
     sendRuntimeMessage({

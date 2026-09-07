@@ -138,8 +138,6 @@ const enUS: Record<LocaleKey, string> = {
     'The next version will add new features that require additional authorization. Once the new version is released, the NiceTab extension will be automatically disabled. If you want to continue using it, please manually enable it.',
   'home.tip.multiSelection': 'Shift multi-select: Step1, Shift + Click A (got highlighted A); Step2, Shift + Click B (A to B selected). It is also applicable to the tab list in the middle of the page',
 
-  'recycleBin.tip.autoClear':
-    'Note: The recycle bin will be automatically cleared once a day!',
 };
 
 export default enUS;

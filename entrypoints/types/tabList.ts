@@ -11,6 +11,7 @@ export interface GroupItem {
   groupId: string;
   groupName: string;
   createTime: string;
+  recycleTime?: string;
   tabList: TabItem[];
   isLocked?: boolean;
   isStarred?: boolean;

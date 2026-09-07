@@ -1,12 +1,4 @@
-import {
-  memo,
-  useMemo,
-  useContext,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { memo, useMemo, useContext, useCallback, useEffect, useRef } from 'react';
 import { Empty } from 'antd';
 import {
   Virtuoso,
@@ -104,13 +96,8 @@ const ListItem = memo(
 export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   const { $fmt } = useIntlUtls();
   const { treeDataHook } = useContext(HomeContext);
-  const {
-    loading,
-    selectedTagKey,
-    selectedTabGroupKey,
-    selectedTag,
-    selectedTagData,
-  } = treeDataHook;
+  const { loading, selectedTagKey, selectedTabGroupKey, selectedTag, selectedTagData } =
+    treeDataHook;
   const selectedTabGroupRef = useRef<HTMLDivElement>(null);
   const virtuosoRef = useRef<VirtuosoHandle>(null);
 
@@ -138,7 +125,10 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
       offset: -180,
     } as FlatIndexLocationWithAlign;
   }, [listEntries, selectedTabGroupKey]);
-  const [prevSelectedTagKey, setPrevSelectedTagKey] = useState(selectedTagKey);
+  const previousSelectionRef = useRef<{
+    tagKey: React.Key | undefined;
+    groupKey: React.Key | undefined;
+  } | null>(null);
   const scrollHandler = useCallback(() => {
     if (virtual && virtuosoRef.current) {
       const index = listEntries.findIndex(
@@ -186,16 +176,28 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
   );
 
   useEffect(() => {
-    if (selectedTagKey === prevSelectedTagKey) {
+    const previousSelection = previousSelectionRef.current;
+    const selectionChanged =
+      !previousSelection ||
+      previousSelection.tagKey !== selectedTagKey ||
+      previousSelection.groupKey !== selectedTabGroupKey;
+
+    if (!selectionChanged) return;
+
+    previousSelectionRef.current = {
+      tagKey: selectedTagKey,
+      groupKey: selectedTabGroupKey,
+    };
+
+    if (!previousSelection || previousSelection.tagKey === selectedTagKey) {
       scrollHandler();
     } else {
       const timer = setTimeout(() => {
-        setPrevSelectedTagKey(selectedTagKey);
         scrollHandler();
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [prevSelectedTagKey, scrollHandler, selectedTagKey]);
+  }, [scrollHandler, selectedTagKey, selectedTabGroupKey]);
 
   return (
     <StyledGroupList className="main-content-wrapper">
@@ -206,7 +208,10 @@ export default function TabGroupList({ virtual }: { virtual?: boolean }) {
       )} */}
       {!loading && groups.length === 0 ? (
         <div className="no-data">
-          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={$fmt('home.emptyTip')} />
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={$fmt('home.emptyTip')}
+          />
         </div>
       ) : virtual ? (
         <Virtuoso

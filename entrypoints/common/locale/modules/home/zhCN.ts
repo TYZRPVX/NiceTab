@@ -119,7 +119,6 @@ const zhCN = {
   'home.tip.addScope': '下一个版本将添加快捷键等功能，需要新增授权，新版本发布后可能会自动停用，如需继续使用请手动启用。',
   'home.tip.multiSelection': 'Shift多选：第一步，Shift + Click A (高亮显示A) 。第二步，Shift + Click B (A到B全被选中)。Shift多选操作也适用于页面中间的标签页列表。',
 
-  'recycleBin.tip.autoClear': '注意：回收站的数据每天会自动清空一次！',
 }
 
 export type LocaleKey = keyof typeof zhCN;

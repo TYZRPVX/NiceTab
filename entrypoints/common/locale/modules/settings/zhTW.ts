@@ -25,6 +25,7 @@ const zhTW: Record<LocaleKey, string> = {
   "settings.autoPinAdminTab.no": "不自動釘選NiceTab管理後台",
   "settings.restoreSnapshotAfterBrowserLaunch": "啟動瀏覽器時是否自動恢復之前開啟的分頁？",
   "settings.autoCreateSnapshotInterval": "自動創建快照的時間間隔（分鐘）：",
+  'settings.recycleRetentionDays': '資源回收桶保留天數（1–365天）',
   "settings.showSendTargetModal": "傳送分頁時-是否顯示指定目錄選擇框：",
   "settings.showSendTargetModal.tooltip": "若選擇否，則直接傳送到中繼站（某些特殊頁面無法觸發談窗，也會直接傳送到中繼站）",
   "settings.allowSendPinnedTabs": "傳送分頁時-是否傳送釘選分頁到NiceTab{mark}",

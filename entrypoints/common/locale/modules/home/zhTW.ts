@@ -118,7 +118,6 @@ const zhTW: Record<LocaleKey, string> = {
   "home.tip.addScope": "下一個版本將添加快速鍵等功能，需要新增授權，新版本發布後可能會自動停用，如需繼續使用請手動起用。",
   'home.tip.multiSelection': 'Shift多選：第一步，Shift + Click A (高亮顯示A) 。第二步，Shift + Click B (A到B全被選中)。Shift多選操作也適用於頁面中間的標籤頁列表',
 
-  "recycleBin.tip.autoClear": "注意：資源回收桶的數據每天會自動清空一次！",
 };
 
 export default zhTW;

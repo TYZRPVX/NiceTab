@@ -38,6 +38,7 @@ type TabItemProps = TabItem & {
   group: Pick<GroupItem, 'groupId' | 'isLocked' | 'isStarred'>;
   highlight?: boolean;
   selected?: boolean;
+  selectable?: boolean;
   showItemActions?: boolean;
   onRemove?: (tabs: TabItem[]) => void;
   onChange?: (data: TabItem) => void;
@@ -63,6 +64,7 @@ export default memo(function TabListItem({
   group,
   highlight,
   selected = false,
+  selectable = true,
   showItemActions = true,
   onRemove,
   onChange,
@@ -269,11 +271,13 @@ export default memo(function TabListItem({
           </>
         )}
         {/* checkbox */}
-        <Checkbox
-          className="checkbox-item"
-          value={tab.tabId}
-          onChange={handleSelectChange}
-        ></Checkbox>
+        {selectable && (
+          <Checkbox
+            className="checkbox-item"
+            value={tab.tabId}
+            onChange={handleSelectChange}
+          ></Checkbox>
+        )}
         {showItemActions && (
           <Tooltip
             title={$fmt('common.more')}

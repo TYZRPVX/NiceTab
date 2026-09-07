@@ -38,6 +38,7 @@ import {
   SmileOutlined,
   SendOutlined,
   MenuOutlined,
+  MoreOutlined,
   ReloadOutlined,
   KeyOutlined,
   CoffeeOutlined,
@@ -161,6 +162,39 @@ const StyledPageContainer = styled.div<{
       }
       .nicetab-menu-item-selected {
         background: var(--nt-accent-soft);
+      }
+      .nicetab-menu-overflow-item-rest {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        margin-inline: 2px;
+        padding-inline: 0 !important;
+        border-radius: 20px;
+
+        &::after {
+          display: none !important;
+        }
+        &:hover {
+          background: var(--nt-surface-muted);
+        }
+        &.nicetab-menu-submenu-selected {
+          color: ${props => props.theme.colorPrimary};
+          background: var(--nt-accent-soft);
+        }
+        .nicetab-menu-submenu-title {
+          display: grid;
+          width: 100%;
+          height: 100%;
+          padding: 0;
+          place-items: center;
+        }
+        .navbar-more-icon {
+          display: inline-flex;
+          font-size: 20px;
+          line-height: 1;
+        }
       }
     }
     .menu-right {
@@ -491,6 +525,15 @@ function AppLayout() {
             defaultSelectedKeys={['home']}
             selectedKeys={selectedKeys}
             items={navs}
+            overflowedIndicator={
+              <span
+                className="navbar-more-icon"
+                title={$fmt('common.more')}
+                aria-label={$fmt('common.more')}
+              >
+                <MoreOutlined />
+              </span>
+            }
             onSelect={onSelect}
           />
 

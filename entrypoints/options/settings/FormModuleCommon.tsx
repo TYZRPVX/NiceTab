@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { Form, Radio } from 'antd';
+import { Form, InputNumber, Radio } from 'antd';
 import { DesktopOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
 import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
@@ -15,6 +15,7 @@ import { sendRuntimeMessage } from '~/entrypoints/common/utils';
 const {
   LANGUAGE,
   THEME_TYPE,
+  RECYCLE_RETENTION_DAYS,
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
   AUTO_PIN_ADMIN_TAB,
@@ -69,6 +70,12 @@ export default function FormModuleCommon(
       </Form.Item>
       <Form.Item label={$fmt('common.theme')}>
         <ColorList colors={THEME_COLORS} gap={12} onItemClick={handleThemeChange} />
+      </Form.Item>
+      <Form.Item<SettingsProps>
+        label={$fmt(`settings.${RECYCLE_RETENTION_DAYS}`)}
+        name={RECYCLE_RETENTION_DAYS}
+      >
+        <InputNumber min={1} max={365} precision={0} />
       </Form.Item>
       {/* 启动浏览器时是否自动打开NiceTab管理后台 */}
       <Form.Item<SettingsProps>

@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { theme, Space, Button, Modal, Empty, Alert } from 'antd';
+import { theme, Button, Modal, Empty } from 'antd';
+import { DeleteOutlined, RollbackOutlined } from '@ant-design/icons';
 import { Virtuoso } from 'react-virtuoso';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
-import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
+import { TagItem, GroupItem } from '~/entrypoints/types';
 import { recycleUtils, initRecycleStorageListener } from '~/entrypoints/common/storage';
 import { updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 import { StyledEmptyBox, StyledRecycleBinWrapper } from './index.styled';
@@ -48,27 +49,6 @@ export default function RecycleBin() {
     },
     [getRecycleBinData],
   );
-  // 删除标签页
-  const handleTabItemRemove = useCallback(
-    async (groupId: React.Key, tabs: TabItem[]) => {
-      await recycleUtils.removeTabs(groupId, tabs, true);
-      getRecycleBinData();
-    },
-    [getRecycleBinData],
-  );
-  // 修改标签页
-  const handleTabItemChange = useCallback(
-    async (tag: TagItem, group: GroupItem, tabData: TabItem) => {
-      await recycleUtils.updateTab({
-        tagId: tag.tagId,
-        groupId: group.groupId,
-        data: tabData,
-      });
-      getRecycleBinData();
-    },
-    [getRecycleBinData],
-  );
-
   // 还原所有
   const handleRecoverConfirm = useCallback(async () => {
     await recycleUtils.recoverAll();
@@ -104,7 +84,7 @@ export default function RecycleBin() {
         (tag.groupList || []).map(group => ({
           tagId: tag.tagId,
           groupId: group.groupId,
-          createTime: group.createTime,
+          createTime: group.recycleTime || group.createTime,
         })),
       ),
     [tagList],
@@ -123,6 +103,19 @@ export default function RecycleBin() {
     });
     return groups;
   }, [tagList]);
+  const recycleTabCount = useMemo(
+    () =>
+      tagList.reduce(
+        (count, tag) =>
+          count +
+          tag.groupList.reduce(
+            (groupCount, group) => groupCount + group.tabList.length,
+            0,
+          ),
+        0,
+      ),
+    [tagList],
+  );
 
   const renderListEntry = useCallback(
     (entry: ListEntry) => {
@@ -153,50 +146,49 @@ export default function RecycleBin() {
           canDrag={false}
           canDrop={false}
           allowGroupActions={['remove', 'recover']}
-          allowTabActions={['open', 'remove', 'recover']}
           onRemove={() => handleTabGroupRemove(tag, group)}
           onRecover={() => handleTabGroupRecover(tag, group)}
-          onTabChange={(tabItem: TabItem) => handleTabItemChange(tag, group, tabItem)}
-          onTabRemove={handleTabItemRemove}
         />
       );
     },
-    [
-      getRecycleBinData,
-      groupByKey,
-      handleTabGroupRecover,
-      handleTabGroupRemove,
-      handleTabItemChange,
-      handleTabItemRemove,
-      tagById,
-    ],
+    [getRecycleBinData, groupByKey, handleTabGroupRecover, handleTabGroupRemove, tagById],
   );
 
   return (
     <StyledRecycleBinWrapper className="recycle-bin-wrapper">
       <StickyBox topGap={60} fullWidth bgColor={token.colorBgContainer}>
-        <Space className="header-action-btns">
-          <Button
-            type="primary"
-            disabled={!recycleGroups.length}
-            onClick={() => setRecoverModalVisible(true)}
-          >
-            {$fmt('home.recoverAll')}
-          </Button>
-          <Button
-            type="primary"
-            disabled={!recycleGroups.length}
-            onClick={() => setConfirmModalVisible(true)}
-          >
-            {$fmt('home.clearAll')}
-          </Button>
-          <Alert
-            className="warning-tip"
-            type="warning"
-            showIcon
-            message={$fmt('recycleBin.tip.autoClear')}
-          />
-        </Space>
+        <div className="recycle-toolbar">
+          <div className="recycle-summary">
+            <strong>{$fmt('common.recycleBin')}</strong>
+            <span>
+              {$fmt({
+                id: 'home.tabGroup.count',
+                values: { count: recycleGroups.length },
+              })}
+            </span>
+            <span>
+              {$fmt({ id: 'home.tab.count', values: { count: recycleTabCount } })}
+            </span>
+          </div>
+          <div className="recycle-actions">
+            <Button
+              type="primary"
+              icon={<RollbackOutlined />}
+              disabled={!recycleGroups.length}
+              onClick={() => setRecoverModalVisible(true)}
+            >
+              {$fmt('home.recoverAll')}
+            </Button>
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              disabled={!recycleGroups.length}
+              onClick={() => setConfirmModalVisible(true)}
+            >
+              {$fmt('home.clearAll')}
+            </Button>
+          </div>
+        </div>
       </StickyBox>
 
       {recycleGroups.length > 0 ? (

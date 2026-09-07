@@ -149,6 +149,7 @@ export enum ENUM_SETTINGS_PROPS {
   AUTO_PIN_ADMIN_TAB = 'autoPinAdminTab', // 是否固定管理后台
   RESTORE_SNAPSHOT_AFTER_BROWSER_LAUNCH = 'restoreSnapshotAfterBrowserLaunch', // 启动浏览器时是否恢复快照
   AUTO_CREATE_SNAPSHOT_INTERVAL = 'autoCreateSnapshotInterval', // 自动创建快照时间间隔
+  RECYCLE_RETENTION_DAYS = 'recycleRetentionDays', // 回收站保留天数
   /* 发送标签页配置 */
   SHOW_SEND_TARGET_MODAL = 'showSendTargetModal', // 发送标签页时是否显示目标选择弹窗
   ALLOW_SEND_PINNED_TABS = 'allowSendPinnedTabs', // 是否发送固定标签页

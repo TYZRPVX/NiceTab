@@ -4,6 +4,7 @@ import type { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types
 
 import Store from './instanceStore';
 import TabListUtils from './tabListUtils';
+import { newCreateTime } from '../utils';
 
 // 回收站工具类
 export default class RecycleBinUtils extends TabListUtils {
@@ -14,8 +15,6 @@ export default class RecycleBinUtils extends TabListUtils {
     tabCount: 0,
   };
   storageKey: `local:${string}` = 'local:recycleBin';
-  clearStatusKey: `local:${string}` = 'local:clearStatus';
-
   constructor() {
     super();
     this.checkAndClear();
@@ -80,6 +79,7 @@ export default class RecycleBinUtils extends TabListUtils {
   }
   // 批量添加标签组（内部调用：多分类循环添加）
   addTabGroupsBasic(tagList: TagItem[], tag: TagItem, groups: GroupItem[]) {
+    const recycleTime = newCreateTime();
     let isTagInRecycleBin = false;
     for (let t of tagList) {
       // 如果回收站中有相同的标签组，则合并标签组
@@ -91,11 +91,17 @@ export default class RecycleBinUtils extends TabListUtils {
             if (g.groupId === group.groupId) {
               isGroupInRecycleBin = true;
               g.tabList = [...group.tabList, ...g.tabList];
+              g.recycleTime = recycleTime;
               break;
             }
           }
           if (!isGroupInRecycleBin) {
-            t.groupList.unshift({ ...group, isLocked: false, isStarred: false });
+            t.groupList.unshift({
+              ...group,
+              isLocked: false,
+              isStarred: false,
+              recycleTime,
+            });
           }
         }
         break;
@@ -109,6 +115,7 @@ export default class RecycleBinUtils extends TabListUtils {
           ...group,
           isLocked: false,
           isStarred: false,
+          recycleTime,
         })),
       });
     }
@@ -125,11 +132,12 @@ export default class RecycleBinUtils extends TabListUtils {
 
   // 批量还原标签组（内部调用：多分类循环还原）
   recoverTabGroupsBasic(storeTagList: TagItem[], tag: TagItem, groups: GroupItem[]) {
+    const restoredGroups = groups.map(({ recycleTime: _recycleTime, ...group }) => group);
     let isTagInListStore = false;
     for (let storeTag of storeTagList) {
       if (storeTag.tagId === tag.tagId) {
         isTagInListStore = true;
-        for (let group of groups) {
+        for (let group of restoredGroups) {
           let isGroupInListStore = false;
           for (let storeGroup of storeTag.groupList) {
             if (storeGroup.groupId === group.groupId) {
@@ -151,7 +159,7 @@ export default class RecycleBinUtils extends TabListUtils {
       }
     }
     if (!isTagInListStore) {
-      storeTagList.unshift({ ...tag, groupList: groups });
+      storeTagList.unshift({ ...tag, groupList: restoredGroups });
     }
 
     return storeTagList;
@@ -180,6 +188,7 @@ export default class RecycleBinUtils extends TabListUtils {
 
   async addTabs(tag: TagItem, group: GroupItem, tabs: TabItem[]) {
     const tagList = await this.getTagList();
+    const recycleTime = newCreateTime();
     let isTagInRecycleBin = false;
     let isGroupInRecycleBin = false;
     for (let t of tagList) {
@@ -190,6 +199,7 @@ export default class RecycleBinUtils extends TabListUtils {
           if (g.groupId === group.groupId) {
             isGroupInRecycleBin = true;
             g.tabList = [...tabs, ...g.tabList];
+            g.recycleTime = recycleTime;
             break;
           }
         }
@@ -199,6 +209,7 @@ export default class RecycleBinUtils extends TabListUtils {
             isLocked: false,
             isStarred: false,
             tabList: tabs,
+            recycleTime,
           });
         }
         break;
@@ -206,25 +217,52 @@ export default class RecycleBinUtils extends TabListUtils {
     }
     // 如果回收站没有相同的分类，则直接添加新的分类
     if (!isTagInRecycleBin) {
-      const newGroup = { ...group, isLocked: false, isStarred: false, tabList: tabs };
+      const newGroup = {
+        ...group,
+        isLocked: false,
+        isStarred: false,
+        tabList: tabs,
+        recycleTime,
+      };
       tagList.unshift({ ...tag, groupList: [newGroup] });
     }
     await this.setTagList(tagList);
     return tagList;
   }
-  // 每天检查并清空回收站
+  // Remove expired groups. Missing timestamps start a fresh retention period.
   async checkAndClear() {
-    const status = await storage.getItem<{ clearedFlag: boolean; date: string }>(
-      this.clearStatusKey,
+    const settings = await Store.settingsUtils.getSettings();
+    const configuredDays = Number(
+      settings.recycleRetentionDays ??
+        Store.settingsUtils.initialSettings.recycleRetentionDays,
     );
-    const { clearedFlag, date } = status || {};
-    const isToday = dayjs().isSame(dayjs(date), 'day');
-    if (isToday && clearedFlag) return;
+    const retentionDays = Number.isFinite(configuredDays)
+      ? Math.min(365, Math.max(1, Math.floor(configuredDays)))
+      : 7;
+    const now = dayjs();
+    const recycleTime = newCreateTime(now);
+    const tagList = await this.getTagList();
+    let changed = false;
 
-    storage.setItem(this.clearStatusKey, {
-      clearedFlag: true,
-      date: dayjs().format('YYYY-MM-DD'),
-    });
-    this.setTagList([]);
+    const retainedTags = tagList.reduce<TagItem[]>((result, tag) => {
+      const groupList = tag.groupList.filter(group => {
+        const recycledAt = dayjs(group.recycleTime);
+        if (!group.recycleTime || !recycledAt.isValid()) {
+          group.recycleTime = recycleTime;
+          changed = true;
+          return true;
+        }
+        if (now.diff(recycledAt, 'day') >= retentionDays) {
+          changed = true;
+          return false;
+        }
+        return true;
+      });
+
+      if (groupList.length) result.push({ ...tag, groupList });
+      return result;
+    }, []);
+
+    if (changed) await this.setTagList(retainedTags);
   }
 }
