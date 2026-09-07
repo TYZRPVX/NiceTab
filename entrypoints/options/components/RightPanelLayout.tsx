@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import styled from 'styled-components';
 import {
   StyledBaseRightPanelWrapper,
@@ -7,6 +7,7 @@ import {
 import { classNames } from '~/entrypoints/common/utils';
 import ToggleSidebarBtn from './ToggleSidebarBtn';
 import useDragResize from '~/entrypoints/options/common/hooks/useDragResize';
+import useHoverReveal from '~/entrypoints/options/common/hooks/useHoverReveal';
 
 const StyledHandle = styled.div<{ $visible?: boolean }>`
   position: absolute;
@@ -61,7 +62,11 @@ export default function RightPanelLayout({
   onDeactivate,
 }: RightPanelLayoutProps) {
   const hiddenUntilHover = collapsed || autoHide;
-  const [hoverExpanded, setHoverExpanded] = useState(false);
+  const { hoverExpanded, hoverClosing, open, scheduleClose } = useHoverReveal({
+    enabled: hiddenUntilHover,
+    onActivate,
+    onDeactivate,
+  });
   const { width, onMouseDown, dragHandleRef } = useDragResize({
     initialWidth: initialWidth || defaultRightPanelWidth,
     currWidth: panelWidth || defaultRightPanelWidth,
@@ -70,38 +75,28 @@ export default function RightPanelLayout({
     onWidthChange,
   });
 
-  useEffect(() => {
-    if (!hiddenUntilHover) setHoverExpanded(false);
-  }, [hiddenUntilHover]);
-
   return (
     <StyledBaseRightPanelWrapper
       className={className}
       style={{ '--panel-width': `${width}px` } as React.CSSProperties}
     >
+      {hiddenUntilHover && (
+        <div
+          className="sidebar-hover-trigger sidebar-hover-trigger-right"
+          onPointerEnter={open}
+          onPointerLeave={scheduleClose}
+        />
+      )}
       <div
         className={classNames(
           'right-panel-inner-box',
           collapsed && 'collapsed',
           autoHide && 'auto-hidden',
           hoverExpanded && 'hover-expanded',
+          hoverClosing && 'hover-closing',
         )}
-        onPointerEnter={
-          hiddenUntilHover
-            ? () => {
-                setHoverExpanded(true);
-                onActivate?.();
-              }
-            : undefined
-        }
-        onPointerLeave={
-          hiddenUntilHover
-            ? () => {
-                setHoverExpanded(false);
-                onDeactivate?.();
-              }
-            : undefined
-        }
+        onPointerEnter={hiddenUntilHover ? open : undefined}
+        onPointerLeave={hiddenUntilHover ? scheduleClose : undefined}
       >
         <StyledHandle
           ref={dragHandleRef}

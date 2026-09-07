@@ -1,7 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, useContext } from 'react';
 import { theme, Flex } from 'antd';
 import { classNames } from '~/entrypoints/common/utils';
 import { StyledColorItem } from '~/entrypoints/common/style/Common.styled';
+import { GlobalContext } from '~/entrypoints/common/hooks/global';
 import type { ColorItem } from '~/entrypoints/types';
 
 // 主题色列表
@@ -17,23 +18,32 @@ export default function ColorList({
   [key: string]: any;
 }) {
   const { token } = theme.useToken();
+  const { themeTypeConfig } = useContext(GlobalContext);
+  const isDarkTheme = themeTypeConfig.type === 'dark';
+  const getDisplayColor = useCallback(
+    (item: ColorItem) => (isDarkTheme ? item.darkColor || item.color : item.color),
+    [isDarkTheme],
+  );
   const isActive = useCallback(
     (item: ColorItem) => {
-      return item.color.toLowerCase() === token.colorPrimary?.toLowerCase();
+      return getDisplayColor(item).toLowerCase() === token.colorPrimary?.toLowerCase();
     },
-    [token],
+    [getDisplayColor, token],
   );
 
   return (
     <Flex className="color-list" wrap="wrap" gap={gap} style={props.style}>
-      {colors.map(item => (
-        <StyledColorItem
-          className={classNames('color-item', isActive(item) && 'active')}
-          key={item.key}
-          style={{ background: item.color, color: item.color }}
-          onClick={() => onItemClick?.(item.color)}
-        ></StyledColorItem>
-      ))}
+      {colors.map(item => {
+        const displayColor = getDisplayColor(item);
+        return (
+          <StyledColorItem
+            className={classNames('color-item', isActive(item) && 'active')}
+            key={item.key}
+            style={{ background: displayColor, color: displayColor }}
+            onClick={() => onItemClick?.(item.color)}
+          ></StyledColorItem>
+        );
+      })}
     </Flex>
   );
 }

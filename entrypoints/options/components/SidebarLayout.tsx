@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import styled from 'styled-components';
 import {
   StyledBaseSidebarWrapper,
@@ -7,6 +7,7 @@ import {
 import { classNames } from '~/entrypoints/common/utils';
 import ToggleSidebarBtn from './ToggleSidebarBtn';
 import useDragResize from '~/entrypoints/options/common/hooks/useDragResize';
+import useHoverReveal from '~/entrypoints/options/common/hooks/useHoverReveal';
 
 const StyledHandle = styled.div<{ $visible?: boolean }>`
   position: absolute;
@@ -51,7 +52,9 @@ export default function SidebarLayout({
   onCollapseChange,
   onWidthChange,
 }: SidebarLayoutProps) {
-  const [hoverExpanded, setHoverExpanded] = useState(false);
+  const { hoverExpanded, hoverClosing, open, scheduleClose } = useHoverReveal({
+    enabled: collapsed,
+  });
   const { width, onMouseDown, dragHandleRef } = useDragResize({
     initialWidth: initialWidth || defaultSidebarWidth,
     currWidth: sidebarWidth || defaultSidebarWidth,
@@ -60,23 +63,27 @@ export default function SidebarLayout({
     onWidthChange,
   });
 
-  useEffect(() => {
-    if (!collapsed) setHoverExpanded(false);
-  }, [collapsed]);
-
   return (
     <StyledBaseSidebarWrapper
       className={className}
       style={{ '--sidebar-width': `${width}px` } as React.CSSProperties}
     >
+      {collapsed && (
+        <div
+          className="sidebar-hover-trigger sidebar-hover-trigger-left"
+          onPointerEnter={open}
+          onPointerLeave={scheduleClose}
+        />
+      )}
       <div
         className={classNames(
           'sidebar-inner-box',
           collapsed && 'collapsed',
           hoverExpanded && 'hover-expanded',
+          hoverClosing && 'hover-closing',
         )}
-        onPointerEnter={() => collapsed && setHoverExpanded(true)}
-        onPointerLeave={() => collapsed && setHoverExpanded(false)}
+        onPointerEnter={collapsed ? open : undefined}
+        onPointerLeave={collapsed ? scheduleClose : undefined}
       >
         <StyledHandle
           ref={dragHandleRef}
@@ -89,7 +96,7 @@ export default function SidebarLayout({
           </div>
         )}
         <div className="sidebar-inner-content">
-          {(!collapsed || hoverExpanded) && (
+          {(!collapsed || hoverExpanded || hoverClosing) && (
             <>
               {sideActionBox && <div className="sidebar-action-box">{sideActionBox}</div>}
               {innerContent}

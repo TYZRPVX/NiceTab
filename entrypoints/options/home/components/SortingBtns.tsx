@@ -1,5 +1,6 @@
-import { type ReactNode, useMemo } from 'react';
-import { Button, Tooltip } from 'antd';
+import { useMemo } from 'react';
+import { Tooltip } from 'antd';
+import ActionIconBtn from '~/entrypoints/common/components/ActionIconBtn';
 import {
   SortAscendingOutlined,
   SortDescendingOutlined,
@@ -52,7 +53,7 @@ export default function SortingBtns({
         },
       };
     }
-  }, [$fmt]);
+  }, [$fmt, sortBy]);
 
   return (
     <>
@@ -62,12 +63,15 @@ export default function SortingBtns({
         mouseEnterDelay={0.3}
         destroyTooltipOnHide
       >
-        <div className="action-icon" onClick={() => onSort?.('ascending')}>
-          <Button
-            aria-label={config?.ascending?.title || $fmt('common.ascending')}
-            icon={config?.ascending?.icon || <SortAscendingOutlined />}
-          ></Button>
-        </div>
+        <span className="action-icon">
+          <ActionIconBtn
+            label={config?.ascending?.title || $fmt('common.ascending')}
+            size={20}
+            onClick={() => onSort?.('ascending')}
+          >
+            {config?.ascending?.icon || <SortAscendingOutlined />}
+          </ActionIconBtn>
+        </span>
       </Tooltip>
       <Tooltip
         title={config?.descending?.title || $fmt('common.descending')}
@@ -75,12 +79,15 @@ export default function SortingBtns({
         mouseEnterDelay={0.3}
         destroyTooltipOnHide
       >
-        <div className="action-icon" onClick={() => onSort?.('descending')}>
-          <Button
-            aria-label={config?.descending?.title || $fmt('common.descending')}
-            icon={config?.descending?.icon || <SortDescendingOutlined />}
-          ></Button>
-        </div>
+        <span className="action-icon">
+          <ActionIconBtn
+            label={config?.descending?.title || $fmt('common.descending')}
+            size={20}
+            onClick={() => onSort?.('descending')}
+          >
+            {config?.descending?.icon || <SortDescendingOutlined />}
+          </ActionIconBtn>
+        </span>
       </Tooltip>
     </>
   );

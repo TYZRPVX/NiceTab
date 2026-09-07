@@ -9,6 +9,18 @@ export const StyledBaseSidebarWrapper = styled.div<{
 }>`
   position: relative;
 
+  .sidebar-hover-trigger {
+    position: fixed;
+    top: 64px;
+    bottom: 0;
+    z-index: 11;
+    width: 20px;
+    background: transparent;
+  }
+  .sidebar-hover-trigger-left {
+    left: 0;
+  }
+
   .sidebar-inner-box {
     box-sizing: border-box;
     width: var(--sidebar-width, ${defaultSidebarWidth}px);
@@ -17,7 +29,7 @@ export const StyledBaseSidebarWrapper = styled.div<{
     top: 64px;
     left: 0;
     padding: 20px 16px;
-    transition: transform 0.2s ease-in-out;
+    transition: transform 180ms cubic-bezier(0.2, 0, 0, 1);
     transform: translateX(0);
     border-right: 1px solid var(--nt-border);
     background: var(--nt-page);
@@ -25,9 +37,7 @@ export const StyledBaseSidebarWrapper = styled.div<{
     z-index: 10;
 
     &.collapsed {
-      transform: translateX(
-        calc(-1 * var(--sidebar-width, ${defaultSidebarWidth}px) + 20px)
-      );
+      transform: translateX(calc(-1 * var(--sidebar-width, ${defaultSidebarWidth}px)));
       border-color: transparent;
       background: transparent;
       cursor: pointer;
@@ -48,6 +58,9 @@ export const StyledBaseSidebarWrapper = styled.div<{
 
       &.hover-expanded {
         transform: translateX(0);
+      }
+      &.hover-expanded,
+      &.hover-closing {
         border-color: var(--nt-border);
         background: var(--nt-page);
         cursor: default;
@@ -157,6 +170,18 @@ export const StyledBaseRightPanelWrapper = styled.div<{
 }>`
   position: relative;
 
+  .sidebar-hover-trigger {
+    position: fixed;
+    top: 64px;
+    bottom: 0;
+    z-index: 11;
+    width: 20px;
+    background: transparent;
+  }
+  .sidebar-hover-trigger-right {
+    right: 0;
+  }
+
   .right-panel-inner-box {
     box-sizing: border-box;
     width: var(--panel-width, ${defaultRightPanelWidth}px);
@@ -165,7 +190,7 @@ export const StyledBaseRightPanelWrapper = styled.div<{
     top: 64px;
     right: 0;
     padding: 20px 16px;
-    transition: transform 0.2s ease-in-out;
+    transition: transform 180ms cubic-bezier(0.2, 0, 0, 1);
     transform: translateX(0);
     border-left: 1px solid var(--nt-border);
     background: var(--nt-page);
@@ -174,7 +199,7 @@ export const StyledBaseRightPanelWrapper = styled.div<{
 
     &.collapsed,
     &.auto-hidden {
-      transform: translateX(calc(var(--panel-width, ${defaultRightPanelWidth}px) - 20px));
+      transform: translateX(var(--panel-width, ${defaultRightPanelWidth}px));
       border-color: transparent;
       background: transparent;
       cursor: pointer;
@@ -194,8 +219,11 @@ export const StyledBaseRightPanelWrapper = styled.div<{
       }
 
       &.hover-expanded {
-        cursor: default;
         transform: translateX(0);
+      }
+      &.hover-expanded,
+      &.hover-closing {
+        cursor: default;
         border-color: var(--nt-border);
         background: var(--nt-page);
 

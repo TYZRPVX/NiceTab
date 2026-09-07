@@ -332,21 +332,9 @@ export default function Home() {
                     {$fmt('home.tab')} ({countInfo?.tabCount})
                   </li>
                 </ul>
-                <div className="sidebar-context-actions">
-                  <SearchTabsBtn></SearchTabsBtn>
-                  {lockTagBtnVisible && (
-                    <ToggleLockedBtn
-                      isLocked={selectedTagData?.isLocked}
-                      onLockStatusChange={onLockStatusChange}
-                    ></ToggleLockedBtn>
-                  )}
-                  {selectedTagKey ? (
-                    <SortingBtns onSort={onNameSort}></SortingBtns>
-                  ) : null}
-                </div>
                 {/* 顶部操作按钮组 */}
                 <div className="sidebar-action-btns-wrapper">
-                  <Space size={12}>
+                  <div className="sidebar-primary-actions">
                     <Tooltip
                       title={$fmt('home.collapseAll')}
                       placement="top"
@@ -389,7 +377,17 @@ export default function Home() {
                         <FolderAddOutlined />
                       </StyledActionIconBtn>
                     </Tooltip>
-                  </Space>
+                    <SearchTabsBtn></SearchTabsBtn>
+                    {lockTagBtnVisible && (
+                      <ToggleLockedBtn
+                        isLocked={selectedTagData?.isLocked}
+                        onLockStatusChange={onLockStatusChange}
+                      ></ToggleLockedBtn>
+                    )}
+                    {selectedTagKey ? (
+                      <SortingBtns onSort={onNameSort}></SortingBtns>
+                    ) : null}
+                  </div>
 
                   <Dropdown
                     menu={{ items: moreItems, onClick: onMoreItemClick }}

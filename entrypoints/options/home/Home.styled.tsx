@@ -34,15 +34,6 @@ export const StyledSidebarWrapper = styled(SidebarLayout)<{
       color: var(--nt-text-secondary);
       font-size: 12px;
     }
-    .sidebar-context-actions {
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      min-height: 32px;
-      margin-bottom: 10px;
-      gap: 6px;
-    }
     .sidebar-action-btns-wrapper {
       flex-shrink: 0;
       display: flex;
@@ -52,6 +43,18 @@ export const StyledSidebarWrapper = styled(SidebarLayout)<{
       padding-bottom: 10px;
       border-bottom: 1px solid var(--nt-border);
       gap: 8px;
+    }
+    .sidebar-primary-actions {
+      display: flex;
+      align-items: center;
+      gap: clamp(2px, calc((var(--sidebar-width) - 240px) / 8), 12px);
+
+      > * {
+        flex-shrink: 0;
+      }
+      .action-icon {
+        display: inline-flex;
+      }
     }
     .tree-controls {
       flex-shrink: 0;

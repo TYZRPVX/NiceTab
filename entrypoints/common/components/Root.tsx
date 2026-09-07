@@ -2,7 +2,12 @@ import type { Runtime } from 'wxt/browser';
 import React, { useEffect, useState } from 'react';
 import { ConfigProvider, theme, message } from 'antd';
 import { IntlProvider } from 'react-intl';
-import { PRIMARY_COLOR, defaultLanguage } from '../constants';
+import {
+  DARK_THEME_TOKENS,
+  PRIMARY_COLOR,
+  THEME_COLORS,
+  defaultLanguage,
+} from '../constants';
 import {
   GlobalContext,
   useAntdLocale,
@@ -159,6 +164,14 @@ export default function Root({
     };
   }, []);
 
+  const isDarkTheme = themeTypeConfig.type === 'dark';
+  const selectedThemeColor = THEME_COLORS.find(
+    item => item.color.toLowerCase() === primaryColor?.toLowerCase(),
+  );
+  const effectivePrimaryColor = isDarkTheme
+    ? selectedThemeColor?.darkColor || primaryColor
+    : primaryColor;
+
   return (
     <IntlProvider locale={localeCustom} messages={messages}>
       <ConfigProvider
@@ -171,8 +184,22 @@ export default function Root({
           algorithm: theme[themeTypeConfig.algorithm],
           token: {
             motion: false,
-            colorPrimary: primaryColor || PRIMARY_COLOR,
+            colorPrimary: effectivePrimaryColor || PRIMARY_COLOR,
             colorBgContainer: themeTypeConfig.bgColor || '#fff',
+            ...(isDarkTheme
+              ? {
+                  colorBgBase: DARK_THEME_TOKENS.page,
+                  colorBgLayout: DARK_THEME_TOKENS.page,
+                  colorBgElevated: DARK_THEME_TOKENS.elevated,
+                  colorFillAlter: DARK_THEME_TOKENS.muted,
+                  colorBorder: DARK_THEME_TOKENS.border,
+                  colorBorderSecondary: DARK_THEME_TOKENS.border,
+                  colorText: DARK_THEME_TOKENS.text,
+                  colorTextSecondary: DARK_THEME_TOKENS.textSecondary,
+                  colorTextTertiary: DARK_THEME_TOKENS.textTertiary,
+                  colorTextLightSolid: DARK_THEME_TOKENS.page,
+                }
+              : {}),
           },
           components: {
             Tree: {

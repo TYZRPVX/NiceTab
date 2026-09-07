@@ -55,16 +55,26 @@ export const THEME_COLOR_NAMES: ThemeColors[] = [
 ];
 // Focused high-contrast theme palette. Semantic colors above remain unchanged.
 export const THEME_COLORS: ColorItem[] = [
-  { key: 'blue', color: '#1D4ED8' },
-  { key: 'purple', color: '#7C3AED' },
-  { key: 'cyan', color: '#007F8B' },
-  { key: 'green', color: '#16803A' },
-  { key: 'volcano', color: '#DC2644' },
+  { key: 'blue', color: '#1D4ED8', darkColor: '#60A5FA' },
+  { key: 'purple', color: '#7C3AED', darkColor: '#A78BFA' },
+  { key: 'cyan', color: '#007F8B', darkColor: '#22D3EE' },
+  { key: 'green', color: '#16803A', darkColor: '#4ADE80' },
+  { key: 'volcano', color: '#DC2644', darkColor: '#FB7185' },
 ];
 // 主色
 export const PRIMARY_COLOR = THEME_COLORS[0].color;
 
 // 主题类型
+export const DARK_THEME_TOKENS = {
+  page: '#181A1F',
+  elevated: '#22252A',
+  muted: '#262A31',
+  border: '#30353D',
+  text: '#F2F4F7',
+  textSecondary: '#A8B0BB',
+  textTertiary: '#7F8894',
+} as const;
+
 export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {
   light: {
     type: 'light',
@@ -73,7 +83,7 @@ export const THEME_TYPE_CONFIG: Record<ThemeTypes, ThemeTypeConfig> = {
   },
   dark: {
     type: 'dark',
-    bgColor: '#2f2f2f',
+    bgColor: DARK_THEME_TOKENS.page,
     algorithm: 'darkAlgorithm',
   },
   auto: {

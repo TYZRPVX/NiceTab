@@ -86,6 +86,7 @@ export type ThemeColors =
 export interface ColorItem {
   key: ThemeColors;
   color: string;
+  darkColor?: string;
 }
 
 // 标签页事件
