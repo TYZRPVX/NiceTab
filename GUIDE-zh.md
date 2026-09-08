@@ -7,7 +7,9 @@
 
 ## 项目简介
 
-本项目是一个免费开源的浏览器标签页管理器插件，OneTab、Toby、SessionBuddy 等扩展的升级替代品，功能丰富易用。
+A simple, open-source tab manager.
+
+*Let your tabs rest, and your mind wander.*
 
 项目的基本介绍和说明，见 <a href="./README-zh.md">README-zh</a>，这里不做赘述了。
 
@@ -449,4 +451,3 @@ v2.9.2 版本新增了精简版的远程容灾备份功能，在远程同步推�
 ## 其他
 
 其他信息后续补充。
-

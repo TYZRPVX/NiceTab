@@ -1,16 +1,7 @@
 import { useContext, useCallback, useEffect, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { ThemeProvider } from 'styled-components';
-import {
-  theme,
-  Space,
-  Dropdown,
-  Button,
-  Switch,
-  Empty,
-  type MenuProps,
-  Tooltip,
-} from 'antd';
+import { theme, Space, Dropdown, Button, Empty, type MenuProps, Tooltip } from 'antd';
 import {
   DownOutlined,
   CompressOutlined,
@@ -71,15 +62,13 @@ function handleQuickJump(route: { path: string; query?: Record<string, any> }) {
 export default function App() {
   const { token } = theme.useToken();
   const NiceGlobalContext = useContext(GlobalContext);
-  const { $fmt, locale } = useIntlUtls();
+  const { $fmt } = useIntlUtls();
   const { version, themeTypeConfig } = NiceGlobalContext;
-  const [tabs, setTabs] = useState<Tabs.Tab[]>([]);
   const [tabGroupList, setTabGroupList] = useState<GroupListItem[]>([]);
   const [tabsReady, setTabsReady] = useState(false);
   const [modules, setModules] = useState<PopupModuleNames[]>([]);
   const [actionBtns, setActionBtns] = useState<ActionBtnItem[]>([]);
   const [isCompact, setIsCompact] = useState(true);
-  const [isShowPinnedTabs, setIsShowPinnedTabs] = useState(false);
 
   // 快捷跳转
   const quickJumpBtns = [
@@ -187,9 +176,7 @@ export default function App() {
   }, []);
 
   const handleTabsChange = useCallback(async (_tabs: Tabs.Tab[]) => {
-    const popupState = await stateUtils.getState('popup');
-    const tabs = _tabs.filter(tab => !!popupState?.isShowPinnedTabs || !tab.pinned);
-    setTabs(tabs);
+    const tabs = _tabs.filter(tab => !tab.pinned);
 
     let groupList: GroupListItem[] = [];
     if (!isGroupSupported()) {
@@ -200,7 +187,7 @@ export default function App() {
       }));
     } else {
       groupList = tabs.reduce<GroupListItem[]>((result, tab) => {
-        const groupId = tab.groupId || -1;
+        const groupId = tab.groupId ?? -1;
         if (groupId === -1) {
           return result.concat({ groupId: -1, groupName: '', tabs: [tab] });
         }
@@ -229,62 +216,34 @@ export default function App() {
     setTabsReady(true);
   }, []);
 
-  const handleTabDiscard = useCallback(
-    async (tab: Tabs.Tab) => {
-      if (tab.active || tab.discarded) return;
-
-      tab.id && (await browser.tabs.discard(tab.id));
-      browser.tabs.query({ currentWindow: true }).then(async allTabs => {
-        const { tab: adminTab } = await getAdminTabInfo();
-        handleTabsChange(allTabs?.filter(t => t.id !== adminTab?.id));
-      });
-    },
-    [handleTabsChange],
-  );
+  const refreshTabs = useCallback(async () => {
+    const allTabs = await browser.tabs.query({ currentWindow: true });
+    const { tab: adminTab } = await getAdminTabInfo();
+    await handleTabsChange(allTabs.filter(tab => tab.id !== adminTab?.id));
+  }, [handleTabsChange]);
 
   const handleTabRemove = useCallback(
     async (tab: Tabs.Tab) => {
-      const { tab: adminTab } = await getAdminTabInfo();
-      const newTabs = tabs.filter(t => t.id !== tab.id && t.id !== adminTab?.id);
-      handleTabsChange(newTabs);
-      if (tab.id) {
+      if (tab.id === undefined) return;
+      try {
         await browser.tabs.remove(tab.id);
-        browser.tabs.query({ currentWindow: true }).then(async allTabs => {
-          handleTabsChange(allTabs?.filter(t => t.id !== adminTab?.id));
-        });
+      } finally {
+        await refreshTabs();
       }
     },
-    [tabs, handleTabsChange],
+    [refreshTabs],
   );
 
-  const handleTabAction = useCallback(async (action: TabActions, tab: Tabs.Tab) => {
-    if (action === 'active') {
-      handleTabActive(tab);
-    } else if (action === 'discard') {
-      handleTabDiscard(tab);
-    } else if (action === 'remove') {
-      handleTabRemove(tab);
-    }
-  }, []);
-
-  const handlePinnedSwitchChange = useCallback(
-    async (checked: boolean) => {
-      setIsShowPinnedTabs(checked);
-      await stateUtils.setStateByModule('popup', { isShowPinnedTabs: checked });
-      browser.tabs.query({ currentWindow: true }).then(async allTabs => {
-        const { tab: adminTab } = await getAdminTabInfo();
-        handleTabsChange(allTabs?.filter(t => t.id !== adminTab?.id));
-      });
+  const handleTabAction = useCallback(
+    (action: TabActions, tab: Tabs.Tab) => {
+      if (action === 'active') {
+        handleTabActive(tab);
+      } else {
+        void handleTabRemove(tab);
+      }
     },
-    [handleTabsChange],
+    [handleTabActive, handleTabRemove],
   );
-
-  // 分组操作回调
-  const handleGroupAction = useCallback(async () => {
-    const { tab: adminTab } = await getAdminTabInfo();
-    const newTabs = tabs.filter(t => t.id !== adminTab?.id);
-    handleTabsChange(newTabs);
-  }, [tabs]);
 
   const init = async () => {
     const settings = await settingsUtils.getSettings();
@@ -296,8 +255,6 @@ export default function App() {
 
     const popupState = await stateUtils.getState('popup');
     setIsCompact(!!popupState?.isCompact);
-    const _isShowPinnedTabs = !!popupState?.isShowPinnedTabs;
-    setIsShowPinnedTabs(_isShowPinnedTabs);
 
     if (modules.includes('openedTabs')) {
       browser.tabs.query({ currentWindow: true }).then(async allTabs => {
@@ -333,19 +290,6 @@ export default function App() {
     if (key === 'reload') return <ReloadOutlined />;
     return null;
   };
-
-  function PinnedTabsHeaderMarkup({ isCompact }: { isCompact: boolean }) {
-    return (
-      <div className={`pinned-tabs-switch-header ${isCompact ? 'compact' : ''}`}>
-        <span>{$fmt('home.displayPinnedTabs')}</span>
-        <Switch
-          checked={isShowPinnedTabs}
-          size="small"
-          onChange={handlePinnedSwitchChange}
-        ></Switch>
-      </div>
-    );
-  }
 
   const hasOpenedTabs = tabGroupList.length > 0;
 
@@ -414,9 +358,6 @@ export default function App() {
                     }
                   })}
               </div>
-              {modules.includes('openedTabs') && hasOpenedTabs && (
-                <PinnedTabsHeaderMarkup isCompact={isCompact} />
-              )}
             </>
           ) : (
             <>
@@ -498,7 +439,6 @@ export default function App() {
               {modules.includes('openedTabs') && (
                 <div className="tab-list-title">
                   <span>{$fmt('common.openedTabs')}：</span>
-                  <PinnedTabsHeaderMarkup isCompact={isCompact} />
                 </div>
               )}
             </>
@@ -510,12 +450,16 @@ export default function App() {
           tabsReady &&
           (hasOpenedTabs ? (
             <div className="block-opened-tabs">
-              {tabGroupList.map((group, index) => (
+              {tabGroupList.map(group => (
                 <TabGroupItem
-                  key={~group.groupId || index}
+                  key={
+                    group.groupId === -1
+                      ? `tab-${group.tabs[0].id}`
+                      : `group-${group.groupId}`
+                  }
                   group={group}
                   onAction={handleTabAction}
-                  onGroupAction={handleGroupAction}
+                  onGroupAction={refreshTabs}
                 ></TabGroupItem>
               ))}
             </div>
@@ -531,11 +475,6 @@ export default function App() {
                 }
               >
                 <Space wrap>
-                  {!isShowPinnedTabs && (
-                    <Button onClick={() => handlePinnedSwitchChange(true)}>
-                      {$fmt('home.displayPinnedTabs')}
-                    </Button>
-                  )}
                   <Button
                     type="primary"
                     onClick={() => handleQuickJump({ path: '/home' })}

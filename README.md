@@ -8,16 +8,9 @@
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/web-dahuyou/NiceTab)
 
-## Overview
+A simple, open-source tab manager.
 
-**Note** The extension is actively developed with ongoing updates. The screenshots below reflect history versions only. We encourage you to install the latest release for the most up-to-date experience.
-
-- NiceTab is an `open source` browser extension that makes managing your browser tabs quick and convenient.
-- Named `NiceTab` with the hope that it would be a "nice" tab management tool.
-- Similar to other tab management extensions like `OneTab`, `Toby`, `SessionBuddy`, `N-Tab` and `KepTab`. it supports browsers such as Chrome, Firefox, Microsoft Edge, and any Chromium based browser.
-- Developed using `React` and based on the [`wxt framework`](https://wxt.dev/), which provides built-in templates for `Vanilla`, `Vue`, `React`, `Svelte`, and `Solid`.
-- The UI is powered by the popular [`Ant Design`](https://ant-design.antgroup.com/) library.
-
+*Let your tabs rest, and your mind wander.*
 
 ## Extension Installation
 

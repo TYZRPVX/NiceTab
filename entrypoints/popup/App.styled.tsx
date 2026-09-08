@@ -14,8 +14,7 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
     flex-shrink: 0;
     flex-grow: 0;
     position: relative;
-    transition: all 0.3s ease;
-    box-shadow: ${props => props.theme.boxShadow || '0 2px 12px 3px rgba(0, 0, 0, 0.1)'};
+    border-bottom: 1px solid var(--nt-border);
 
     &.compact {
       .block {
@@ -44,7 +43,7 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
         box-shadow: none;
         &:hover {
           color: ${props => props.theme.colorPrimary};
-          background: rgba(0, 0, 0, 0.05);
+          background: var(--nt-surface-muted);
         }
       }
     }
@@ -59,7 +58,7 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
       box-shadow: none;
       &:hover {
         color: ${props => props.theme.colorPrimary};
-        background: rgba(0, 0, 0, 0.05);
+        background: var(--nt-surface-muted);
       }
     }
   }
@@ -67,7 +66,7 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
     display: flex;
     align-items: center;
     padding: 10px;
-    border-bottom: 1px solid #0505050f;
+    border-bottom: 1px solid var(--nt-border);
     gap: 8px;
     font-size: 13px;
     .block-title {
@@ -111,18 +110,10 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
     font-size: 14px;
     font-weight: bold;
   }
-  .pinned-tabs-switch-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 12px;
-    &.compact {
-      padding-bottom: 8px;
-    }
-  }
   .block-opened-tabs {
     flex: 1;
-    padding: 12px 0;
+    padding: 8px;
+    min-height: 0;
     overflow-y: auto;
   }
   .opened-tabs-empty {
@@ -154,21 +145,12 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
 export const StyledGroupWrapper = styled.div<{ $color?: string }>`
   margin: 4px 0;
   position: relative;
-  &:after {
-    content: '';
-    position: absolute;
-    width: calc(100% - 6px);
-    height: 100%;
-    top: 0;
-    left: 4px;
-    border-radius: 6px;
-    border: 1px solid #d9d9d9;
-    pointer-events: none;
-  }
   .group-title {
     display: flex;
     align-items: center;
-    padding: 6px 12px;
+    padding: 6px 8px;
+    min-height: 36px;
+    box-sizing: border-box;
     gap: 8px;
     cursor: pointer;
     .collapse-icon-btn {
@@ -177,7 +159,7 @@ export const StyledGroupWrapper = styled.div<{ $color?: string }>`
     .group-name {
       flex: 1;
       overflow: hidden;
-      font-size: 12px;
+      font-size: 14px;
       color: ${props => props.theme.colorText || '#000'};
       ${StyledEllipsis}
     }
@@ -215,46 +197,36 @@ export const StyledTabItem = styled.div`
   position: relative;
   display: flex;
   align-items: center;
-  padding: 6px 8px;
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 5px 8px;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--nt-radius-sm);
   cursor: pointer;
-  &:hover,
-  &.active {
-    background: ${props => props.theme.colorPrimaryBg || 'rgba(0, 0, 0, 0.1)'};
+  &:hover {
+    border-color: var(--nt-border);
+    background: var(--nt-surface-muted);
   }
-  // &.active:before {
-  //   content: '';
-  //   position: absolute;
-  //   left: 0;
-  //   top: 0;
-  //   width: 3px;
-  //   height: 100%;
-  //   background: ${props => props.theme.colorPrimary};
-  // }
+  &.active {
+    background: ${props => props.theme.colorPrimaryBg};
+  }
   .tab-item-title {
     flex: 1;
+    min-width: 0;
     overflow: hidden;
-    font-size: 12px;
-    color: ${props => props.theme.colorText || '#000'};
+    font-size: 14px;
+    line-height: 24px;
+    color: var(--nt-text);
     ${StyledEllipsis}
   }
-  .action-icon-btn {
+  .tab-close {
+    display: flex;
     flex-shrink: 0;
-    margin-left: 8px;
   }
-  &.discarded {
-    .tab-item-title,
-    .btn-discarded {
-      color: ${props => props.theme.colorTextQuaternary || 'rgba(0, 0, 0, 0.25)'};
-    }
+  &.discarded .tab-item-title {
+    color: var(--nt-text-secondary);
   }
-`;
-
-export const StyledFavIcon = styled.i<{ $icon?: string }>`
-  flex: 0 0 16px;
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
-  background: url(${props => props.$icon}) center / 100% 100% no-repeat;
 `;
 
 export default {

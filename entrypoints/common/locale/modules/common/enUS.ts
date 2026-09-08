@@ -72,7 +72,7 @@ const enUS: Record<LocaleKey, string> = {
   'common.failedReason': 'Reason for Failure',
   'common.noData': 'No Data',
   'common.noOpenedTabs': 'No tabs to show',
-  'common.noOpenedTabsHint': 'Show pinned tabs or open NiceTab to view saved items.',
+  'common.noOpenedTabsHint': 'Open NiceTab to view your saved tabs.',
   'common.comingSoon': 'Coming Soon',
   'common.CopySuccess': 'Copy Successful',
   'common.CopyFailed': 'Copy Failed',

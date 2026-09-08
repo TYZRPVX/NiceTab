@@ -8,13 +8,9 @@
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/web-dahuyou/NiceTab)
 
-## 基础介绍
-- 本项目是一个免费开源的浏览器标签页管理器插件，OneTab、Toby、SessionBuddy 等扩展的升级替代品，功能丰富易用。
-- 取名 `NiceTab` 是希望它是一个用起来很 nice 的 tab 标签页管理工具（不过本人的UI和交互设计太差，只能凑合凑合了）。
-- 类似于 `OneTab`、`Toby`、`SessionBuddy`、`N-Tab`、`KepTab` 等标签页管理插件，支持**谷歌Chrome**、**Firefox**、**微软Edge**等浏览器。
-- 采用 `react` 语言，基于[wxt框架](https://wxt.dev/)开发（wxt框架内置 `vanilla | vue | react | svelte | solid` 语言的初始化模板）。
-- UI直接使用了 `Ant Design` 这个常用的 UI 框架。
+A simple, open-source tab manager.
 
+*Let your tabs rest, and your mind wander.*
 
 ## 扩展安装
 - 谷歌 Chrome 应用商店：[Chrome Web Store](https://chromewebstore.google.com/detail/fonflmjnjbkigocpoommgmhljdpljain)

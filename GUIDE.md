@@ -7,7 +7,9 @@
 
 ## Project Introduction
 
-NiceTab is a free, open-source browser tab manager extension. It serves as a powerful, upgraded alternative to OneTab, Toby, SessionBuddy, and similar tools, delivering rich features and excellent usability.
+A simple, open-source tab manager.
+
+*Let your tabs rest, and your mind wander.*
 
 For a project overview, see the <a href="./README.md">README</a>.
 

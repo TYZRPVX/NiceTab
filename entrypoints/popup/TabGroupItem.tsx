@@ -1,18 +1,13 @@
-import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
+import { useRef, useState, useCallback, useMemo } from 'react';
 import { Tabs } from 'wxt/browser';
-import {
-  RightOutlined,
-  DownOutlined,
-  CloseOutlined,
-  CoffeeOutlined,
-} from '@ant-design/icons';
+import { RightOutlined, DownOutlined, CloseOutlined } from '@ant-design/icons';
 import { classNames, getDisplayGroupName } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
 import ActionBtnList, {
   type ActionOptionItem,
 } from '~/entrypoints/common/components/ActionBtnList';
-import TabItem from './TabItem';
+import TabItem, { type TabActions } from './TabItem';
 import { StyledGroupWrapper } from './App.styled';
 
 export interface GroupListItem {
@@ -23,7 +18,6 @@ export interface GroupListItem {
   color?: string;
 }
 
-export type TabActions = 'active' | 'discard' | 'remove';
 export interface GroupItemProps {
   group: GroupListItem;
   onAction: (action: TabActions, tab: Tabs.Tab) => void;
@@ -33,7 +27,9 @@ export interface GroupItemProps {
 export default function TabGroupItem({ group, onAction, onGroupAction }: GroupItemProps) {
   const { $fmt } = useIntlUtls();
   const groupRef = useRef<HTMLDivElement>(null);
-  const [collapsed, setCollapsed] = useState(group.collapsed);
+  const [collapsed, setCollapsed] = useState(
+    group.tabs.some(tab => tab.active) ? false : group.collapsed,
+  );
   const groupDisplayName = useMemo(
     () => getDisplayGroupName({ groupName: group.groupName, tabList: group.tabs }),
     [group.groupName, group.tabs],
@@ -41,30 +37,6 @@ export default function TabGroupItem({ group, onAction, onGroupAction }: GroupIt
   const onToggle = useCallback(() => {
     setCollapsed(value => !value);
   }, []);
-
-  const autoFocus = useCallback(() => {
-    const hasActiveTab = group.tabs?.find(tab => tab.active);
-    // 如果有激活的tab，则自动展开标签组
-    if (hasActiveTab) {
-      setCollapsed(false);
-    }
-  }, [group]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      autoFocus();
-    }, 30);
-  }, []);
-
-  // 分组级批量操作
-  const handleGroupDiscard = useCallback(async () => {
-    const discardableTabs = group.tabs.filter(tab => !tab.active && !tab.discarded);
-    const discardableTabIds = discardableTabs.map(tab => tab.id!).filter(Boolean);
-    if (discardableTabIds.length > 0) {
-      await Promise.all(discardableTabIds.map(id => browser.tabs.discard(id)));
-      onGroupAction?.('discard', group);
-    }
-  }, [group, onGroupAction]);
 
   const handleGroupRemove = useCallback(async () => {
     const tabIds = group.tabs.map(tab => tab.id!).filter(Boolean);
@@ -75,16 +47,7 @@ export default function TabGroupItem({ group, onAction, onGroupAction }: GroupIt
   }, [group, onGroupAction]);
 
   const groupActions: ActionOptionItem[] = useMemo(() => {
-    const discardableTabs = group.tabs.filter(tab => !tab.active && !tab.discarded);
-
     return [
-      {
-        key: 'discard',
-        label: $fmt('common.hibernate'),
-        icon: <CoffeeOutlined />,
-        disabled: !discardableTabs?.length,
-        onClick: handleGroupDiscard,
-      },
       {
         key: 'remove',
         label: $fmt('common.remove'),
@@ -103,7 +66,7 @@ export default function TabGroupItem({ group, onAction, onGroupAction }: GroupIt
         onClick: handleGroupRemove,
       },
     ];
-  }, [group]);
+  }, [group, $fmt, handleGroupRemove]);
 
   if (group.groupId === -1) {
     return group.tabs?.map(tab => <TabItem key={tab.id} tab={tab} onAction={onAction} />);
@@ -119,7 +82,9 @@ export default function TabGroupItem({ group, onAction, onGroupAction }: GroupIt
         <div className="collapse-icon-btn">
           {collapsed ? <RightOutlined /> : <DownOutlined />}
         </div>
-        <div className="group-name">{groupDisplayName}</div>
+        <div className="group-name" title={groupDisplayName}>
+          {groupDisplayName}
+        </div>
         <div className="group-actions" onClick={e => e.stopPropagation()}>
           <ActionBtnList actionBtnStyle="icon" outerList={groupActions} gap={8} />
         </div>

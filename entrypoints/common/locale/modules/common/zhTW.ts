@@ -72,7 +72,7 @@ const zhTW: Record<LocaleKey, string> = {
   "common.failedReason": "失敗原因",
   "common.noData": "暫無",
   "common.noOpenedTabs": "暫無可顯示的分頁",
-  "common.noOpenedTabsHint": "可以顯示釘選分頁，或前往管理後台查看已儲存內容。",
+  "common.noOpenedTabsHint": "開啟 NiceTab 查看已儲存的分頁。",
   "common.comingSoon": "敬請期待",
   "common.CopySuccess": "複製成功",
   "common.CopyFailed": "複製失敗",
