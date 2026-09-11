@@ -8,6 +8,7 @@ import type {
   OpeningTabsOrder,
   NewTabDisplayTypes,
   SearchEngine,
+  TabSortDomainOrderMode,
 } from '~/entrypoints/types';
 import {
   ENUM_SETTINGS_PROPS,
@@ -53,6 +54,9 @@ const {
   UNNAMED_GROUP_RESTORE_AS_GROUP,
   NAMED_GROUP_RESTORE_AS_GROUP,
   OPENING_TABS_ORDER,
+  /* 当前窗口标签页排序配置 */
+  TAB_SORT_DOMAIN_ORDER_MODE,
+  TAB_SORT_CUSTOM_DOMAIN_LIST,
   /* 页面标题配置 */
   PAGE_TITLE_CONFIG,
   /* 全局搜索配置 */
@@ -117,6 +121,9 @@ export default class SettingsUtils {
     [OPENING_TABS_ORDER]: 'default' as OpeningTabsOrder, // 打开标签页的顺序
     [UNNAMED_GROUP_RESTORE_AS_GROUP]: import.meta.env.FIREFOX ? false : true, // 是否以标签组形式恢复未命名标签组
     [NAMED_GROUP_RESTORE_AS_GROUP]: import.meta.env.FIREFOX ? false : true, // 是否以标签组形式恢复已命名标签组
+    /* 当前窗口标签页排序配置 */
+    [TAB_SORT_DOMAIN_ORDER_MODE]: 'alphabetical' as TabSortDomainOrderMode, // 域名分组顺序方式
+    [TAB_SORT_CUSTOM_DOMAIN_LIST]: '', // 自定义域名优先级列表（每行一个域名）
     /* 页面标题配置 */
     [PAGE_TITLE_CONFIG]: [], // 页面标题配置
     /* 全局搜索配置 */

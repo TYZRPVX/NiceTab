@@ -95,6 +95,9 @@ const enUS: Record<LocaleKey, string> = {
   'common.bindShortcuts': 'Bind Shortcuts',
   'common.bindShortcuts.tip':
     'For Firefox: Go to the about:addons page, switch to the "Extensions" tab, click the "Settings (Tools for all add-ons)" button in the top-right corner to open the dropdown menu, then select "Manage Extension Shortcuts" to bind shortcuts.',
+  'common.sortTabs': 'Sort Current Tabs',
+  'common.sortTabsNoEligible': 'No sortable tabs. All tabs are pinned.',
+  'common.sortTabsNoChanges': 'Tabs are already sorted using the current rule.',
   'common.sendTo': 'Send To',
   'common.search': 'Search',
   'common.reload': 'Reload',

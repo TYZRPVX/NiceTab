@@ -4,6 +4,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.block.common': 'Common',
   'settings.block.sendTabs': 'Sending Tabs',
   'settings.block.openTabs': 'Opening Tabs',
+  'settings.block.tabSort': 'Tab Sorting',
   'settings.block.pageTitleConfig': 'Page Title Overwrite',
   'settings.block.globalSearch': 'Global Search',
   'settings.block.otherActions': 'Other Actions',
@@ -69,6 +70,15 @@ const enUS: Record<LocaleKey, string> = {
   'settings.openingTabsOrder': 'The order when opening multiple tabs:',
   'settings.unnamedGroupRestoreAsGroup': 'Restore the unnamed group as a browser tab group?',
   'settings.namedGroupRestoreAsGroup': 'Restore the named group as a browser tab group?',
+
+  /* 当前窗口标签页排序配置 */
+  'settings.tabSortDomainOrderMode': 'Site grouping order when sorting tabs{mark}',
+  'settings.tabSortDomainOrderMode.tooltip': 'Clicking the sort icon in the Popup panel groups non-pinned tabs by their full site hostname, such as confluence.shopee.io, then sorts titles alphabetically within each site. Native browser groups, including Vivaldi Tab Stacks, are sorted only within themselves and never moved across groups. Pinned tabs are not affected.',
+  'settings.tabSortDomainOrderMode.alphabetical': 'Group domains alphabetically (recommended)',
+  'settings.tabSortDomainOrderMode.custom': 'Group domains by a custom priority list',
+  'settings.tabSortCustomDomainList': 'Custom domain priority list:',
+  'settings.tabSortCustomDomainList.tooltip': 'One domain per line. A root domain, such as shopee.io, matches all of its subdomains; a full hostname, such as confluence.shopee.io, prioritizes only that site. Unlisted sites follow in alphabetical order.',
+  'settings.tabSortCustomDomainList.placeholder': 'e.g.\nshopee.io\ngithub.com',
 
   /* 页面标题配置 */
   'settings.pageTitleConfig': 'Page title overwrite:',

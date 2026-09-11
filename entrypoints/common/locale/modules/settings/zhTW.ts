@@ -4,6 +4,7 @@ const zhTW: Record<LocaleKey, string> = {
   "settings.block.common": "通用設定",
   "settings.block.sendTabs": "傳送分頁設定",
   "settings.block.openTabs": "開啟分頁設定",
+  "settings.block.tabSort": "分頁排序設定",
   "settings.block.pageTitleConfig": "網頁標題設定",
   "settings.block.globalSearch": "全域搜尋設定",
   "settings.block.otherActions": "其他操作設定",
@@ -65,6 +66,15 @@ const zhTW: Record<LocaleKey, string> = {
   "settings.openingTabsOrder": "批量開啟分頁的順序：",
   "settings.unnamedGroupRestoreAsGroup": "恢復未命名分頁群組時-是否以分頁群組形式開啟到瀏覽器：",
   "settings.namedGroupRestoreAsGroup": "恢復已命名分頁群組時-是否以分頁群組形式開啟到瀏覽器：",
+
+  "settings.tabSortDomainOrderMode": "排序時-站點分組順序方式{mark}",
+  "settings.tabSortDomainOrderMode.tooltip": "點擊 Popup 面板中的排序圖示時，會按完整站點網域分組（例如 confluence.shopee.io），群組內按標題字母升序排列；瀏覽器原生分頁群組（包括 Vivaldi Tab Stack）只會在群組內排序，不會跨群組移動；固定分頁不參與排序。",
+  "settings.tabSortDomainOrderMode.alphabetical": "按網域字母順序分組（推薦）",
+  "settings.tabSortDomainOrderMode.custom": "按自訂網域優先順序清單分組",
+  "settings.tabSortCustomDomainList": "自訂網域優先順序清單：",
+  "settings.tabSortCustomDomainList.tooltip": "每行一個網域。可使用主網域（如 shopee.io）匹配其所有子網域，或使用完整站點網域（如 confluence.shopee.io）單獨優先；未列出的站點將按字母順序排在後面。",
+  "settings.tabSortCustomDomainList.placeholder": "例如：\nshopee.io\ngithub.com",
+
   "settings.pageTitleConfig": "網頁標題自定義：",
   "settings.pageTitleConfig.drawerTitle": "網頁標題設定",
   "settings.globalSearchDeleteAfterOpen": "開啟分頁後是否從列表中刪除：",

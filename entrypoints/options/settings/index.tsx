@@ -31,6 +31,7 @@ import FormModuleOtherActions from './FormModuleOtherActions';
 import FormModuleDisplay from './FormModuleDisplay';
 import FormModuleNewtab from './FormModuleNewtab';
 import FormModuleSync from './FormModuleSync';
+import FormModuleTabSort from './FormModuleTabSort';
 import { StyledSidebarWrapper, StyledMainWrapper } from './Settings.styled';
 
 const { LANGUAGE, AUTO_SYNC_TIME_RANGES } = ENUM_SETTINGS_PROPS;
@@ -74,6 +75,10 @@ export default function Settings() {
       {
         key: 'openTabs',
         label: $fmt('settings.block.openTabs'),
+      },
+      {
+        key: 'tabSort',
+        label: $fmt('settings.block.tabSort'),
       },
       {
         key: 'pageTitleConfig',
@@ -256,6 +261,9 @@ export default function Settings() {
 
             {/* ******************* 打开标签页相关设置 ******************* */}
             <FormModuleOpen hidden={currModule !== 'openTabs'} form={form} />
+
+            {/* ******************* 当前窗口标签页排序相关设置 ******************* */}
+            <FormModuleTabSort hidden={currModule !== 'tabSort'} form={form} />
 
             {/* ******************* 网页标题相关设置 ******************* */}
             <FormModulePageTitle hidden={currModule !== 'pageTitleConfig'} form={form} />

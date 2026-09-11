@@ -5,7 +5,6 @@ import {
   Input,
   Checkbox,
   Space,
-  Switch,
   Modal,
   Tooltip,
   type InputRef,
@@ -19,6 +18,7 @@ import {
   ProductOutlined,
   DeleteOutlined,
   ExportOutlined,
+  SearchOutlined,
 } from '@ant-design/icons';
 import { debounce, groupBy } from 'lodash-es';
 import {
@@ -31,7 +31,6 @@ import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants
 import { useIntlUtls, eventEmitter } from '~/entrypoints/common/hooks/global';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { openNewTab, updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
-import { ContentGlobalContext } from '~/entrypoints/content/context';
 import {
   StyledEllipsis,
   StyledActionIconBtn,
@@ -68,61 +67,100 @@ export type BatchActionCallbackFn = (
   selectedItems?: SearchListItemProps[],
 ) => void;
 
+function getSearchItemHost(url?: string) {
+  if (!url) return '';
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return '';
+  }
+}
+
 export const StyledListItem = styled.div`
   display: flex;
-  align-items: center;
+  min-width: 0;
+  padding: 2px 0;
+
   .checkbox-wrapper {
     flex: 0 0 auto;
-    padding: 8px 16px 8px 0;
+    padding: 5px 12px 0 0;
   }
   .item-content-box {
     width: 0;
-    position: relative;
     flex: 1;
+    min-width: 0;
   }
-  .item-content {
-    position: relative;
+
+  .item-primary,
+  .item-meta {
     width: 100%;
     display: flex;
     align-items: center;
+    min-width: 0;
     overflow: hidden;
   }
+
+  .item-primary {
+    min-height: 22px;
+  }
+  .item-meta {
+    gap: 6px;
+    margin-top: 1px;
+    color: var(--nt-text-tertiary);
+    font-size: 12px;
+  }
+
   .tag-name,
   .group-name {
-    max-width: 25%;
+    max-width: 32%;
     display: inline-flex;
+    flex: 0 1 auto;
     align-items: center;
     gap: 4px;
-    cursor: pointer;
 
     .text {
       ${StyledEllipsis};
     }
   }
-  .divider {
-    display: inline-flex;
+  .meta-separator {
     flex: 0 0 auto;
-    margin: 0 8px;
+    color: var(--nt-border);
   }
   .tab-title {
-    flex: 1 0 auto;
+    flex: 1;
+    min-width: 0;
     display: inline-flex;
     align-items: center;
-    cursor: pointer;
+    color: var(--nt-text);
+    font-weight: 500;
+
     .text {
       flex: 1;
       width: 0;
       ${StyledEllipsis};
     }
+
     .icon-open {
       flex: 0 0 auto;
       margin-left: 8px;
+      visibility: hidden;
+      opacity: 0;
     }
   }
-  .tab-url {
-    width: 100%;
-    color: ${props => props.theme.colorTextTertiary || '#999'};
+
+  .tab-host {
+    flex: 0 1 30%;
+    min-width: 0;
+    margin-left: auto;
     ${StyledEllipsis};
+  }
+
+  &:hover,
+  &:focus-within {
+    .icon-open {
+      visibility: visible;
+      opacity: 1;
+    }
   }
 `;
 
@@ -163,33 +201,8 @@ export function SearchListItem({
         </div>
       )}
       <div className="item-content-box">
-        <div className="item-content">
-          <div
-            className="tag-name"
-            title={option.tagName}
-            // onClick={() => onAction?.('tag', option)}
-          >
-            <TagOutlined />
-            {/* {option.tagName} */}
-            <span className="text">
-              {option.static ? $fmt('home.stagingArea') : option.tagName}
-            </span>
-          </div>
-          <div className="divider">{'>'}</div>
-          <div
-            className="group-name"
-            title={option.groupName}
-            // onClick={() => onAction?.('tabGroup', option)}
-          >
-            <ProductOutlined />
-            <span className="text">{option.groupName}</span>
-          </div>
-          <div className="divider">{'>'}</div>
-          <div
-            className="tab-title"
-            title={option.title}
-            // onClick={() => onAction?.('tab', option)}
-          >
+        <div className="item-primary">
+          <div className="tab-title" title={option.title}>
             <span className="text">{option.title}</span>
             <StyledActionIconBtn
               as="a"
@@ -204,7 +217,22 @@ export function SearchListItem({
             </StyledActionIconBtn>
           </div>
         </div>
-        <div className="tab-url">{option.url}</div>
+        <div className="item-meta">
+          <div className="tag-name" title={option.tagName}>
+            <TagOutlined />
+            <span className="text">
+              {option.static ? $fmt('home.stagingArea') : option.tagName}
+            </span>
+          </div>
+          <span className="meta-separator">/</span>
+          <div className="group-name" title={option.groupName}>
+            <ProductOutlined />
+            <span className="text">{option.groupName}</span>
+          </div>
+          <span className="tab-host" title={option.url}>
+            {getSearchItemHost(option.url)}
+          </span>
+        </div>
       </div>
     </StyledListItem>
   );
@@ -451,13 +479,83 @@ export function GlobalSearchList({
 const StyledSearchList = styled.div`
   position: relative;
   width: 100%;
+
+  > .nicetab-select {
+    height: 42px;
+  }
+
+  .nicetab-select-selector {
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 3px 11px !important;
+    border-radius: 0 !important;
+    border-color: var(--nt-border) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+
+    .nicetab-select-selection-wrap {
+      display: flex;
+      align-items: center;
+    }
+    .nicetab-select-selection-search {
+      inset-block: 0;
+      display: flex;
+      align-items: center;
+    }
+    .nicetab-select-selection-search-input {
+      height: 100% !important;
+    }
+  }
+  .nicetab-select-arrow {
+    top: 50%;
+    margin-top: 0;
+    transform: translateY(-50%);
+    color: var(--nt-text-secondary);
+  }
+
+  .global-search-results {
+    padding: 4px 0;
+    border-radius: 0;
+    background: var(--nt-page);
+    box-shadow: none;
+
+    .nicetab-select-item {
+      min-height: 0;
+      padding: 8px 12px;
+      border-radius: 0;
+    }
+    .nicetab-select-item-option-active,
+    .nicetab-select-item-option-selected {
+      background: var(--nt-accent-soft);
+    }
+  }
 `;
 const StyledBatchActionHeader = styled.div`
   display: flex;
   align-items: center;
-  padding: 6px 0 12px;
+  min-height: 32px;
+  padding: 0 0 8px;
   box-sizing: border-box;
-  gap: 24px;
+  color: var(--nt-text-secondary);
+
+  .selection-toggle {
+    font-size: 12px;
+  }
+  .selection-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .selected-count-text {
+    font-size: 12px;
+    color: var(--nt-text-tertiary);
+  }
+  .selection-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+  }
 `;
 
 export interface GlobalSearchBoxHandle {
@@ -557,6 +655,14 @@ export const GlobalSearchBox = forwardRef(
       [selectedItems, setSelectedItems, refreshData, onBatchAction],
     );
 
+    const handleSelectSwitchChange = useCallback(
+      (checked: boolean) => {
+        setSelectSwitch(checked);
+        if (!checked) setSelectedItems([]);
+      },
+      [setSelectedItems],
+    );
+
     useImperativeHandle(ref, () => ({
       focus: () => {
         selectRef.current?.focus();
@@ -575,25 +681,23 @@ export const GlobalSearchBox = forwardRef(
     return (
       <>
         <StyledBatchActionHeader>
-          <Switch
+          <Checkbox
+            className="selection-toggle"
             checked={selectSwitch}
-            checkedChildren={$fmt('common.multiSelection')}
-            unCheckedChildren={$fmt('common.multiSelection')}
-            onChange={setSelectSwitch}
-          ></Switch>
+            onChange={event => handleSelectSwitchChange(event.target.checked)}
+          >
+            {$fmt('common.multiSelection')}
+          </Checkbox>
           {selectSwitch && (
-            <>
-              <span
-                className="selected-count-text"
-                style={{ color: ENUM_COLORS.volcano }}
-              >
+            <div className="selection-summary">
+              <span className="selected-count-text">
                 {$fmt({
                   id: 'common.selectedTabCount',
                   values: { count: selectedItems.length || 0 },
                 })}
               </span>
               {selectedItems.length > 0 && (
-                <Space>
+                <Space className="selection-actions" size={2}>
                   <Tooltip
                     title={$fmt('common.remove')}
                     placement="top"
@@ -629,7 +733,7 @@ export const GlobalSearchBox = forwardRef(
                   </Tooltip>
                 </Space>
               )}
-            </>
+            </div>
           )}
         </StyledBatchActionHeader>
         <StyledSearchList ref={searchListRef}>
@@ -645,12 +749,14 @@ export const GlobalSearchBox = forwardRef(
             defaultOpen={defaultOpen}
             open={open}
             getPopupContainer={() => searchListRef.current || document.body}
+            popupClassName="global-search-results"
             popupMatchSelectWidth={listWidth}
+            suffixIcon={<SearchOutlined />}
             onChange={onChange}
             onSearch={onSearch}
             placement={placement}
             placeholder={$fmt('home.searchTabAndUrl')}
-            style={{ width: inputWidth }}
+            style={{ width: inputWidth, height: 42 }}
           ></Select>
         </StyledSearchList>
       </>
@@ -666,12 +772,24 @@ const StyledGlobalSearchBox = styled.div<{ height: number }>`
 `;
 
 const modalStyles = {
-  header: {},
-  body: {},
-  mask: {},
+  header: {
+    padding: '16px 20px 8px',
+    marginBottom: 0,
+    borderBottom: 0,
+    background: 'transparent',
+  },
+  body: {
+    padding: '0 20px 20px',
+  },
+  mask: {
+    background: 'rgba(16, 24, 40, 0.2)',
+  },
   footer: {},
   content: {
-    padding: 12,
+    padding: 0,
+    borderRadius: 0,
+    background: 'var(--nt-page)',
+    boxShadow: 'none',
   },
 };
 
@@ -702,7 +820,6 @@ export const GlobalSearchPanel = forwardRef<
     ref,
   ) => {
     const { $fmt } = useIntlUtls();
-    const contentContext = useContext(ContentGlobalContext);
     const [visible, setVisible] = useState<boolean>(false);
     const searchBoxRef = useRef<GlobalSearchBoxHandle>(null);
     const [listHeight, setListHeight] = useState<number>(window.innerHeight * 0.5);
@@ -873,7 +990,7 @@ export const GlobalSearchPanel = forwardRef<
         destroyOnClose
         maskClosable
         centered
-        getContainer={() => contentContext.rootWrapper}
+        getContainer={false}
         closeIcon={null}
         footer={null}
         open={visible}

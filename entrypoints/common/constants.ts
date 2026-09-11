@@ -170,6 +170,9 @@ export enum ENUM_SETTINGS_PROPS {
   OPENING_TABS_ORDER = 'openingTabsOrder', // 批量打开标签页的顺序
   UNNAMED_GROUP_RESTORE_AS_GROUP = 'unnamedGroupRestoreAsGroup', // 是否以标签组形式恢复未命名标签组
   NAMED_GROUP_RESTORE_AS_GROUP = 'namedGroupRestoreAsGroup', // 是否以标签组形式恢复已命名标签组
+  /* 当前窗口标签页排序配置 */
+  TAB_SORT_DOMAIN_ORDER_MODE = 'tabSortDomainOrderMode', // 域名分组顺序方式
+  TAB_SORT_CUSTOM_DOMAIN_LIST = 'tabSortCustomDomainList', // 自定义域名优先级列表
   /* 页面标题配置 */
   PAGE_TITLE_CONFIG = 'pageTitleConfig', // 页面标题配置
   /* 全局搜索配置 */

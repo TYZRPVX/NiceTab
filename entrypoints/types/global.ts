@@ -157,6 +157,9 @@ export type TimeRange = [string, string];
 // 批量打开标签页顺序（default-正向 reverse-反向）
 export type OpeningTabsOrder = 'default' | 'reverse';
 
+// 当前窗口标签页排序-域名分组顺序方式（alphabetical-字母序 custom-自定义优先级）
+export type TabSortDomainOrderMode = 'alphabetical' | 'custom';
+
 // 管理后台-设置信息
 export type SettingsProps = {
   language?: LanguageTypes; // 语言
@@ -187,6 +190,9 @@ export type SettingsProps = {
   openingTabsOrder?: OpeningTabsOrder; // 批量打开标签页顺序
   unnamedGroupRestoreAsGroup?: boolean; // 是否以标签组形式恢复未命名标签组
   namedGroupRestoreAsGroup?: boolean; // 是否以标签组形式恢复已命名标签组
+  /* 当前窗口标签页排序配置 */
+  tabSortDomainOrderMode?: TabSortDomainOrderMode; // 域名分组顺序方式
+  tabSortCustomDomainList?: string; // 自定义域名优先级列表（每行一个域名，顺序即优先级）
   /* 页面标题配置 */
   pageTitleConfig?: PageTitleConfigItem[]; // 页面标题配置
   /* 全局搜索配置 */

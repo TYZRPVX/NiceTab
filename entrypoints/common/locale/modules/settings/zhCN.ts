@@ -2,6 +2,7 @@ const zhCN = {
   'settings.block.common': '通用配置',
   'settings.block.sendTabs': '发送标签页配置',
   'settings.block.openTabs': '打开标签页配置',
+  'settings.block.tabSort': '标签页排序配置',
   'settings.block.pageTitleConfig': '网页标题配置',
   'settings.block.globalSearch': '全局搜索配置',
   'settings.block.otherActions': '其他操作配置',
@@ -67,6 +68,15 @@ const zhCN = {
   'settings.openingTabsOrder': '批量打开标签页的顺序：',
   'settings.unnamedGroupRestoreAsGroup': '恢复未命名标签组时-是否以标签组形式打开到浏览器：',
   'settings.namedGroupRestoreAsGroup': '恢复已命名标签组时-是否以标签组形式打开到浏览器：',
+
+  /* 当前窗口标签页排序配置 */
+  'settings.tabSortDomainOrderMode': '排序时-站点分组顺序方式{mark}',
+  'settings.tabSortDomainOrderMode.tooltip': '点击 Popup 面板中的排序图标时，会按完整站点域名分组（例如 confluence.shopee.io），组内按标题字母升序排列；浏览器原生标签组（包括 Vivaldi Tab Stack）只在组内排序，不会跨组移动；固定标签页不参与排序。',
+  'settings.tabSortDomainOrderMode.alphabetical': '按域名字母顺序分组（推荐）',
+  'settings.tabSortDomainOrderMode.custom': '按自定义域名优先级列表分组',
+  'settings.tabSortCustomDomainList': '自定义域名优先级列表：',
+  'settings.tabSortCustomDomainList.tooltip': '每行一个域名。可使用主域名（如 shopee.io）匹配其所有子域，或使用完整站点域名（如 confluence.shopee.io）单独优先；未列出的站点将按字母顺序排在后面。',
+  'settings.tabSortCustomDomainList.placeholder': '例如：\nshopee.io\ngithub.com',
 
   /* 页面标题配置 */
   'settings.pageTitleConfig': '网页标题自定义：',

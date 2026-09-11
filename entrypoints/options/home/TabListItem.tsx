@@ -305,8 +305,14 @@ export default memo(function TabListItem({
         <Favicon pageUrl={tab.url!} favIconUrl={tab.favIconUrl}></Favicon>
         {/* tab title */}
         <StyledTabTitle className="tab-item-title">
-          <a className="link" href={tab.url} draggable={false} onClick={onTabOpen}>
-            {tab.title}
+          <a
+            className="link"
+            href={tab.url}
+            title={tab.title || tab.url}
+            draggable={false}
+            onClick={onTabOpen}
+          >
+            {tab.title || tab.url}
           </a>
         </StyledTabTitle>
       </StyledTabItemWrapper>

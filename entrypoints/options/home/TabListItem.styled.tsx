@@ -47,13 +47,14 @@ export const StyledTabItemWrapper = styled.div<{ $bgColor?: string }>`
 export const StyledTabTitle = styled.span`
   flex: 1;
   width: 0;
-  ${StyledEllipsis}
+  min-width: 0;
   .tab-item-title-text {
     font-size: 14px;
   }
   .link {
     display: block;
     color: inherit;
+    ${StyledEllipsis}
   }
   &:hover .link {
     color: ${props => props.theme.colorPrimary};

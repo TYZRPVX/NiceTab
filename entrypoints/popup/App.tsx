@@ -14,6 +14,7 @@ import {
   CoffeeOutlined,
   CloudSyncOutlined,
   ReloadOutlined,
+  SortAscendingOutlined,
 } from '@ant-design/icons';
 import { sendRuntimeMessage, isGroupSupported } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
@@ -26,6 +27,10 @@ import {
   discardOtherTabs,
   openUserGuide,
 } from '~/entrypoints/common/tabs';
+import {
+  sortCurrentWindowTabs,
+  parseCustomDomainList,
+} from '~/entrypoints/common/tabSort';
 import { getMenus } from '~/entrypoints/common/contextMenus';
 import { settingsUtils, stateUtils } from '~/entrypoints/common/storage';
 import { TAB_EVENTS, SHORTCUTS_PAGE_URL } from '~/entrypoints/common/constants';
@@ -63,7 +68,7 @@ export default function App() {
   const { token } = theme.useToken();
   const NiceGlobalContext = useContext(GlobalContext);
   const { $fmt } = useIntlUtls();
-  const { version, themeTypeConfig } = NiceGlobalContext;
+  const { version, themeTypeConfig, $message } = NiceGlobalContext;
   const [tabGroupList, setTabGroupList] = useState<GroupListItem[]>([]);
   const [tabsReady, setTabsReady] = useState(false);
   const [modules, setModules] = useState<PopupModuleNames[]>([]);
@@ -86,6 +91,40 @@ export default function App() {
           active: true,
           openToNext: true,
         });
+      },
+    },
+    {
+      path: '/sort-tabs',
+      label: $fmt('common.sortTabs'),
+      onClick: async () => {
+        try {
+          const settings = await settingsUtils.getSettings();
+          const result = await sortCurrentWindowTabs({
+            domainOrderMode: settings.tabSortDomainOrderMode || 'alphabetical',
+            customDomainList: parseCustomDomainList(settings.tabSortCustomDomainList),
+          });
+          await refreshTabs();
+          if (result.sortableTabCount === 0) {
+            $message.info($fmt('common.sortTabsNoEligible'));
+          } else if (result.sortedRunCount === 0) {
+            $message.info($fmt('common.sortTabsNoChanges'));
+          } else {
+            $message.success(
+              $fmt({
+                id: 'common.actionSuccess',
+                values: { action: $fmt('common.sortTabs') },
+              }),
+            );
+          }
+        } catch (err) {
+          console.error('[sortTabs] failed to sort current tabs', err);
+          $message.error(
+            $fmt({
+              id: 'common.actionFailed',
+              values: { action: $fmt('common.sortTabs') },
+            }),
+          );
+        }
       },
     },
     {
@@ -281,6 +320,7 @@ export default function App() {
   const getActionIcon = (key: string, path?: string) => {
     if (path === '/home') return <HomeOutlined />;
     if (path === '/shortcuts') return <KeyOutlined />;
+    if (path === '/sort-tabs') return <SortAscendingOutlined />;
     if (path === '/user-guide') return <ReadOutlined />;
 
     if (key === 'group-sendTabs') return <SendOutlined />;
