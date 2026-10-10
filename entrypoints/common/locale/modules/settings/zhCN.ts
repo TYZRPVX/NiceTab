@@ -3,7 +3,7 @@ const zhCN = {
   'settings.block.sendTabs': '发送标签页配置',
   'settings.block.openTabs': '打开标签页配置',
   'settings.block.tabSort': '标签页排序配置',
-  'settings.block.pageTitleConfig': '网页标题配置',
+  'settings.block.pageTitleConfig': '标题别名',
   'settings.block.globalSearch': '全局搜索配置',
   'settings.block.otherActions': '其他操作配置',
   'settings.block.display': '展示配置',
@@ -79,8 +79,13 @@ const zhCN = {
   'settings.tabSortCustomDomainList.placeholder': '例如：\nshopee.io\ngithub.com',
 
   /* 页面标题配置 */
-  'settings.pageTitleConfig': '网页标题自定义：',
-  'settings.pageTitleConfig.drawerTitle': '网页标题配置',
+  'settings.pageTitleConfig': '标题别名：',
+  'settings.pageTitleConfig.drawerTitle': '标题别名',
+  'settings.pageTitleConfig.description': '仅替换 NiceTab 内部显示的标签标题，不影响网页、浏览器标签栏、保存数据、复制链接或导出。第一个匹配 URL 的规则生效；删除规则后恢复原始显示标题。搜索同时匹配原始标题和替换标题。',
+  'settings.pageTitleConfig.importPresets': '一键导入休闲网站规则',
+  'settings.pageTitleConfig.presetsAdded': '已新增 {count} 条规则',
+  'settings.pageTitleConfig.presetsExist': '预设规则已存在',
+  'settings.pageTitleConfig.presetsFailed': '规则保存失败，请重试',
 
   /* 全局搜索配置 */
   'settings.globalSearchDeleteAfterOpen': '打开标签页后是否从列表中删除：',

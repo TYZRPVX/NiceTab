@@ -162,8 +162,9 @@ export default class SettingsUtils {
   settings: SettingsProps = this.initialSettings;
 
   async setSettings(settings: SettingsProps) {
-    this.settings = { ...this.initialSettings, ...settings };
-    return await storage.setItem(this.storageKey, this.settings);
+    const nextSettings = { ...this.initialSettings, ...settings };
+    await storage.setItem(this.storageKey, nextSettings);
+    this.settings = nextSettings;
   }
   async getSettings() {
     const settings = await storage.getItem<SettingsProps>(this.storageKey);

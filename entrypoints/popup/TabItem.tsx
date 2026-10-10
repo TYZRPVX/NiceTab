@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { useTabDisplayTitle } from '~/entrypoints/common/hooks/tabDisplayTitle';
 import type { Tabs } from 'wxt/browser';
 import { CloseOutlined } from '@ant-design/icons';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
@@ -17,7 +18,8 @@ interface TabItemProps {
 export default function TabItem({ tab, onAction }: TabItemProps) {
   const { $fmt } = useIntlUtls();
   const tabRef = useRef<HTMLDivElement>(null);
-  const tabTitle = tab.title || tab.url || '';
+  const getDisplayTitle = useTabDisplayTitle();
+  const tabTitle = getDisplayTitle(tab);
   // Reveal the initially active tab once; closing another tab must not recenter it.
   const initiallyActive = useRef(tab.active);
   useEffect(() => {

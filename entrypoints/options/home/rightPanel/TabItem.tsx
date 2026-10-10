@@ -1,4 +1,5 @@
 import React, { useRef, useCallback, useEffect } from 'react';
+import { useTabDisplayTitle } from '~/entrypoints/common/hooks/tabDisplayTitle';
 import { Tabs } from 'wxt/browser';
 import { Checkbox, Popconfirm, Tooltip } from 'antd';
 import type { CheckboxProps } from 'antd';
@@ -26,7 +27,8 @@ export default function TabItem({
 }: TabItemProps) {
   const { $fmt } = useIntlUtls();
   const tabRef = useRef<HTMLDivElement>(null);
-  const tabTitle = tab.title || tab.url || '';
+  const getDisplayTitle = useTabDisplayTitle();
+  const tabTitle = getDisplayTitle(tab);
   const handleAction = useCallback(
     (event: React.MouseEvent<HTMLElement, MouseEvent>, action: TabActions) => {
       if (action === 'discard' || action === 'remove') {

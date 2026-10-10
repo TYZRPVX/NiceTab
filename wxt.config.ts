@@ -52,7 +52,6 @@ export default defineConfig({
       'contextMenus',
       'unlimitedStorage',
       'alarms',
-      'scripting',
       ...(isFirefox ? [] : ['tabGroups', 'commands', 'favicon', 'offscreen']),
     ],
     optional_permissions: [
