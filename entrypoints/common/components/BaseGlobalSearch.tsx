@@ -1,4 +1,11 @@
-import { useState, useCallback, useRef, forwardRef, useImperativeHandle } from 'react';
+import {
+  useState,
+  useCallback,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+  useContext,
+} from 'react';
 import {
   theme,
   Select,
@@ -28,7 +35,13 @@ import {
   sendRuntimeMessage,
 } from '~/entrypoints/common/utils';
 import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
-import { useIntlUtls, eventEmitter } from '~/entrypoints/common/hooks/global';
+import {
+  useIntlUtls,
+  eventEmitter,
+  GlobalContext,
+} from '~/entrypoints/common/hooks/global';
+import { useTabDisplayTitle } from '~/entrypoints/common/hooks/tabDisplayTitle';
+import { matchesTabSearch } from '~/entrypoints/common/utils/tabDisplayTitle';
 import { settingsUtils } from '~/entrypoints/common/storage';
 import { openNewTab, updateAdminPageUrlDebounced } from '~/entrypoints/common/tabs';
 import {
@@ -177,6 +190,8 @@ export function SearchListItem({
 }) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
+  const getDisplayTitle = useTabDisplayTitle();
+  const displayTitle = getDisplayTitle(option);
 
   const selected = useMemo(() => {
     return selectedTabIds.includes(option.tabId);
@@ -202,8 +217,8 @@ export function SearchListItem({
       )}
       <div className="item-content-box">
         <div className="item-primary">
-          <div className="tab-title" title={option.title}>
-            <span className="text">{option.title}</span>
+          <div className="tab-title" title={displayTitle}>
+            <span className="text">{displayTitle}</span>
             <StyledActionIconBtn
               as="a"
               className="icon-open"
@@ -248,8 +263,10 @@ export function useSearchAction({
   onAction?: ActionCallbackFn;
 }) {
   const [tagList, setTagList] = useState<TagItem[]>([]);
+  const { pageTitleConfig } = useContext(GlobalContext);
   const [value, setValue] = useState<string>('');
   const [searchValue, setSearchValue] = useState<string>('');
+  const searchValueRef = useRef('');
   const [filterList, setFilterList] = useState<SearchListItemProps[]>([]);
   const [selectedItems, setSelectedItems] = useState<SearchListItemProps[]>([]);
 
@@ -301,11 +318,7 @@ export function useSearchAction({
       for (const tag of tagList) {
         for (const group of tag?.groupList || []) {
           for (const tab of group?.tabList || []) {
-            if (
-              !searchText ||
-              tab?.title?.toLowerCase().includes(searchText) ||
-              tab?.url?.toLowerCase().includes(searchText)
-            ) {
+            if (matchesTabSearch(tab, searchText, pageTitleConfig)) {
               result.push({
                 ...pick(tag, ['tagId', 'static']),
                 tagName: getDisplayTagName(tag),
@@ -320,7 +333,7 @@ export function useSearchAction({
       }
       return result;
     },
-    [tagList],
+    [tagList, pageTitleConfig],
   );
 
   const debounceSearch = useMemo(
@@ -335,6 +348,7 @@ export function useSearchAction({
 
   const handleSearch = useCallback(
     (value: string) => {
+      searchValueRef.current = value;
       debounceSearch(value);
     },
     [debounceSearch],
@@ -371,7 +385,7 @@ export function useSearchAction({
   );
 
   useEffect(() => {
-    const _filterList = getFilterList('');
+    const _filterList = getFilterList(searchValueRef.current);
     setFilterList(_filterList || []);
   }, [getFilterList]);
 

@@ -23,6 +23,7 @@ export const eventEmitter = mitt<EventsEmitterProps>();
 
 // global context
 export const GlobalContext = createContext<GlobalContextProps>({
+  pageTitleConfig: [],
   version: '888.888.888',
   colorPrimary: PRIMARY_COLOR,
   themeTypeConfig: THEME_TYPE_CONFIG[defaultThemeType],
@@ -37,7 +38,7 @@ export const GlobalContext = createContext<GlobalContextProps>({
     themeUtils.setThemeData(themeData);
   },
   setSettings: async settings => {
-    settingsUtils.setSettings({ ...settingsUtils.settings, ...settings });
+    await settingsUtils.setSettings({ ...settingsUtils.settings, ...settings });
   },
   setLocale: async (language = defaultLanguage, callback) => {
     settingsUtils.setSettings({ ...settingsUtils.settings, language });

@@ -51,8 +51,13 @@ function getOffscreenApi(): OffscreenApi | undefined {
 
 function actionIconPaths(theme: EffectiveTheme) {
   return {
-    16: `icon/16-${theme}.png`,
-    32: `icon/32-${theme}.png`,
+    16: `icon/action-16-${theme}.png`,
+    20: `icon/action-20-${theme}.png`,
+    24: `icon/action-24-${theme}.png`,
+    32: `icon/action-32-${theme}.png`,
+    40: `icon/action-40-${theme}.png`,
+    48: `icon/action-48-${theme}.png`,
+    64: `icon/action-64-${theme}.png`,
   };
 }
 
@@ -138,27 +143,9 @@ async function setBadge() {
   });
 }
 
-// 页面创建后设置页面标题
-async function setPageTitleOnCreated(tab: Tabs.Tab) {
-  if (tab.status === 'complete') {
-    tabUtils.setPageTitle({ windowId: tab.windowId, tabId: tab.id });
-  }
-}
-// 页面更新时设置页面标题
-async function setPageTitleOnUpdated(
-  tabId: number,
-  changeInfo: Tabs.OnUpdatedChangeInfoType,
-  tab: Tabs.Tab,
-) {
-  if (changeInfo.status === 'complete' || tab.status === 'complete') {
-    tabUtils.setPageTitle({ windowId: tab.windowId, tabId: tab.id });
-  }
-}
-
 async function initTabEventListener() {
   function handler() {
     setBadge();
-    tabUtils.setPageTitle();
   }
 
   handler();
@@ -172,11 +159,6 @@ async function initTabEventListener() {
   browser.tabs.onActivated.addListener(setBadge);
   browser.runtime.onInstalled.addListener(setBadge);
   // TAB_EVENTS.forEach((event) => browser.tabs[event]?.addListener(handler));
-
-  browser.tabs.onCreated.removeListener(setPageTitleOnCreated);
-  browser.tabs.onCreated.addListener(setPageTitleOnCreated);
-  browser.tabs.onUpdated.removeListener(setPageTitleOnUpdated);
-  browser.tabs.onUpdated.addListener(setPageTitleOnUpdated);
 }
 
 // 初始化 popup 交互

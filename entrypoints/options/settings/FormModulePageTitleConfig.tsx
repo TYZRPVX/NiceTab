@@ -37,10 +37,14 @@ const StyledConfigItem = styled.div`
 `;
 
 export default function FormModulePageTitleConfig(
-  props: FormItemProps & { form: FormInstance<SettingsProps> },
+  props: FormItemProps & {
+    form: FormInstance<SettingsProps>;
+    onImportPresets: () => Promise<void>;
+    importingPresets: boolean;
+  },
 ) {
   const { $fmt } = useIntlUtls();
-  const { form, ...formItemProps } = props;
+  const { form, onImportPresets, importingPresets, ...formItemProps } = props;
 
   const options = useMemo(() => {
     return [
@@ -73,6 +77,16 @@ export default function FormModulePageTitleConfig(
 
   return (
     <Form.Item noStyle {...formItemProps}>
+      <p>{$fmt('settings.pageTitleConfig.description')}</p>
+      <Form.Item>
+        <Button
+          onClick={onImportPresets}
+          loading={importingPresets}
+          disabled={importingPresets}
+        >
+          {$fmt('settings.pageTitleConfig.importPresets')}
+        </Button>
+      </Form.Item>
       <Form.List name={PAGE_TITLE_CONFIG}>
         {(fields, { add, remove }, { errors }) => (
           <>
@@ -85,7 +99,11 @@ export default function FormModulePageTitleConfig(
                     initialValue="equal"
                     layout="horizontal"
                   >
-                    <Select options={options} placeholder={$fmt('common.matchMode')} />
+                    <Select
+                      disabled={importingPresets}
+                      options={options}
+                      placeholder={$fmt('common.matchMode')}
+                    />
                   </Form.Item>
                   <Form.Item
                     className="config-item-url"
@@ -104,7 +122,7 @@ export default function FormModulePageTitleConfig(
                     ]}
                     layout="horizontal"
                   >
-                    <Input placeholder={$fmt('common.url')} />
+                    <Input disabled={importingPresets} placeholder={$fmt('common.url')} />
                   </Form.Item>
                   <Form.Item
                     className="config-item-title"
@@ -123,7 +141,10 @@ export default function FormModulePageTitleConfig(
                     ]}
                     layout="horizontal"
                   >
-                    <Input placeholder={$fmt('common.title')} />
+                    <Input
+                      disabled={importingPresets}
+                      placeholder={$fmt('common.title')}
+                    />
                   </Form.Item>
                 </div>
 
@@ -134,7 +155,7 @@ export default function FormModulePageTitleConfig(
                     $size={18}
                     $hoverColor={ENUM_COLORS.red}
                     onClick={() => {
-                      remove(field.name);
+                      if (!importingPresets) remove(field.name);
                     }}
                   >
                     <MinusCircleOutlined />
@@ -143,7 +164,12 @@ export default function FormModulePageTitleConfig(
               </StyledConfigItem>
             ))}
             <Form.Item>
-              <Button type="dashed" icon={<PlusOutlined />} onClick={() => add()}>
+              <Button
+                disabled={importingPresets}
+                type="dashed"
+                icon={<PlusOutlined />}
+                onClick={() => add()}
+              >
                 {$fmt('sync.addConfig')}
               </Button>
               <Form.ErrorList errors={errors} />

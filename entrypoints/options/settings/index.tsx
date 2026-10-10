@@ -1,11 +1,22 @@
-import { useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import { useContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Menu, Form, Modal, message } from 'antd';
 import type { MenuProps, FormProps } from 'antd';
-import { SettingOutlined } from '@ant-design/icons';
+import {
+  SettingOutlined,
+  SendOutlined,
+  FolderOpenOutlined,
+  SortAscendingOutlined,
+  FontSizeOutlined,
+  ToolOutlined,
+  DesktopOutlined,
+  AppstoreOutlined,
+  SyncOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import { isEqual, debounce } from 'lodash-es';
 import { useBlocker } from 'react-router-dom';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
-import type { SettingsProps, TimeRange } from '~/entrypoints/types';
+import type { SettingsProps, TimeRange, LanguageTypes } from '~/entrypoints/types';
 import { recycleUtils, settingsUtils } from '~/entrypoints/common/storage';
 import {
   ENUM_SETTINGS_PROPS,
@@ -33,6 +44,7 @@ import FormModuleNewtab from './FormModuleNewtab';
 import FormModuleSync from './FormModuleSync';
 import FormModuleTabSort from './FormModuleTabSort';
 import { StyledSidebarWrapper, StyledMainWrapper } from './Settings.styled';
+import { saveLeisurePageTitlePresets } from './pageTitlePresets';
 
 const { LANGUAGE, AUTO_SYNC_TIME_RANGES } = ENUM_SETTINGS_PROPS;
 
@@ -59,7 +71,9 @@ export default function Settings() {
     setSidebarWidth(width);
   };
 
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<SettingsProps>();
+  const [importingPresets, setImportingPresets] = useState(false);
+  const importInProgress = useRef(false);
 
   const [currModule, setCurrModule] = useState<string>('common');
   const blockModuleOptions: MenuItem[] = useMemo(() => {
@@ -67,46 +81,56 @@ export default function Settings() {
       {
         key: 'common',
         label: $fmt('settings.block.common'),
+        icon: <SettingOutlined />,
       },
       {
         key: 'sendTabs',
         label: $fmt('settings.block.sendTabs'),
+        icon: <SendOutlined />,
       },
       {
         key: 'openTabs',
         label: $fmt('settings.block.openTabs'),
+        icon: <FolderOpenOutlined />,
       },
       {
         key: 'tabSort',
         label: $fmt('settings.block.tabSort'),
+        icon: <SortAscendingOutlined />,
       },
       {
         key: 'pageTitleConfig',
         label: $fmt('settings.block.pageTitleConfig'),
+        icon: <FontSizeOutlined />,
       },
       {
         key: 'otherActions',
         label: $fmt('settings.block.otherActions'),
+        icon: <ToolOutlined />,
       },
       {
         key: 'display',
         label: $fmt('settings.block.display'),
+        icon: <DesktopOutlined />,
       },
       {
         key: 'newtab',
         label: $fmt('settings.block.newtab'),
+        icon: <AppstoreOutlined />,
       },
       {
         key: 'sync',
         label: $fmt('settings.block.sync'),
+        icon: <SyncOutlined />,
       },
       {
         key: 'globalSearch',
         label: $fmt('settings.block.globalSearch'),
+        icon: <SearchOutlined />,
       },
     ];
 
-    return _options.map(item => ({ ...item, icon: <SettingOutlined /> }) as MenuItem);
+    return _options;
   }, [$fmt]);
 
   const onModuleChange: MenuProps['onClick'] = e => {
@@ -127,6 +151,7 @@ export default function Settings() {
   });
 
   const handleFinish: FormProps<SettingsProps>['onFinish'] = async values => {
+    if (importInProgress.current) return;
     const settings = await settingsUtils.getSettings();
     const newSettings = {
       ...settingsUtils.initialSettings,
@@ -166,10 +191,48 @@ export default function Settings() {
     });
   };
 
-  const onValuesChange = useMemo(
-    () => debounce(handleValuesChange, 500),
-    [handleValuesChange],
-  );
+  const onValuesChange = useMemo(() => debounce(handleValuesChange, 500), [form]);
+
+  const handleImportPresets = async () => {
+    if (importInProgress.current) return;
+    importInProgress.current = true;
+    setImportingPresets(true);
+    try {
+      try {
+        await form.validateFields([['pageTitleConfig']], { recursive: true });
+      } catch {
+        // Form.Item displays validation errors; nothing is saved.
+        return;
+      }
+      const { rules, addedCount } = await saveLeisurePageTitlePresets(
+        form.getFieldValue('pageTitleConfig') || [],
+        () => settingsUtils.getSettings(),
+        settings => NiceGlobalContext.setSettings(settings),
+      );
+      form.setFieldsValue({ pageTitleConfig: rules });
+      const baseline = { ...initialFormValues, pageTitleConfig: rules };
+      setInitialFormValues(baseline);
+      onValuesChange.cancel();
+      setHasChanged(
+        Object.entries(form.getFieldsValue()).some(
+          ([key, value]) => !isEqual(value, baseline[key as keyof SettingsProps]),
+        ),
+      );
+      messageApi.success(
+        addedCount
+          ? $fmt({
+              id: 'settings.pageTitleConfig.presetsAdded',
+              values: { count: addedCount },
+            })
+          : $fmt('settings.pageTitleConfig.presetsExist'),
+      );
+    } catch {
+      messageApi.error($fmt('settings.pageTitleConfig.presetsFailed'));
+    } finally {
+      importInProgress.current = false;
+      setImportingPresets(false);
+    }
+  };
 
   const handleSave = useCallback(() => {
     form?.submit();
@@ -181,7 +244,7 @@ export default function Settings() {
   }, [hasChanged, handleSave]);
 
   useEffect(() => {
-    form.setFieldsValue({ [LANGUAGE]: locale });
+    form.setFieldsValue({ [LANGUAGE]: locale as LanguageTypes });
   }, [locale]);
 
   const { urlParams } = useUrlParams();
@@ -201,6 +264,7 @@ export default function Settings() {
     eventEmitter.on('settings:values-change', onValuesChange);
     return () => {
       eventEmitter.off('settings:values-change', onValuesChange);
+      onValuesChange.cancel();
     };
   }, []);
 
@@ -266,7 +330,12 @@ export default function Settings() {
             <FormModuleTabSort hidden={currModule !== 'tabSort'} form={form} />
 
             {/* ******************* 网页标题相关设置 ******************* */}
-            <FormModulePageTitle hidden={currModule !== 'pageTitleConfig'} form={form} />
+            <FormModulePageTitle
+              hidden={currModule !== 'pageTitleConfig'}
+              form={form}
+              onImportPresets={handleImportPresets}
+              importingPresets={importingPresets}
+            />
 
             {/* ******************* 全局搜索相关设置 ******************* */}
             <FormModuleGlobalSearch hidden={currModule !== 'globalSearch'} form={form} />

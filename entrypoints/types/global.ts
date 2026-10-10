@@ -29,6 +29,7 @@ export type EventsEmitterProps = {
 
 // 全局 Context
 export interface GlobalContextProps {
+  pageTitleConfig: PageTitleConfigItem[];
   version: string;
   colorPrimary: string;
   themeTypeConfig: ThemeTypeConfig;
@@ -38,7 +39,7 @@ export interface GlobalContextProps {
   $message: MessageInstance;
   setThemeType: (themeType: ThemeTypes) => void;
   setThemeData: (themeData: Partial<ThemeProps>) => void;
-  setSettings: (settings: Partial<SettingsProps>) => void;
+  setSettings: (settings: Partial<SettingsProps>) => Promise<void>;
   setLocale: (language?: LanguageTypes, callback?: () => void) => Promise<void>;
   setPageWidthType: (pageWidthType: PageWidthTypes) => void;
 }

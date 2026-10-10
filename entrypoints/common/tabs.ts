@@ -19,7 +19,6 @@ import {
   getRandomId,
   isGroupSupported,
   isDomainAllowed,
-  isContentMatched,
   sendRuntimeMessage,
 } from '~/entrypoints/common/utils';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
@@ -700,73 +699,6 @@ export const restoreOpenedTabsSnapshot = async (
   }
 };
 
-// 设置网页标题
-export const setPageTitle = async ({
-  tabId,
-  windowId,
-}: {
-  tabId?: number;
-  windowId?: number;
-} = {}) => {
-  async function setSinglePageTitle(tabId: number) {
-    try {
-      // 获取标签页信息
-      const tab = await browser.tabs.get(tabId);
-
-      // 检查标签页是否包含必要的信息
-      if (!tab?.url || tab.status !== 'complete') return;
-
-      // 获取设置中的页面标题配置
-      const settings = await settingsUtils.getSettings();
-      const pageTitleConfig = settings.pageTitleConfig || [];
-
-      // 查找匹配的配置项
-      let newTitle = null;
-      for (const config of pageTitleConfig) {
-        if (!config.url || !config.title) continue;
-
-        if (isContentMatched(tab.url, config.url, config.mode)) {
-          newTitle = config.title;
-          break;
-        }
-      }
-
-      // 如果找到了匹配的标题配置，则通过内容脚本更新页面标题
-      if (newTitle) {
-        // 使用现代的executeScript API更新页面标题
-        browser.scripting.executeScript({
-          target: { tabId: tabId },
-          func: (title: string) => {
-            document.title = title;
-          },
-          args: [newTitle],
-        });
-      }
-    } catch (error) {
-      console.error('Error setting page title:', error);
-    }
-  }
-
-  if (tabId) {
-    setSinglePageTitle(tabId);
-  } else {
-    const windows = await browser.windows.getAll({
-      populate: true,
-      windowTypes: ['normal'],
-    });
-
-    for (const win of windows) {
-      const allTabs = await getAllTabs(win.id);
-
-      for (const tab of allTabs) {
-        if (tab.id) {
-          setSinglePageTitle(tab.id);
-        }
-      }
-    }
-  }
-};
-
 // 打开用户指南
 export const openUserGuide = async () => {
   const settings = await settingsUtils.getSettings();
@@ -812,7 +744,6 @@ export default {
   discardOtherTabs,
   saveOpenedTabsAsSnapshot,
   restoreOpenedTabsSnapshot,
-  setPageTitle,
   openUserGuide,
   openChangelog,
 };

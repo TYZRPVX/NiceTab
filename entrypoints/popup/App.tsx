@@ -12,7 +12,7 @@ import {
   SendOutlined,
   SearchOutlined,
   CoffeeOutlined,
-  CloudSyncOutlined,
+  ContainerOutlined,
   ReloadOutlined,
   SortAscendingOutlined,
 } from '@ant-design/icons';
@@ -188,10 +188,15 @@ export default function App() {
         },
       },
       {
-        key: 'startSync',
-        label: $fmt('common.startSync'),
+        key: 'sendAllAndClose',
+        label: $fmt('common.sendAllTabs'),
         onClick: () => {
-          handleAction('startSync', ENUM_ACTION_NAME.START_SYNC);
+          sendRuntimeMessage({
+            msgType: 'sendTabsActionStart',
+            data: { actionName: ENUM_ACTION_NAME.SEND_ALL_TABS },
+            targetPageContexts: ['background'],
+          });
+          window.close();
         },
       },
       {
@@ -326,7 +331,7 @@ export default function App() {
     if (key === 'group-sendTabs') return <SendOutlined />;
     if (key === 'globalSearch') return <SearchOutlined />;
     if (key === 'hibernateTabs') return <CoffeeOutlined />;
-    if (key === 'startSync') return <CloudSyncOutlined />;
+    if (key === 'sendAllAndClose') return <ContainerOutlined />;
     if (key === 'reload') return <ReloadOutlined />;
     return null;
   };

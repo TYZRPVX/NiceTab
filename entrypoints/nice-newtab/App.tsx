@@ -12,6 +12,7 @@ import {
   sendRuntimeMessage,
 } from '~/entrypoints/common/utils';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
+import { useTabDisplayTitle } from '~/entrypoints/common/hooks/tabDisplayTitle';
 import { openAdminRoutePage } from '~/entrypoints/common/tabs';
 import { ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { GlobalStyle } from '~/entrypoints/common/style/Common.styled';
@@ -54,6 +55,7 @@ export default function App() {
   const NiceGlobalContext = useContext(GlobalContext);
   const { themeTypeConfig } = NiceGlobalContext;
   const { $fmt } = useIntlUtls();
+  const getDisplayTitle = useTabDisplayTitle();
 
   const { globalSearchPanelRef } = useGlobalSearchPanel();
 
@@ -136,7 +138,7 @@ export default function App() {
             'home.tab',
           )}${` <div style="display: inline-flex; align-items: center; font-weight: bold;">
           [<strong style="display: inline-block; max-width: 280px" class="ellipsis">
-            ${tab.title}</strong>
+            ${getDisplayTitle(tab).replace(/[&<>"']/g, char => `&#${char.charCodeAt(0)};`)}</strong>
           ]</div>
         `}`,
         },
@@ -152,7 +154,7 @@ export default function App() {
         reloadAdminPage();
       }
     },
-    [settings, removeModal, $fmt, initData],
+    [settings, removeModal, $fmt, initData, getDisplayTitle],
   );
 
   const handleTabEdit = useCallback((tab: TabItem) => {

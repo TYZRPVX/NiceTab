@@ -2,6 +2,7 @@ import type { Runtime } from 'wxt/browser';
 import React, { useEffect, useState } from 'react';
 import { ConfigProvider, theme, message } from 'antd';
 import { IntlProvider } from 'react-intl';
+import { isEqual } from 'lodash-es';
 import {
   DARK_THEME_TOKENS,
   PRIMARY_COLOR,
@@ -22,6 +23,7 @@ import type {
   ThemeTypes,
   SettingsProps,
   PageWidthTypes,
+  PageTitleConfigItem,
 } from '~/entrypoints/types';
 import {
   themeUtils,
@@ -48,8 +50,12 @@ export default function Root({
   pageContext: PageContextType;
   children: React.ReactNode;
 }) {
-  const [$message, messageContextHolder] = message.useMessage();
+  const [$message, messageContextHolder] = message.useMessage({
+    // Leave the popup's top action toolbar visible while feedback is displayed.
+    top: pageContext === 'popupPage' ? 64 : undefined,
+  });
   const [version, setVersion] = useState('');
+  const [pageTitleConfig, setPageTitleConfig] = useState<PageTitleConfigItem[]>([]);
   const { locale: localeAntd, changeLocale: changeLocaleAntd } = useAntdLocale();
   const {
     locale: localeCustom,
@@ -82,6 +88,9 @@ export default function Root({
       themeType = settingsUtils.initialSettings.themeType,
       pageWidthType = settingsUtils.initialSettings.pageWidthType,
     } = settingsUtils.settings || {};
+    if (pageContext !== 'contentScriptPage') {
+      setPageTitleConfig(settingsUtils.settings.pageTitleConfig || []);
+    }
     handleLocaleChange(language);
     handlePageWidthTypeChange(pageWidthType);
     handleThemeTypeChange(themeType);
@@ -89,7 +98,7 @@ export default function Root({
 
   const initData = async () => {
     const settings = await settingsUtils.getSettings();
-    handleSettingsChange(settings);
+    await handleSettingsChange(settings);
     const theme = await themeUtils.getThemeData();
     setPrimaryColor(theme.colorPrimary);
     setHasReady(true);
@@ -150,8 +159,18 @@ export default function Root({
     getManifest();
     browser.runtime.onMessage.addListener(messageListener);
 
-    const settingsUnwatch = initSettingsStorageListener(() => {
-      initData();
+    // Reuse the existing watcher: only the current rules are retained, no cache/polling.
+    const settingsUnwatch = initSettingsStorageListener((settings, oldSettings) => {
+      const { pageTitleConfig: rules = [], ...rest } = settings;
+      const { pageTitleConfig: oldRules = [], ...oldRest } = oldSettings;
+      if (isEqual(rest, oldRest)) {
+        settingsUtils.settings = { ...settingsUtils.initialSettings, ...settings };
+        if (pageContext !== 'contentScriptPage' && !isEqual(rules, oldRules)) {
+          setPageTitleConfig(rules);
+        }
+      } else {
+        initData();
+      }
     });
     const themeUnwatch = initThemeStorageListener(() => {
       initData();
@@ -211,6 +230,7 @@ export default function Root({
       >
         <GlobalContext.Provider
           value={{
+            pageTitleConfig,
             version,
             colorPrimary: primaryColor,
             themeTypeConfig,

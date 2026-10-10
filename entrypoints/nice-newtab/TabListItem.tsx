@@ -1,4 +1,5 @@
 import { Dropdown } from 'antd';
+import { useTabDisplayTitle } from '~/entrypoints/common/hooks/tabDisplayTitle';
 import type { MenuProps } from 'antd';
 import { MoreOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { TabItem } from '~/entrypoints/types';
@@ -20,7 +21,8 @@ export default function TabListItem({
   onEdit: (tab: TabItem) => void;
 }) {
   const { $fmt } = useIntlUtls();
-  const displayTitle = tab.title || tab.url || 'Untitled';
+  const getDisplayTitle = useTabDisplayTitle();
+  const displayTitle = getDisplayTitle(tab) || 'Untitled';
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();

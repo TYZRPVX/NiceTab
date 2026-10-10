@@ -23,6 +23,7 @@ import type { ModifierKeys } from '~/entrypoints/common/utils/click';
 import { classNames } from '~/entrypoints/common/utils';
 import { openNewTab } from '~/entrypoints/common/tabs';
 import { settingsUtils } from '~/entrypoints/common/storage';
+import { useTabDisplayTitle } from '~/entrypoints/common/hooks/tabDisplayTitle';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
 import { ENUM_COLORS, ENUM_SETTINGS_PROPS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -73,6 +74,8 @@ export default memo(function TabListItem({
 }: TabItemProps) {
   const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
+  const getDisplayTitle = useTabDisplayTitle();
+  const displayTitle = getDisplayTitle({ title, url });
   const [removeModal, removeContextHolder] = Modal.useModal();
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -106,7 +109,7 @@ export default memo(function TabListItem({
           'home.tab',
         )}${` <div style="display: inline-flex; align-items: center; font-weight: bold;">
           [<strong style="display: inline-block; max-width: 280px" class="ellipsis">
-            ${tab.title}</strong>
+            ${displayTitle.replace(/[&<>"']/g, char => `&#${char.charCodeAt(0)};`)}</strong>
           ]</div>
         `}`,
       },
@@ -119,7 +122,7 @@ export default memo(function TabListItem({
     if (confirmed) {
       onRemove?.([tab]);
     }
-  }, [$fmt, tab, onRemove]);
+  }, [$fmt, tab, onRemove, displayTitle]);
 
   // 执行打开标签页
   const handleTabOpen = useCallback(
@@ -308,11 +311,11 @@ export default memo(function TabListItem({
           <a
             className="link"
             href={tab.url}
-            title={tab.title || tab.url}
+            title={displayTitle}
             draggable={false}
             onClick={onTabOpen}
           >
-            {tab.title || tab.url}
+            {displayTitle}
           </a>
         </StyledTabTitle>
       </StyledTabItemWrapper>

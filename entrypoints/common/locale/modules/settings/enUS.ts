@@ -5,7 +5,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.block.sendTabs': 'Sending Tabs',
   'settings.block.openTabs': 'Opening Tabs',
   'settings.block.tabSort': 'Tab Sorting',
-  'settings.block.pageTitleConfig': 'Page Title Overwrite',
+  'settings.block.pageTitleConfig': 'Title Aliases',
   'settings.block.globalSearch': 'Global Search',
   'settings.block.otherActions': 'Other Actions',
   'settings.block.display': 'Displays',
@@ -81,8 +81,13 @@ const enUS: Record<LocaleKey, string> = {
   'settings.tabSortCustomDomainList.placeholder': 'e.g.\nshopee.io\ngithub.com',
 
   /* 页面标题配置 */
-  'settings.pageTitleConfig': 'Page title overwrite:',
-  'settings.pageTitleConfig.drawerTitle': 'Page Title Overwrite',
+  'settings.pageTitleConfig': 'Title alias:',
+  'settings.pageTitleConfig.drawerTitle': 'Title Aliases',
+  'settings.pageTitleConfig.description': 'Replace tab titles only inside NiceTab. Webpage and browser tab titles, saved data, copied links and exports remain unchanged. The first matching URL rule wins; removing a rule restores the original display title. Search matches both original and display titles.',
+  'settings.pageTitleConfig.importPresets': 'Import leisure website rules',
+  'settings.pageTitleConfig.presetsAdded': 'Added {count} rules',
+  'settings.pageTitleConfig.presetsExist': 'Preset rules already exist',
+  'settings.pageTitleConfig.presetsFailed': 'Could not save rules. Please try again.',
 
   /* 全局搜索配置 */
   'settings.globalSearchDeleteAfterOpen': 'Remove tabs from the NiceTab list after opening them?',

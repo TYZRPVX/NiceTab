@@ -5,14 +5,16 @@ import yargsParser from 'yargs-parser';
 const args = yargsParser(process.argv.slice(2));
 
 const isFirefox = args.b === 'firefox';
-const actionDefaultIcons = {
-  16: 'icon/16.png',
-  32: 'icon/32.png',
-};
-const firefoxThemeIcons = [
-  { size: 16, light: 'icon/16-light.png', dark: 'icon/16-dark.png' },
-  { size: 32, light: 'icon/32-light.png', dark: 'icon/32-dark.png' },
-];
+const actionIconSizes = [16, 20, 24, 32, 40, 48, 64];
+const actionDefaultIcons = Object.fromEntries(
+  actionIconSizes.map(size => [size, `icon/action-${size}-light.png`]),
+);
+// Firefox names these after the toolbar text color, rather than the surface.
+const firefoxThemeIcons = actionIconSizes.map(size => ({
+  size,
+  light: `icon/action-${size}-dark.png`,
+  dark: `icon/action-${size}-light.png`,
+}));
 const action = {
   default_icon: actionDefaultIcons,
   ...(isFirefox ? { theme_icons: firefoxThemeIcons } : {}),
@@ -52,7 +54,6 @@ export default defineConfig({
       'contextMenus',
       'unlimitedStorage',
       'alarms',
-      'scripting',
       ...(isFirefox ? [] : ['tabGroups', 'commands', 'favicon', 'offscreen']),
     ],
     optional_permissions: [
