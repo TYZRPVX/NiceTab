@@ -1,6 +1,7 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import type { GetProp, MenuProps } from 'antd';
 import { theme, Space, Divider, Dropdown, Popconfirm, Tooltip } from 'antd';
-import { MoreOutlined } from '@ant-design/icons';
+import { EllipsisVerticalIcon } from '~/entrypoints/common/components/icon/Icons';
 import type { ReactNode } from 'react';
 import { ActionBtnStyle } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -94,6 +95,7 @@ export default function ActionBtnList({
     const renderedAction =
       item.confirm && !item.disabled ? (
         <Popconfirm
+          icon={<UIIcons.CircleHelpIcon />}
           key={item.key}
           title={item.confirm.title}
           description={item.confirm.description}
@@ -146,7 +148,7 @@ export default function ActionBtnList({
                   btnStyle={actionBtnStyle}
                   size={iconSize}
                 >
-                  <MoreOutlined />
+                  <EllipsisVerticalIcon />
                 </ActionIconBtn>
               </Tooltip>
             ) : (

@@ -33,7 +33,7 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
     .compact-toolbar {
       display: flex;
       align-items: center;
-      padding: 4px 42px 4px 6px;
+      padding: 4px 46px 4px 9px;
       min-height: 38px;
       gap: 2px;
 
@@ -50,7 +50,7 @@ export const StyledContainer = styled.div<{ theme: StyledThemeProps }>`
     .toggle-compact-btn {
       position: absolute;
       top: 4px;
-      right: 6px;
+      right: 10px;
       z-index: 10;
       cursor: pointer;
       color: ${props => props.theme.colorTextSecondary || '#333'};

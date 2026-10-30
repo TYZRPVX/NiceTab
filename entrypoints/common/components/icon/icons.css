@@ -1,0 +1,28 @@
+.nt-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1em;
+  height: 1em;
+  line-height: 0;
+  color: inherit;
+  vertical-align: -0.125em;
+}
+.nt-icon > svg {
+  display: block;
+  flex-shrink: 0;
+}
+.nt-icon-spin > svg {
+  animation: nt-icon-spin 1s linear infinite;
+}
+@keyframes nt-icon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nt-icon-spin > svg {
+    animation: none;
+  }
+}

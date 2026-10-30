@@ -14,13 +14,13 @@ import {
   type MenuProps,
 } from 'antd';
 import {
-  FolderOutlined,
-  FolderOpenOutlined,
-  FolderAddOutlined,
-  QuestionCircleOutlined,
-  MoreOutlined,
-  ClearOutlined,
-} from '@ant-design/icons';
+  FolderIcon,
+  FolderOpenIcon,
+  FolderPlusIcon,
+  CircleHelpIcon,
+  EllipsisVerticalIcon,
+  EraserIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useGlobalSelectionBox, {
   StyledSelectionBox,
@@ -210,7 +210,7 @@ export default function Home() {
       {
         key: 'clear',
         label: $fmt('home.clearAll'),
-        icon: <ClearOutlined />,
+        icon: <EraserIcon />,
       },
     ],
     [$fmt],
@@ -317,7 +317,7 @@ export default function Home() {
                       aria-label={$fmt('home.helpInfo')}
                       onClick={() => setHelpDrawerVisible(true)}
                     >
-                      <QuestionCircleOutlined />
+                      <CircleHelpIcon />
                     </StyledActionIconBtn>
                   </Tooltip>
                 </div>
@@ -346,7 +346,7 @@ export default function Home() {
                         aria-label={$fmt('home.collapseAll')}
                         onClick={() => toggleExpand(false)}
                       >
-                        <FolderOutlined />
+                        <FolderIcon />
                       </StyledActionIconBtn>
                     </Tooltip>
                     <Tooltip
@@ -360,7 +360,7 @@ export default function Home() {
                         aria-label={$fmt('home.expandAll')}
                         onClick={() => toggleExpand(true)}
                       >
-                        <FolderOpenOutlined />
+                        <FolderOpenIcon />
                       </StyledActionIconBtn>
                     </Tooltip>
                     <Tooltip
@@ -374,7 +374,7 @@ export default function Home() {
                         aria-label={$fmt('home.addTag')}
                         onClick={handleTagCreate}
                       >
-                        <FolderAddOutlined />
+                        <FolderPlusIcon />
                       </StyledActionIconBtn>
                     </Tooltip>
                     <SearchTabsBtn></SearchTabsBtn>
@@ -404,7 +404,7 @@ export default function Home() {
                         $size="18"
                         aria-label={$fmt('common.more')}
                       >
-                        <MoreOutlined />
+                        <EllipsisVerticalIcon />
                       </StyledActionIconBtn>
                     </Tooltip>
                   </Dropdown>
@@ -535,7 +535,7 @@ export default function Home() {
                   }
                   styles={{ root: { maxWidth: '300px', width: '300px' } }}
                 >
-                  <QuestionCircleOutlined style={{ marginLeft: '4px' }} />
+                  <CircleHelpIcon style={{ marginLeft: '4px' }} />
                 </Tooltip>
               </li>
             </ul>

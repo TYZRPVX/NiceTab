@@ -1,5 +1,7 @@
+import { withMessageIcons } from './icon/messageIcons';
+import * as UIIcons from './icon/Icons';
 import type { Runtime } from 'wxt/browser';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ConfigProvider, theme, message } from 'antd';
 import { IntlProvider } from 'react-intl';
 import { isEqual } from 'lodash-es';
@@ -50,10 +52,11 @@ export default function Root({
   pageContext: PageContextType;
   children: React.ReactNode;
 }) {
-  const [$message, messageContextHolder] = message.useMessage({
+  const [messageApi, messageContextHolder] = message.useMessage({
     // Leave the popup's top action toolbar visible while feedback is displayed.
     top: pageContext === 'popupPage' ? 64 : undefined,
   });
+  const $message = useMemo(() => withMessageIcons(messageApi), [messageApi]);
   const [version, setVersion] = useState('');
   const [pageTitleConfig, setPageTitleConfig] = useState<PageTitleConfigItem[]>([]);
   const { locale: localeAntd, changeLocale: changeLocaleAntd } = useAntdLocale();
@@ -196,6 +199,23 @@ export default function Root({
       <ConfigProvider
         prefixCls="nicetab"
         locale={localeAntd}
+        modal={{ closeIcon: <UIIcons.XIcon /> }}
+        drawer={{ closeIcon: <UIIcons.XIcon /> }}
+        notification={{ closeIcon: <UIIcons.XIcon /> }}
+        tag={{ closeIcon: <UIIcons.XIcon /> }}
+        alert={{ closeIcon: <UIIcons.XIcon /> }}
+        tour={{ closeIcon: <UIIcons.XIcon /> }}
+        tabs={{
+          addIcon: <UIIcons.PlusIcon />,
+          removeIcon: <UIIcons.XIcon />,
+          moreIcon: <UIIcons.EllipsisVerticalIcon />,
+        }}
+        collapse={{
+          expandIcon: ({ isActive }) => (
+            <UIIcons.ChevronRightIcon rotate={isActive ? 90 : 0} />
+          ),
+        }}
+        spin={{ indicator: <UIIcons.LoaderCircleIcon spin /> }}
         theme={{
           cssVar: { key: 'css-var-token-nicetab' },
           hashed: false,

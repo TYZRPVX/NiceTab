@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { theme, Tooltip, Typography, Menu, type MenuProps } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { CircleHelpIcon } from '~/entrypoints/common/components/icon/Icons';
 
 type MenuItemType = Required<MenuProps>['items'][number] & {
   label: React.ReactNode;
@@ -22,7 +22,7 @@ export default function useMenus() {
               title={<Typography.Text>{item.tip}</Typography.Text>}
               styles={{ root: { maxWidth: '300px', width: '300px' } }}
             >
-              <QuestionCircleOutlined style={{ marginLeft: '4px' }} />
+              <CircleHelpIcon style={{ marginLeft: '4px' }} />
             </Tooltip>
           </div>
         ) : (

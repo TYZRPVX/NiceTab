@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { StarFilled } from '@ant-design/icons';
+import { StarIcon } from '~/entrypoints/common/components/icon/Icons';
 import { useIntl } from 'react-intl';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { StyledDayDivider } from '../TabGroup.styled';
@@ -37,7 +37,7 @@ export default function DayDivider({
   return (
     <StyledDayDivider role="separator">
       <span className="day-divider-label">
-        {starred && <StarFilled aria-hidden="true" />}
+        {starred && <StarIcon aria-hidden="true" />}
         {label}
       </span>
       <span className="day-divider-line" aria-hidden="true" />

@@ -1,5 +1,5 @@
 import { FloatButton } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchIcon } from '~/entrypoints/common/components/icon/Icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import SearchList from '../footer/SearchList';
 
@@ -14,7 +14,7 @@ export default function FooterFloatButton() {
       style={{ right: 30, bottom: 30 }}
       icon={
         <span title={$fmt('home.searchTabAndUrl')}>
-          <SearchOutlined />
+          <SearchIcon />
         </span>
       }
     >

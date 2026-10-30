@@ -1,3 +1,4 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import React, { useCallback, useState, memo, useRef } from 'react';
 import {
   theme,
@@ -12,12 +13,12 @@ import {
 } from 'antd';
 import type { MenuProps, CheckboxProps } from 'antd';
 import {
-  CloseOutlined,
-  EditOutlined,
-  QrcodeOutlined,
-  MoreOutlined,
-  CopyOutlined,
-} from '@ant-design/icons';
+  XIcon,
+  PencilIcon,
+  QrCodeIcon,
+  EllipsisVerticalIcon,
+  CopyIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import { TagItem, GroupItem, TabItem } from '~/entrypoints/types';
 import type { ModifierKeys } from '~/entrypoints/common/utils/click';
 import { classNames } from '~/entrypoints/common/utils';
@@ -115,6 +116,7 @@ export default memo(function TabListItem({
       },
     });
     const confirmed = await removeModal.confirm({
+      icon: <UIIcons.CircleHelpIcon />,
       title: $fmt('home.removeTitle'),
       content: <div dangerouslySetInnerHTML={{ __html: removeDesc }}></div>,
     });
@@ -177,13 +179,13 @@ export default memo(function TabListItem({
       {
         key: 'edit',
         label: $fmt('common.edit'),
-        icon: <EditOutlined />,
+        icon: <PencilIcon />,
         disabled: tag?.isLocked || group.isLocked,
       },
       {
         key: 'copy',
         label: $fmt('common.copy'),
-        icon: <CopyOutlined />,
+        icon: <CopyIcon />,
         disabled: tag?.isLocked || group.isLocked,
       },
       {
@@ -195,7 +197,7 @@ export default memo(function TabListItem({
             content={<QRCode value={tab.url!} color="#000" bordered={false} />}
           >
             <Space>
-              <QrcodeOutlined />
+              <QrCodeIcon />
               <Typography.Text>{$fmt('common.qrcode')}</Typography.Text>
             </Space>
           </Popover>
@@ -268,7 +270,7 @@ export default memo(function TabListItem({
                 $hoverColor={ENUM_COLORS.red}
                 onClick={handleTabRemove}
               >
-                <CloseOutlined />
+                <XIcon />
               </StyledActionIconBtn>
             </Tooltip>
           </>
@@ -298,7 +300,7 @@ export default memo(function TabListItem({
                 $size="16"
                 aria-label={$fmt('common.more')}
               >
-                <MoreOutlined />
+                <EllipsisVerticalIcon />
               </StyledActionIconBtn>
             </Dropdown>
           </Tooltip>

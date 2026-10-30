@@ -1,5 +1,6 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import { theme, Flex, Space, Alert, Empty, Tooltip, Typography } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { CircleHelpIcon } from '~/entrypoints/common/components/icon/Icons';
 import type { SyncResultItemProps } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { SUCCESS_KEY } from '~/entrypoints/common/constants';
@@ -36,11 +37,18 @@ export default function SyncResultList({ resultList }: SyncResultListProps) {
           destroyTooltipOnHide
           title={<Typography.Text>{$fmt('sync.tip.syncHistory')}</Typography.Text>}
         >
-          <QuestionCircleOutlined />
+          <CircleHelpIcon />
         </Tooltip>
       </Space>
       {resultList.map((result, index) => (
         <Alert
+          icon={
+            result.syncResult === SUCCESS_KEY ? (
+              <UIIcons.CircleCheckIcon />
+            ) : (
+              <UIIcons.CircleXIcon />
+            )
+          }
           key={`${result.syncTime}__${index}`}
           message={
             <Flex vertical gap={2}>

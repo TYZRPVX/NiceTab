@@ -68,12 +68,15 @@ export default function SidebarLayout({
       className={className}
       style={{ '--sidebar-width': `${width}px` } as React.CSSProperties}
     >
+      {/* Memory: one fixed 32px button while collapsed. */}
       {collapsed && (
         <div
-          className="sidebar-hover-trigger sidebar-hover-trigger-left"
+          className="sidebar-edge-toggle sidebar-edge-toggle-left"
           onPointerEnter={open}
           onPointerLeave={scheduleClose}
-        />
+        >
+          <ToggleSidebarBtn collapsed onCollapseChange={onCollapseChange} />
+        </div>
       )}
       <div
         className={classNames(

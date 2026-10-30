@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 import { theme } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { CircleHelpIcon } from '~/entrypoints/common/components/icon/Icons';
 import styled from 'styled-components';
 
 const StyledText = styled.div`
@@ -26,7 +26,7 @@ export default function useTooltipOption() {
         }}
       ></StyledText>
     ),
-    icon: icon || <QuestionCircleOutlined />,
+    icon: icon || <CircleHelpIcon />,
     color: token.colorBgElevated,
     styles: { root: { maxWidth: `${width}px`, width: `${width}px` } },
   });

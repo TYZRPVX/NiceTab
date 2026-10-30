@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import type { ReactElement } from 'react';
 import { theme, Flex, Typography, Divider, Form, Input, Switch } from 'antd';
-import { LinkOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { LinkIcon, InfoIcon } from '~/entrypoints/common/components/icon/Icons';
 import type { InputRef, FormInstance } from 'antd';
 import styled from 'styled-components';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -39,7 +39,7 @@ export default function SyncConfigFormItem({ form, type }: SyncConfigFormItemPro
     icon?: ReactElement;
   }) => ({
     title: <Typography.Text>{title}</Typography.Text>,
-    icon: icon || <InfoCircleOutlined />,
+    icon: icon || <InfoIcon />,
     color: token.colorBgContainer,
   });
 
@@ -51,7 +51,7 @@ export default function SyncConfigFormItem({ form, type }: SyncConfigFormItemPro
         </Divider>
         <StyledLink>
           <a className="link" href={tokenSettingsPageUrls[type]} target="_blank">
-            <LinkOutlined /> {$fmt('sync.getYourToken')}
+            <LinkIcon /> {$fmt('sync.getYourToken')}
           </a>
         </StyledLink>
         <Form.Item<SyncConfigProps>

@@ -1,3 +1,4 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import { Alert } from 'antd';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { StyledFooterWrapper } from './Footer.styled';
@@ -9,7 +10,13 @@ export default function Footer() {
       className="footer-wrapper"
       // $paddingLeft={sidebarCollapsed ? 0 : 280}
     >
-      <Alert className="tip" type="info" showIcon message={$fmt('sync.tip.supportTip')} />
+      <Alert
+        icon={<UIIcons.InfoIcon />}
+        className="tip"
+        type="info"
+        showIcon
+        message={$fmt('sync.tip.supportTip')}
+      />
     </StyledFooterWrapper>
   );
 }

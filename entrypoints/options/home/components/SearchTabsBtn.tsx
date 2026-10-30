@@ -1,6 +1,6 @@
 import { Tooltip } from 'antd';
 import ActionIconBtn from '~/entrypoints/common/components/ActionIconBtn';
-import { SearchOutlined } from '@ant-design/icons';
+import { SearchIcon } from '~/entrypoints/common/components/icon/Icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 
 export default function SearchTabsBtn() {
@@ -15,7 +15,7 @@ export default function SearchTabsBtn() {
     <Tooltip title={label} placement="top" mouseEnterDelay={0.3} destroyTooltipOnHide>
       <span className="action-icon">
         <ActionIconBtn label={label} size={20} onClick={openGlobalSearchPanel}>
-          <SearchOutlined />
+          <SearchIcon />
         </ActionIconBtn>
       </span>
     </Tooltip>

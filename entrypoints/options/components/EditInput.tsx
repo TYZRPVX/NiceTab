@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { theme, Input, Tooltip } from 'antd';
 import type { InputProps, InputRef } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
+import { PencilIcon } from '~/entrypoints/common/components/icon/Icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import styled from 'styled-components';
 import {
@@ -158,7 +158,7 @@ export default function EditInput({
               disabled={disabled}
               onClick={handleClick}
             >
-              <EditOutlined />
+              <PencilIcon />
             </StyledActionIconBtn>
           )}
         </>

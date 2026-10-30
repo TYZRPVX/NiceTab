@@ -1,3 +1,4 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import {
   useState,
   useCallback,
@@ -8,6 +9,7 @@ import {
 } from 'react';
 import {
   theme,
+  Button,
   Select,
   Input,
   Checkbox,
@@ -21,12 +23,12 @@ import {
 import styled from 'styled-components';
 import VirtualList from 'rc-virtual-list';
 import {
-  TagOutlined,
-  ProductOutlined,
-  DeleteOutlined,
-  ExportOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+  TagIcon,
+  PanelsTopLeftIcon,
+  Trash2Icon,
+  ExternalLinkIcon,
+  SearchIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import { debounce, groupBy } from 'lodash-es';
 import {
   getDisplayGroupName,
@@ -228,20 +230,20 @@ export function SearchListItem({
               target="_blank"
               onClick={handleTabOpen}
             >
-              <ExportOutlined />
+              <ExternalLinkIcon />
             </StyledActionIconBtn>
           </div>
         </div>
         <div className="item-meta">
           <div className="tag-name" title={option.tagName}>
-            <TagOutlined />
+            <TagIcon />
             <span className="text">
               {option.static ? $fmt('home.stagingArea') : option.tagName}
             </span>
           </div>
           <span className="meta-separator">/</span>
           <div className="group-name" title={option.groupName}>
-            <ProductOutlined />
+            <PanelsTopLeftIcon />
             <span className="text">{option.groupName}</span>
           </div>
           <span className="tab-host" title={option.url}>
@@ -468,10 +470,11 @@ export function GlobalSearchList({
   return (
     <StyledTabsSearchList>
       <Input.Search
+        enterButton={<Button icon={<UIIcons.SearchIcon />} />}
         ref={inputRef}
         style={{ width: inputWidth, marginBottom: 8 }}
         placeholder={$fmt('home.searchTabAndUrl')}
-        allowClear
+        allowClear={{ clearIcon: <UIIcons.CircleXIcon /> }}
         onChange={onSearchTextChange}
         onSearch={onSearch}
       />
@@ -726,7 +729,7 @@ export const GlobalSearchBox = forwardRef(
                       hoverColor={ENUM_COLORS.red}
                       onClick={() => handleBatchAction('remove')}
                     >
-                      <DeleteOutlined />
+                      <Trash2Icon />
                     </ActionIconBtn>
                   </Tooltip>
                   <Tooltip
@@ -742,7 +745,7 @@ export const GlobalSearchBox = forwardRef(
                       size={16}
                       onClick={() => handleBatchAction('open')}
                     >
-                      <ExportOutlined />
+                      <ExternalLinkIcon />
                     </ActionIconBtn>
                   </Tooltip>
                 </Space>
@@ -752,6 +755,8 @@ export const GlobalSearchBox = forwardRef(
         </StyledBatchActionHeader>
         <StyledSearchList ref={searchListRef}>
           <Select
+            removeIcon={<UIIcons.XIcon />}
+            menuItemSelectedIcon={<UIIcons.CheckIcon />}
             ref={selectRef}
             options={options}
             listHeight={listHeight}
@@ -765,7 +770,7 @@ export const GlobalSearchBox = forwardRef(
             getPopupContainer={() => searchListRef.current || document.body}
             popupClassName="global-search-results"
             popupMatchSelectWidth={listWidth}
-            suffixIcon={<SearchOutlined />}
+            suffixIcon={<SearchIcon />}
             onChange={onChange}
             onSearch={onSearch}
             placement={placement}

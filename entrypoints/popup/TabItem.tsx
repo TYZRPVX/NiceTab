@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { useTabDisplayTitle } from '~/entrypoints/common/hooks/tabDisplayTitle';
 import type { Tabs } from 'wxt/browser';
-import { CloseOutlined } from '@ant-design/icons';
+import { XIcon } from '~/entrypoints/common/components/icon/Icons';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -49,7 +49,7 @@ export default function TabItem({ tab, onAction }: TabItemProps) {
           hoverColor={ENUM_COLORS.red}
           onClick={() => onAction('remove', tab)}
         >
-          <CloseOutlined />
+          <XIcon />
         </ActionIconBtn>
       </span>
     </StyledTabItem>

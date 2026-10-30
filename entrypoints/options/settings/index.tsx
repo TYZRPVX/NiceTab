@@ -2,17 +2,17 @@ import { useContext, useState, useEffect, useMemo, useCallback, useRef } from 'r
 import { Menu, Form, Modal, message } from 'antd';
 import type { MenuProps, FormProps } from 'antd';
 import {
-  SettingOutlined,
-  SendOutlined,
-  FolderOpenOutlined,
-  SortAscendingOutlined,
-  FontSizeOutlined,
-  ToolOutlined,
-  DesktopOutlined,
-  AppstoreOutlined,
-  SyncOutlined,
-  SearchOutlined,
-} from '@ant-design/icons';
+  SettingsIcon,
+  InboxIcon,
+  FolderOpenIcon,
+  ArrowDownAZIcon,
+  TypeIcon,
+  WrenchIcon,
+  MonitorIcon,
+  LayoutGridIcon,
+  RefreshCwIcon,
+  SearchIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import { isEqual, debounce } from 'lodash-es';
 import { useBlocker } from 'react-router-dom';
 import { getCustomLocaleMessages } from '~/entrypoints/common/locale';
@@ -81,52 +81,52 @@ export default function Settings() {
       {
         key: 'common',
         label: $fmt('settings.block.common'),
-        icon: <SettingOutlined />,
+        icon: <SettingsIcon />,
       },
       {
         key: 'sendTabs',
         label: $fmt('settings.block.sendTabs'),
-        icon: <SendOutlined />,
+        icon: <InboxIcon />,
       },
       {
         key: 'openTabs',
         label: $fmt('settings.block.openTabs'),
-        icon: <FolderOpenOutlined />,
+        icon: <FolderOpenIcon />,
       },
       {
         key: 'tabSort',
         label: $fmt('settings.block.tabSort'),
-        icon: <SortAscendingOutlined />,
+        icon: <ArrowDownAZIcon />,
       },
       {
         key: 'pageTitleConfig',
         label: $fmt('settings.block.pageTitleConfig'),
-        icon: <FontSizeOutlined />,
+        icon: <TypeIcon />,
       },
       {
         key: 'otherActions',
         label: $fmt('settings.block.otherActions'),
-        icon: <ToolOutlined />,
+        icon: <WrenchIcon />,
       },
       {
         key: 'display',
         label: $fmt('settings.block.display'),
-        icon: <DesktopOutlined />,
+        icon: <MonitorIcon />,
       },
       {
         key: 'newtab',
         label: $fmt('settings.block.newtab'),
-        icon: <AppstoreOutlined />,
+        icon: <LayoutGridIcon />,
       },
       {
         key: 'sync',
         label: $fmt('settings.block.sync'),
-        icon: <SyncOutlined />,
+        icon: <RefreshCwIcon />,
       },
       {
         key: 'globalSearch',
         label: $fmt('settings.block.globalSearch'),
-        icon: <SearchOutlined />,
+        icon: <SearchIcon />,
       },
     ];
 

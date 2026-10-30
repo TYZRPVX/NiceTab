@@ -27,29 +27,29 @@ import {
   type MenuProps,
 } from 'antd';
 import {
-  HomeOutlined,
-  SettingOutlined,
-  ImportOutlined,
-  SyncOutlined,
-  RestOutlined,
-  MoonOutlined,
-  DesktopOutlined,
-  SunOutlined,
-  SmileOutlined,
-  SendOutlined,
-  MenuOutlined,
-  MoreOutlined,
-  ReloadOutlined,
-  KeyOutlined,
-  CoffeeOutlined,
-  CameraOutlined,
-  SaveOutlined,
-  RollbackOutlined,
-  SearchOutlined,
-  ReadOutlined,
-  HistoryOutlined,
-  ToTopOutlined,
-} from '@ant-design/icons';
+  HouseIcon,
+  SettingsIcon,
+  ImportIcon,
+  RefreshCwIcon,
+  Trash2Icon,
+  MoonIcon,
+  MonitorIcon,
+  SunIcon,
+  SmileIcon,
+  InboxIcon,
+  MenuIcon,
+  EllipsisVerticalIcon,
+  RotateCwIcon,
+  KeyboardIcon,
+  CoffeeIcon,
+  CameraIcon,
+  SaveIcon,
+  Undo2Icon,
+  SearchIcon,
+  BookOpenIcon,
+  HistoryIcon,
+  ArrowUpToLineIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import styled, { ThemeProvider } from 'styled-components';
 import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
@@ -260,35 +260,35 @@ const navsTemplate: NavProps[] = [
     key: 'home',
     label: 'common.list',
     path: '/home',
-    icon: <HomeOutlined />,
+    icon: <HouseIcon />,
     element: <Home />,
   },
   {
     key: 'settings',
     label: 'common.settings',
     path: '/settings',
-    icon: <SettingOutlined />,
+    icon: <SettingsIcon />,
     element: <Settings />,
   },
   {
     key: 'import-export',
     label: 'common.importExport',
     path: '/import-export',
-    icon: <ImportOutlined />,
+    icon: <ImportIcon />,
     element: <ImportExport />,
   },
   {
     key: 'sync',
     label: 'common.sync',
     path: '/sync',
-    icon: <SyncOutlined />,
+    icon: <RefreshCwIcon />,
     element: <SyncPage />,
   },
   {
     key: 'recycle-bin',
     label: 'common.recycleBin',
     path: '/recycle',
-    icon: <RestOutlined />,
+    icon: <Trash2Icon />,
     element: <RecycleBin />,
   },
 ];
@@ -370,46 +370,46 @@ function AppLayout() {
   const extActionOptions = useMemo(
     () =>
       createMenus([
-        { key: 'sendAllTabs', icon: <SendOutlined />, label: $fmt('common.sendAllTabs') },
+        { key: 'sendAllTabs', icon: <InboxIcon />, label: $fmt('common.sendAllTabs') },
         {
           key: 'createSnapshot',
-          icon: <CameraOutlined />,
+          icon: <CameraIcon />,
           label: $fmt('home.createSnapshot'),
           tip: $fmt('home.createSnapshot.tip'),
         },
         {
           key: 'restoreSnapshot',
-          icon: <RollbackOutlined />,
+          icon: <Undo2Icon />,
           label: $fmt('home.restoreSnapshot'),
         },
         {
           key: 'userGuide',
-          icon: <ReadOutlined />,
+          icon: <BookOpenIcon />,
           label: $fmt('common.userGuide'),
         },
         {
           key: 'changelog',
-          icon: <HistoryOutlined />,
+          icon: <HistoryIcon />,
           label: $fmt('common.changelog'),
         },
         {
           key: 'bindShortcuts',
-          icon: <KeyOutlined />,
+          icon: <KeyboardIcon />,
           label: $fmt('common.bindShortcuts'),
           tip: import.meta.env.FIREFOX ? $fmt('common.bindShortcuts.tip') : '',
           disabled: import.meta.env.FIREFOX,
         },
         {
           key: 'hibernateTabs',
-          icon: <CoffeeOutlined />,
+          icon: <CoffeeIcon />,
           label: $fmt('common.hibernateTabs'),
         },
         {
           key: 'startSync',
-          icon: <SyncOutlined />,
+          icon: <RefreshCwIcon />,
           label: $fmt('common.startSync'),
         },
-        { key: 'reload', icon: <ReloadOutlined />, label: $fmt('common.reload') },
+        { key: 'reload', icon: <RotateCwIcon />, label: $fmt('common.reload') },
       ]),
     [$fmt],
   );
@@ -531,7 +531,7 @@ function AppLayout() {
                 title={$fmt('common.more')}
                 aria-label={$fmt('common.more')}
               >
-                <MoreOutlined />
+                <EllipsisVerticalIcon />
               </span>
             }
             onSelect={onSelect}
@@ -549,7 +549,7 @@ function AppLayout() {
               <Typography.Text type="warning">
                 {$fmt({
                   id: 'common.update.available',
-                  values: { version: updateDetail?.version || <SmileOutlined /> },
+                  values: { version: updateDetail?.version || <SmileIcon /> },
                 })}
                 :
               </Typography.Text>
@@ -566,9 +566,9 @@ function AppLayout() {
               aria-label={$fmt('common.toggleThemeType')}
               onClick={handleThemeTypeChange}
             >
-              {NiceGlobalContext.themeType === 'light' && <SunOutlined />}
-              {NiceGlobalContext.themeType === 'dark' && <MoonOutlined />}
-              {NiceGlobalContext.themeType === 'auto' && <DesktopOutlined />}
+              {NiceGlobalContext.themeType === 'light' && <SunIcon />}
+              {NiceGlobalContext.themeType === 'dark' && <MoonIcon />}
+              {NiceGlobalContext.themeType === 'auto' && <MonitorIcon />}
             </StyledActionIconBtn>
             {/* ext actions */}
             <Dropdown
@@ -582,7 +582,7 @@ function AppLayout() {
                 title={$fmt('common.actions')}
                 aria-label={$fmt('common.actions')}
               >
-                <MenuOutlined />
+                <MenuIcon />
               </StyledActionIconBtn>
             </Dropdown>
           </Space>
@@ -597,7 +597,7 @@ function AppLayout() {
           {/* 回到顶部 */}
           <Button
             shape="circle"
-            icon={<ToTopOutlined />}
+            icon={<ArrowUpToLineIcon />}
             title={$fmt('common.backToTop')}
             aria-label={$fmt('common.backToTop')}
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -605,7 +605,7 @@ function AppLayout() {
 
           <Button
             shape="circle"
-            icon={<SearchOutlined />}
+            icon={<SearchIcon />}
             title={$fmt('home.searchTabAndUrl')}
             aria-label={$fmt('home.searchTabAndUrl')}
             onClick={openGlobalSearchPanel}
@@ -620,7 +620,7 @@ function AppLayout() {
               <Button
                 shape="circle"
                 type={settingsSaveAction?.hasChanged ? 'primary' : 'default'}
-                icon={<SaveOutlined />}
+                icon={<SaveIcon />}
                 title={$fmt('common.save')}
                 aria-label={$fmt('common.save')}
                 onClick={settingsSaveAction?.onSave}
@@ -629,7 +629,7 @@ function AppLayout() {
           ) : (
             <Button
               shape="circle"
-              icon={<SendOutlined />}
+              icon={<InboxIcon />}
               title={$fmt('common.sendAllTabs')}
               aria-label={$fmt('common.sendAllTabs')}
               onClick={handleSendAllTabs}

@@ -1,6 +1,11 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import { useContext } from 'react';
 import { Form, InputNumber, Radio } from 'antd';
-import { DesktopOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
+import {
+  MonitorIcon,
+  MoonIcon,
+  SunIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
 import ColorList from '~/entrypoints/common/components/ColorList';
@@ -58,13 +63,13 @@ export default function FormModuleCommon(
       >
         <Radio.Group>
           <Radio value="light">
-            <SunOutlined /> {$fmt('common.light')}
+            <SunIcon /> {$fmt('common.light')}
           </Radio>
           <Radio value="dark">
-            <MoonOutlined /> {$fmt('common.dark')}
+            <MoonIcon /> {$fmt('common.dark')}
           </Radio>
           <Radio value="auto">
-            <DesktopOutlined /> {$fmt('common.auto')}
+            <MonitorIcon /> {$fmt('common.auto')}
           </Radio>
         </Radio.Group>
       </Form.Item>
@@ -75,7 +80,12 @@ export default function FormModuleCommon(
         label={$fmt(`settings.${RECYCLE_RETENTION_DAYS}`)}
         name={RECYCLE_RETENTION_DAYS}
       >
-        <InputNumber min={1} max={365} precision={0} />
+        <InputNumber
+          controls={{ upIcon: <UIIcons.PlusIcon />, downIcon: <UIIcons.MinusIcon /> }}
+          min={1}
+          max={365}
+          precision={0}
+        />
       </Form.Item>
       {/* 启动浏览器时是否自动打开NiceTab管理后台 */}
       <Form.Item<SettingsProps>

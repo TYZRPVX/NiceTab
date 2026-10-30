@@ -1,7 +1,11 @@
 import { Dropdown } from 'antd';
 import { useTabDisplayTitle } from '~/entrypoints/common/hooks/tabDisplayTitle';
 import type { MenuProps } from 'antd';
-import { MoreOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import {
+  EllipsisVerticalIcon,
+  PencilIcon,
+  Trash2Icon,
+} from '~/entrypoints/common/components/icon/Icons';
 import type { TabItem } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { StyledActionIconBtn } from '~/entrypoints/common/style/Common.styled';
@@ -37,7 +41,7 @@ export default function TabListItem({
     {
       key: 'edit',
       label: $fmt('common.edit'),
-      icon: <EditOutlined />,
+      icon: <PencilIcon />,
       onClick: e => {
         e?.domEvent?.stopPropagation();
         onEdit(tab);
@@ -46,7 +50,7 @@ export default function TabListItem({
     {
       key: 'delete',
       label: $fmt('common.delete'),
-      icon: <DeleteOutlined />,
+      icon: <Trash2Icon />,
       danger: true,
       onClick: e => {
         e?.domEvent?.stopPropagation();
@@ -66,7 +70,7 @@ export default function TabListItem({
             e.stopPropagation();
           }}
         >
-          <MoreOutlined />
+          <EllipsisVerticalIcon />
         </StyledActionIconBtn>
       </Dropdown>
 

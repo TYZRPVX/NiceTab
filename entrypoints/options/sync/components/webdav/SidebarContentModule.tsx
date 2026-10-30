@@ -1,6 +1,6 @@
 import { useCallback, forwardRef, useImperativeHandle } from 'react';
 import { message, Flex, Divider, Drawer, Typography, Button } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusIcon } from '~/entrypoints/common/components/icon/Icons';
 import dayjs from 'dayjs';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { syncWebDAVUtils } from '~/entrypoints/common/storage';
@@ -157,7 +157,7 @@ export default forwardRef(
             <Flex justify="center">
               <Button
                 type="dashed"
-                icon={<PlusOutlined />}
+                icon={<PlusIcon />}
                 onClick={() => setDrawerVisible(true)}
               >
                 {$fmt('sync.addConfig')}

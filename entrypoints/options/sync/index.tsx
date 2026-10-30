@@ -1,6 +1,7 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import { useEffect, useState, useRef, useContext, useMemo, useCallback } from 'react';
 import { theme, Flex, Button, Modal } from 'antd';
-import { CloudUploadOutlined, ClearOutlined } from '@ant-design/icons';
+import { CloudUploadIcon, EraserIcon } from '~/entrypoints/common/components/icon/Icons';
 import { classNames } from '~/entrypoints/common/utils';
 import {
   eventEmitter,
@@ -89,6 +90,7 @@ export default function SyncPage() {
 
   const pushToAllRemotes = async () => {
     const modalConfig = {
+      icon: <UIIcons.CircleHelpIcon />,
       title: $fmt('sync.actionTip'),
       content: $fmt('sync.actionTip.manualPushForce'),
     };
@@ -171,14 +173,14 @@ export default function SyncPage() {
                 title={$fmt('sync.pushToAllRemotes')}
                 onClick={pushToAllRemotes}
               >
-                <Button icon={<CloudUploadOutlined />}></Button>
+                <Button icon={<CloudUploadIcon />}></Button>
               </div>
               <div
                 className="action-icon"
                 title={$fmt('sync.clearSyncHistory')}
                 onClick={clearSyncResult}
               >
-                <Button icon={<ClearOutlined />}></Button>
+                <Button icon={<EraserIcon />}></Button>
               </div>
             </>
           }

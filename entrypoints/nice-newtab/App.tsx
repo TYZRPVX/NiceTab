@@ -1,6 +1,7 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import { useEffect, useState, useCallback, useContext } from 'react';
 import { theme, Modal, Button, Tag, Spin } from 'antd';
-import { PlusOutlined, TagOutlined } from '@ant-design/icons';
+import { PlusIcon, TagIcon } from '~/entrypoints/common/components/icon/Icons';
 import { ThemeProvider } from 'styled-components';
 import { settingsUtils, tabListUtils } from '~/entrypoints/common/storage';
 import type { TabItem } from '~/entrypoints/types';
@@ -24,7 +25,6 @@ import TabItemEditModal from '~/entrypoints/options/home/TabItemEditModal';
 import { StyledNewTabContainer, StyledGroupHeader, StyledAddTabBtn } from './App.styled';
 import TabListItem from './TabListItem';
 import SearchEngine from './SearchEngine';
-
 
 const { CONFIRM_BEFORE_DELETING_TABS } = ENUM_SETTINGS_PROPS;
 
@@ -144,6 +144,7 @@ export default function App() {
         },
       });
       const confirmed = await removeModal.confirm({
+        icon: <UIIcons.CircleHelpIcon />,
         title: $fmt('home.removeTitle'),
         content: <div dangerouslySetInnerHTML={{ __html: removeDesc }}></div>,
       });
@@ -255,7 +256,7 @@ export default function App() {
                 <div key={group.groupId} className="newtab-group-section">
                   <StyledGroupHeader>
                     {group.tagName ? (
-                      <Tag icon={<TagOutlined />} color={token.colorPrimary}>
+                      <Tag icon={<TagIcon />} color={token.colorPrimary}>
                         {group.tagStatic ? $fmt('home.stagingArea') : group.tagName}
                       </Tag>
                     ) : null}
@@ -283,7 +284,7 @@ export default function App() {
                     ))}
                     <StyledAddTabBtn onClick={() => handleAddTabStart(group.groupId)}>
                       <div className="add-icon-wrapper">
-                        <PlusOutlined className="add-icon-plus" />
+                        <PlusIcon className="add-icon-plus" />
                       </div>
                       <span className="add-label">{$fmt('newtab.addTab')}</span>
                     </StyledAddTabBtn>

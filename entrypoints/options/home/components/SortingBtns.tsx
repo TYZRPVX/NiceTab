@@ -1,12 +1,14 @@
+import {
+  ClockArrowUpIcon,
+  ClockArrowDownIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import { useMemo } from 'react';
 import { Tooltip } from 'antd';
 import ActionIconBtn from '~/entrypoints/common/components/ActionIconBtn';
 import {
-  SortAscendingOutlined,
-  SortDescendingOutlined,
-  // ArrowUpOutlined,
-  // ArrowDownOutlined,
-} from '@ant-design/icons';
+  ArrowDownAZIcon,
+  ArrowUpZAIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 
 export default function SortingBtns({
@@ -25,14 +27,14 @@ export default function SortingBtns({
             id: 'common.ascending',
             values: { sortBy: $fmt('home.tabGroup.name') },
           }),
-          icon: <SortAscendingOutlined />,
+          icon: <ArrowDownAZIcon />,
         },
         descending: {
           title: $fmt({
             id: 'common.descending',
             values: { sortBy: $fmt('home.tabGroup.name') },
           }),
-          icon: <SortDescendingOutlined />,
+          icon: <ArrowUpZAIcon />,
         },
       };
     } else if (sortBy === 'createTime') {
@@ -42,14 +44,14 @@ export default function SortingBtns({
             id: 'common.ascending',
             values: { sortBy: $fmt('home.tabGroup.createTime') },
           }),
-          icon: <SortAscendingOutlined />,
+          icon: <ClockArrowUpIcon />,
         },
         descending: {
           title: $fmt({
             id: 'common.descending',
             values: { sortBy: $fmt('home.tabGroup.createTime') },
           }),
-          icon: <SortDescendingOutlined />,
+          icon: <ClockArrowDownIcon />,
         },
       };
     }
@@ -69,7 +71,7 @@ export default function SortingBtns({
             size={20}
             onClick={() => onSort?.('ascending')}
           >
-            {config?.ascending?.icon || <SortAscendingOutlined />}
+            {config?.ascending?.icon || <ArrowDownAZIcon />}
           </ActionIconBtn>
         </span>
       </Tooltip>
@@ -85,7 +87,7 @@ export default function SortingBtns({
             size={20}
             onClick={() => onSort?.('descending')}
           >
-            {config?.descending?.icon || <SortDescendingOutlined />}
+            {config?.descending?.icon || <ArrowUpZAIcon />}
           </ActionIconBtn>
         </span>
       </Tooltip>

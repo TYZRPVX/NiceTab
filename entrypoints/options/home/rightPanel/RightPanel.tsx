@@ -2,7 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { Empty, Checkbox, Tooltip, Typography, theme } from 'antd';
 import type { CheckboxProps } from 'antd';
-import { CloseOutlined, CoffeeOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import {
+  XIcon,
+  CoffeeIcon,
+  CircleHelpIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import { getDisplayGroupName, isGroupSupported } from '~/entrypoints/common/utils';
 import { getAdminTabInfo } from '~/entrypoints/common/tabs';
 import {
@@ -189,13 +193,13 @@ function OpenedTabsContent() {
       {
         key: 'discard',
         label: $fmt('common.hibernate'),
-        icon: <CoffeeOutlined />,
+        icon: <CoffeeIcon />,
         onClick: handleBatchDiscard,
       },
       {
         key: 'remove',
         label: $fmt('common.remove'),
-        icon: <CloseOutlined />,
+        icon: <XIcon />,
         hoverColor: ENUM_COLORS.red,
         confirm: {
           title: $fmt('home.removeTitle'),
@@ -285,7 +289,7 @@ function OpenedTabsContent() {
           styles={{ root: { maxWidth: '300px', width: '300px' } }}
         >
           <StyledActionIconBtn className="btn-tips" aria-label={$fmt('common.tips')}>
-            <QuestionCircleOutlined />
+            <CircleHelpIcon />
           </StyledActionIconBtn>
         </Tooltip>
       </div>

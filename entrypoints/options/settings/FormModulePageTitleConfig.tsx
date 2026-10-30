@@ -1,7 +1,8 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import styled from 'styled-components';
 import { Form, Button, Select, Input } from 'antd';
 import type { FormItemProps, FormInstance } from 'antd';
-import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { PlusIcon, CircleMinusIcon } from '~/entrypoints/common/components/icon/Icons';
 import { ENUM_SETTINGS_PROPS, ENUM_COLORS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import type { SettingsProps } from '~/entrypoints/types';
@@ -100,6 +101,9 @@ export default function FormModulePageTitleConfig(
                     layout="horizontal"
                   >
                     <Select
+                      suffixIcon={<UIIcons.ChevronDownIcon />}
+                      removeIcon={<UIIcons.XIcon />}
+                      menuItemSelectedIcon={<UIIcons.CheckIcon />}
                       disabled={importingPresets}
                       options={options}
                       placeholder={$fmt('common.matchMode')}
@@ -158,7 +162,7 @@ export default function FormModulePageTitleConfig(
                       if (!importingPresets) remove(field.name);
                     }}
                   >
-                    <MinusCircleOutlined />
+                    <CircleMinusIcon />
                   </StyledActionIconBtn>
                 </div>
               </StyledConfigItem>
@@ -167,7 +171,7 @@ export default function FormModulePageTitleConfig(
               <Button
                 disabled={importingPresets}
                 type="dashed"
-                icon={<PlusOutlined />}
+                icon={<PlusIcon />}
                 onClick={() => add()}
               >
                 {$fmt('sync.addConfig')}

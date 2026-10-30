@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { Modal, Tooltip } from 'antd';
-import { DeleteOutlined, ExportOutlined, TagOutlined } from '@ant-design/icons';
+import {
+  Trash2Icon,
+  ExternalLinkIcon,
+  TagIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import { TagItem } from '~/entrypoints/types';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { recycleUtils } from '~/entrypoints/common/storage';
@@ -72,7 +76,7 @@ export default function TagNode({
 
   return (
     <StyledTagNode>
-      <TagOutlined style={{ fontSize: '16px' }} />
+      <TagIcon style={{ fontSize: '16px' }} />
       <div className="tag-name">
         {tag.static ? $fmt('home.stagingArea') : tag.tagName}
       </div>
@@ -97,7 +101,7 @@ export default function TagNode({
             btnStyle="icon"
             onClick={openConfirmModal}
           >
-            <DeleteOutlined />
+            <Trash2Icon />
           </ActionIconBtn>
         </Tooltip>
         <Tooltip
@@ -113,7 +117,7 @@ export default function TagNode({
             btnStyle="icon"
             onClick={openRecoverModal}
           >
-            <ExportOutlined />
+            <ExternalLinkIcon />
           </ActionIconBtn>
         </Tooltip>
       </div>

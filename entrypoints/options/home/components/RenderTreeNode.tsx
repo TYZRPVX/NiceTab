@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useCallback, memo, useContext } from 'react';
 import { theme, Dropdown, Tooltip } from 'antd';
-import { CloseOutlined, MoreOutlined } from '@ant-design/icons';
+import { XIcon, EllipsisVerticalIcon } from '~/entrypoints/common/components/icon/Icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS, UNNAMED_TAG, UNNAMED_GROUP } from '~/entrypoints/common/constants';
 import { getDisplayGroupName, getDisplayTagName } from '~/entrypoints/common/utils';
@@ -93,7 +93,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
       items.push({
         key: 'more',
         label: $fmt('common.more'),
-        icon: <MoreOutlined />,
+        icon: <EllipsisVerticalIcon />,
         children: groupActions.innerList,
       });
     }
@@ -250,7 +250,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
                     aria-label={$fmt('common.more')}
                     onClick={e => e.stopPropagation()}
                   >
-                    <MoreOutlined />
+                    <EllipsisVerticalIcon />
                   </StyledActionIconBtn>
                 </Tooltip>
               </Dropdown>
@@ -275,7 +275,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
                     aria-label={$fmt('common.more')}
                     onClick={e => e.stopPropagation()}
                   >
-                    <MoreOutlined />
+                    <EllipsisVerticalIcon />
                   </StyledActionIconBtn>
                 </Tooltip>
               </Dropdown>
@@ -295,7 +295,7 @@ function RenderTreeNode({ node, onAction }: RenderTreeNodeProps) {
                   $hoverColor={ENUM_COLORS.red}
                   onClick={onRemoveClick}
                 >
-                  <CloseOutlined />
+                  <XIcon />
                 </StyledActionIconBtn>
               </Tooltip>
             )}

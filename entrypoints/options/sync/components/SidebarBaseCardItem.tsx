@@ -1,12 +1,13 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import { useCallback, useMemo } from 'react';
 import { theme, Flex, Card, Tooltip, Typography, Tag, Modal } from 'antd';
 import {
-  SettingOutlined,
-  SyncOutlined,
-  CloudDownloadOutlined,
-  CloudUploadOutlined,
-  ReloadOutlined,
-} from '@ant-design/icons';
+  SettingsIcon,
+  RefreshCwIcon,
+  CloudDownloadIcon,
+  CloudUploadIcon,
+  RotateCwIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import type { SyncType } from '~/entrypoints/types';
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -44,6 +45,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
     if (!validator?.(option)) return;
 
     const modalConfig = {
+      icon: <UIIcons.CircleHelpIcon />,
       title: $fmt('sync.actionTip'),
       content: actionConfirmTextMap[actionType],
     };
@@ -62,7 +64,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
       <StyledCardTitle>
         <div className="card-title">{option.label}</div>
         {syncStatus === 'syncing' && (
-          <Tag icon={<SyncOutlined spin />} color="processing">
+          <Tag icon={<RefreshCwIcon spin />} color="processing">
             {$fmt('sync.syncing')}
           </Tag>
         )}
@@ -117,7 +119,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
         title={<Typography.Text>{$fmt('common.settings')}</Typography.Text>}
       >
         <div className="icon-btn-wrapper" onClick={() => onAction?.(option, 'setting')}>
-          <SettingOutlined key="setting" />
+          <SettingsIcon key="setting" />
         </div>
       </Tooltip>,
       <Tooltip
@@ -129,7 +131,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
           className="icon-btn-wrapper"
           onClick={() => handleConfirm(syncTypeMap['MANUAL_PULL_FORCE'])}
         >
-          <CloudDownloadOutlined key={syncTypeMap['MANUAL_PULL_FORCE']} />
+          <CloudDownloadIcon key={syncTypeMap['MANUAL_PULL_FORCE']} />
         </div>
       </Tooltip>,
       <Tooltip
@@ -138,7 +140,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
         title={<Typography.Text>{$fmt('sync.tip.manualPushMerge')}</Typography.Text>}
       >
         <div className="icon-btn-wrapper" onClick={handlePushMerge}>
-          <SyncOutlined key={syncTypeMap['MANUAL_PUSH_MERGE']} />
+          <RefreshCwIcon key={syncTypeMap['MANUAL_PUSH_MERGE']} />
         </div>
       </Tooltip>,
       <Tooltip
@@ -150,7 +152,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
           className="icon-btn-wrapper"
           onClick={() => handleConfirm(syncTypeMap['MANUAL_PUSH_FORCE'])}
         >
-          <CloudUploadOutlined key={syncTypeMap['MANUAL_PUSH_FORCE']} />
+          <CloudUploadIcon key={syncTypeMap['MANUAL_PUSH_FORCE']} />
         </div>
       </Tooltip>,
       <Tooltip
@@ -162,7 +164,7 @@ export default function BaseCardItem<T extends { label: string } = RemoteOptionP
           className="icon-btn-wrapper"
           onClick={() => onAction?.(option, 'resetStatus')}
         >
-          <ReloadOutlined />
+          <RotateCwIcon />
         </div>
       </Tooltip>,
     ];

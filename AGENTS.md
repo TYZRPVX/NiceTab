@@ -19,3 +19,9 @@
 - Bound every cache. Define its limit and expiry.
 - Long lists must keep DOM near the visible rows only.
 - New always-on code must document its memory cost.
+
+# Build rules
+
+- After finishing code changes, run `pnpm build && pnpm pack:crx`.
+- Do not run `pnpm dev`.
+- Do not change the version unless explicitly asked.

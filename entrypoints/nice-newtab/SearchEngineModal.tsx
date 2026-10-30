@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Drawer, Modal, Form, Input, Button, Dropdown, theme } from 'antd';
 import type { InputRef, MenuProps } from 'antd';
 import {
-  EditOutlined,
-  DeleteOutlined,
-  MoreOutlined,
-  StarOutlined,
-} from '@ant-design/icons';
+  PencilIcon,
+  Trash2Icon,
+  EllipsisVerticalIcon,
+  StarIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { getRandomId } from '~/entrypoints/common/utils';
 import type { SearchEngine } from '~/entrypoints/types';
@@ -209,7 +209,7 @@ export default function SearchEngineModal({
     {
       key: 'setAsDefault',
       label: $fmt('common.setAsDefault'),
-      icon: <StarOutlined />,
+      icon: <StarIcon />,
       disabled: engine.default,
       onClick: e => {
         e?.domEvent?.stopPropagation();
@@ -219,7 +219,7 @@ export default function SearchEngineModal({
     {
       key: 'edit',
       label: $fmt('common.edit'),
-      icon: <EditOutlined />,
+      icon: <PencilIcon />,
       onClick: e => {
         e?.domEvent?.stopPropagation();
         handleEngineEdit(engine);
@@ -228,7 +228,7 @@ export default function SearchEngineModal({
     {
       key: 'remove',
       label: $fmt('common.remove'),
-      icon: <DeleteOutlined />,
+      icon: <Trash2Icon />,
       disabled: engines.length <= 1 || engine.default,
       onClick: e => {
         e?.domEvent?.stopPropagation();
@@ -269,7 +269,7 @@ export default function SearchEngineModal({
               trigger={['click']}
             >
               <StyledActionIconBtn $size={14} onClick={e => e.stopPropagation()}>
-                <MoreOutlined />
+                <EllipsisVerticalIcon />
               </StyledActionIconBtn>
             </Dropdown>
           </StyledEngineItem>

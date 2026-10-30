@@ -1,8 +1,9 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import { useState, memo, useCallback, useRef, useLayoutEffect } from 'react';
 import { debounce } from 'lodash-es';
 import { Tree, Typography, Button, Checkbox, Input, Empty, Spin } from 'antd';
 import type { TreeDataNode } from 'antd';
-import { DownOutlined, SearchOutlined } from '@ant-design/icons';
+import { ChevronDownIcon, SearchIcon } from '~/entrypoints/common/components/icon/Icons';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import type { TagItem, GroupItem } from '~/entrypoints/types';
 import type { TreeDataNodeUnion, MoveToCallbackProps } from './types';
@@ -257,13 +258,13 @@ function TreeBox() {
             className="tree-search-input"
             value={searchText}
             placeholder={$fmt('home.searchTagAndGroup')}
-            allowClear
+            allowClear={{ clearIcon: <UIIcons.CircleXIcon /> }}
             onChange={onSearchTextChange}
             onPressEnter={event => onSearch(event.currentTarget.value)}
           />
           <Button
             className="tree-search-button"
-            icon={<SearchOutlined />}
+            icon={<SearchIcon />}
             title={$fmt('common.search')}
             aria-label={$fmt('common.search')}
             onClick={() => onSearch(searchText)}
@@ -280,7 +281,7 @@ function TreeBox() {
               draggable={draggableConfig}
               allowDrop={checkAllowDrop}
               blockNode
-              switcherIcon={<DownOutlined />}
+              switcherIcon={<ChevronDownIcon />}
               autoExpandParent
               defaultExpandAll
               expandedKeys={expandedKeys}

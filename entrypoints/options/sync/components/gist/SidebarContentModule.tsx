@@ -1,6 +1,10 @@
 import { useCallback, forwardRef, useImperativeHandle } from 'react';
 import { message, Flex, Divider, Drawer, Typography, Button, Tag } from 'antd';
-import { SyncOutlined, ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  RefreshCwIcon,
+  CircleAlertIcon,
+  PlusIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import dayjs from 'dayjs';
 import { eventEmitter, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { syncUtils } from '~/entrypoints/common/storage';
@@ -39,12 +43,12 @@ function CardTitle({
       <div className="card-title">{option.label}</div>
       {syncConfig?.accessToken ? (
         syncStatus === 'syncing' ? (
-          <Tag icon={<SyncOutlined spin />} color="processing">
+          <Tag icon={<RefreshCwIcon spin />} color="processing">
             {$fmt('sync.syncing')}
           </Tag>
         ) : null
       ) : (
-        <Tag icon={<ExclamationCircleOutlined />} color="warning">
+        <Tag icon={<CircleAlertIcon />} color="warning">
           {$fmt('sync.noAccessToken')}
         </Tag>
       )}
@@ -203,7 +207,7 @@ export default forwardRef(
               <Flex justify="center">
                 <Button
                   type="dashed"
-                  icon={<PlusOutlined />}
+                  icon={<PlusIcon />}
                   onClick={() => setDrawerVisible(true)}
                 >
                   {$fmt('sync.addConfig')}

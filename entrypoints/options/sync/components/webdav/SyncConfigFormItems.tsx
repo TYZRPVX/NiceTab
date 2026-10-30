@@ -1,6 +1,11 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import type { ReactElement } from 'react';
 import { theme, Flex, Typography, Form, Input, Button, Modal, Switch } from 'antd';
-import { InfoCircleOutlined, PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import {
+  InfoIcon,
+  PlusIcon,
+  CircleMinusIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import type { FormInstance } from 'antd';
 import styled from 'styled-components';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -48,7 +53,7 @@ export default function SyncConfigFormItem({ form }: SyncConfigFormItemProps) {
         <div dangerouslySetInnerHTML={{ __html: title }}></div>
       </Typography.Text>
     ),
-    icon: icon || <InfoCircleOutlined />,
+    icon: icon || <InfoIcon />,
     color: token.colorBgContainer,
   });
 
@@ -184,6 +189,7 @@ export default function SyncConfigFormItem({ form }: SyncConfigFormItemProps) {
                           remove(field.name);
                         } else {
                           modal.confirm({
+                            icon: <UIIcons.CircleHelpIcon />,
                             title: $fmt('home.removeTitle'),
                             content: $fmt('sync.removeDesc'),
                             onOk: () => remove(field.name),
@@ -191,13 +197,13 @@ export default function SyncConfigFormItem({ form }: SyncConfigFormItemProps) {
                         }
                       }}
                     >
-                      <MinusCircleOutlined />
+                      <CircleMinusIcon />
                     </StyledActionIconBtn>
                   </div>
                 </StyledConfigItem>
               ))}
               <Form.Item>
-                <Button type="dashed" icon={<PlusOutlined />} onClick={() => add()}>
+                <Button type="dashed" icon={<PlusIcon />} onClick={() => add()}>
                   {$fmt('sync.addConfig')}
                 </Button>
                 <Form.ErrorList errors={errors} />

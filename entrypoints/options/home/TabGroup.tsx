@@ -1,15 +1,16 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
 import { theme, message, Modal, Checkbox, Button } from 'antd';
 import type { CheckboxProps } from 'antd';
 import {
-  DeleteOutlined,
-  LockFilled,
-  StarFilled,
-  ExportOutlined,
-  SendOutlined,
-  CopyOutlined,
-  RetweetOutlined,
-} from '@ant-design/icons';
+  Trash2Icon,
+  LockIcon,
+  StarIcon,
+  ExternalLinkIcon,
+  FolderInputIcon,
+  CopyIcon,
+  ArrowRightLeftIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import copyToClipboard from 'copy-to-clipboard';
 import { GroupItem, TabItem, ActionBtnStyle } from '~/entrypoints/types';
 import {
@@ -315,6 +316,7 @@ function TabGroup({
     }
 
     const confirmed = await tabsRemoveModal.confirm({
+      icon: <UIIcons.CircleHelpIcon />,
       title: $fmt('common.confirm'),
       content: $fmt({
         id: 'home.tab.removeSelected',
@@ -448,7 +450,7 @@ function TabGroup({
       {
         key: 'remove',
         label: $fmt(actionMap['remove'].labelKey),
-        icon: <DeleteOutlined />,
+        icon: <Trash2Icon />,
         disabled: tagLocked || isLocked,
         hoverColor: ENUM_COLORS.red,
         onClick: handleTabRemoveConfirm,
@@ -456,26 +458,26 @@ function TabGroup({
       {
         key: 'open',
         label: $fmt(actionMap['open'].labelKey),
-        icon: <ExportOutlined />,
+        icon: <ExternalLinkIcon />,
         onClick: handleTabsOpen,
       },
       {
         key: 'moveTo',
         label: $fmt(actionMap['moveTo'].labelKey),
-        icon: <SendOutlined />,
+        icon: <FolderInputIcon />,
         disabled: tagLocked || isLocked,
         onClick: () => openMoveToModal?.({ groupId, tabs: selectedTabs }),
       },
       {
         key: 'copyLinks',
         label: $fmt(actionMap['copyLinks'].labelKey),
-        icon: <CopyOutlined />,
+        icon: <CopyIcon />,
         onClick: handleSelectedTabsCopyLinks,
       },
       {
         key: 'clone',
         label: $fmt(actionMap['clone'].labelKey),
-        icon: <RetweetOutlined />,
+        icon: <ArrowRightLeftIcon />,
         disabled: tagLocked || isLocked,
         onClick: handleSelectedTabsCopy,
       },
@@ -526,12 +528,12 @@ function TabGroup({
               {(isLocked || isStarred) && (
                 <div className="group-status-wrapper">
                   {isLocked && (
-                    <LockFilled
+                    <LockIcon
                       style={{ fontSize: '18px', color: token.colorPrimaryHover }}
                     />
                   )}
                   {isStarred && (
-                    <StarFilled
+                    <StarIcon
                       style={{ fontSize: '18px', color: token.colorPrimaryHover }}
                     />
                   )}

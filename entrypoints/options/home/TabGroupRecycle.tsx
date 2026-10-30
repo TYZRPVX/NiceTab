@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, useMemo, memo } from 'react';
 import { theme, Skeleton, Modal, Tooltip } from 'antd';
 import {
-  LockOutlined,
-  StarOutlined,
-  CloseOutlined,
-  RollbackOutlined,
-} from '@ant-design/icons';
+  LockIcon,
+  StarIcon,
+  XIcon,
+  Undo2Icon,
+} from '~/entrypoints/common/components/icon/Icons';
 import { GroupItem } from '~/entrypoints/types';
 import ActionIconBtn from '~/entrypoints/common/components/ActionIconBtn';
 import { ENUM_COLORS, UNNAMED_GROUP } from '~/entrypoints/common/constants';
@@ -117,12 +117,12 @@ function TabGroup({
               {(isLocked || isStarred) && (
                 <div className="group-status-wrapper">
                   {isLocked && (
-                    <LockOutlined
+                    <LockIcon
                       style={{ fontSize: '18px', color: token.colorPrimaryHover }}
                     />
                   )}
                   {isStarred && (
-                    <StarOutlined
+                    <StarIcon
                       style={{ fontSize: '18px', color: token.colorPrimaryHover }}
                     />
                   )}
@@ -156,7 +156,7 @@ function TabGroup({
                     btnStyle="icon"
                     onClick={() => setModalVisible(true)}
                   >
-                    <CloseOutlined />
+                    <XIcon />
                   </ActionIconBtn>
                 </Tooltip>
               )}
@@ -174,7 +174,7 @@ function TabGroup({
                     btnStyle="icon"
                     onClick={() => setRecoverModalVisible(true)}
                   >
-                    <RollbackOutlined />
+                    <Undo2Icon />
                   </ActionIconBtn>
                 </Tooltip>
               )}

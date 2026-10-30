@@ -3,19 +3,19 @@ import { browser, Tabs } from 'wxt/browser';
 import { ThemeProvider } from 'styled-components';
 import { theme, Space, Dropdown, Button, Empty, type MenuProps, Tooltip } from 'antd';
 import {
-  DownOutlined,
-  CompressOutlined,
-  ExpandOutlined,
-  HomeOutlined,
-  KeyOutlined,
-  ReadOutlined,
-  SendOutlined,
-  SearchOutlined,
-  CoffeeOutlined,
-  ContainerOutlined,
-  ReloadOutlined,
-  SortAscendingOutlined,
-} from '@ant-design/icons';
+  ChevronDownIcon,
+  MinimizeIcon,
+  MaximizeIcon,
+  HouseIcon,
+  KeyboardIcon,
+  BookOpenIcon,
+  InboxIcon,
+  SearchIcon,
+  CoffeeIcon,
+  ArchiveIcon,
+  RotateCwIcon,
+  ArrowDownAZIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import { sendRuntimeMessage, isGroupSupported } from '~/entrypoints/common/utils';
 import '~/assets/css/reset.css';
 import '~/assets/css/index.css';
@@ -323,16 +323,16 @@ export default function App() {
   };
 
   const getActionIcon = (key: string, path?: string) => {
-    if (path === '/home') return <HomeOutlined />;
-    if (path === '/shortcuts') return <KeyOutlined />;
-    if (path === '/sort-tabs') return <SortAscendingOutlined />;
-    if (path === '/user-guide') return <ReadOutlined />;
+    if (path === '/home') return <HouseIcon />;
+    if (path === '/shortcuts') return <KeyboardIcon />;
+    if (path === '/sort-tabs') return <ArrowDownAZIcon />;
+    if (path === '/user-guide') return <BookOpenIcon />;
 
-    if (key === 'group-sendTabs') return <SendOutlined />;
-    if (key === 'globalSearch') return <SearchOutlined />;
-    if (key === 'hibernateTabs') return <CoffeeOutlined />;
-    if (key === 'sendAllAndClose') return <ContainerOutlined />;
-    if (key === 'reload') return <ReloadOutlined />;
+    if (key === 'group-sendTabs') return <InboxIcon />;
+    if (key === 'globalSearch') return <SearchIcon />;
+    if (key === 'hibernateTabs') return <CoffeeIcon />;
+    if (key === 'sendAllAndClose') return <ArchiveIcon />;
+    if (key === 'reload') return <RotateCwIcon />;
     return null;
   };
 
@@ -351,7 +351,7 @@ export default function App() {
             <Button
               className="toggle-compact-btn"
               type="text"
-              icon={isCompact ? <ExpandOutlined /> : <CompressOutlined />}
+              icon={isCompact ? <MaximizeIcon /> : <MinimizeIcon />}
               onClick={toggleCompact}
             />
           </Tooltip>
@@ -453,7 +453,7 @@ export default function App() {
                             <Button size="small">
                               <Space>
                                 {item.label}
-                                <DownOutlined />
+                                <ChevronDownIcon />
                               </Space>
                             </Button>
                           </Dropdown>

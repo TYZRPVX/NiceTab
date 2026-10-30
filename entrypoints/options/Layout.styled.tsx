@@ -9,16 +9,29 @@ export const StyledBaseSidebarWrapper = styled.div<{
 }>`
   position: relative;
 
-  .sidebar-hover-trigger {
+  .sidebar-edge-toggle {
     position: fixed;
-    top: 64px;
-    bottom: 0;
-    z-index: 11;
-    width: 20px;
-    background: transparent;
+    top: 76px;
+    z-index: 12;
+
+    button {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      box-shadow: none;
+      color: var(--nt-text-secondary);
+      background: var(--nt-surface-muted);
+      place-items: center;
+    }
+    button:hover {
+      color: ${props => props.theme.colorPrimary};
+      background: var(--nt-accent-soft);
+    }
   }
-  .sidebar-hover-trigger-left {
-    left: 0;
+  .sidebar-edge-toggle-left {
+    left: 12px;
   }
 
   .sidebar-inner-box {
@@ -29,7 +42,9 @@ export const StyledBaseSidebarWrapper = styled.div<{
     top: 64px;
     left: 0;
     padding: 20px 16px;
-    transition: transform 180ms cubic-bezier(0.2, 0, 0, 1);
+    transition:
+      transform 180ms cubic-bezier(0.2, 0, 0, 1),
+      box-shadow 180ms ease;
     transform: translateX(0);
     border-right: 1px solid var(--nt-border);
     background: var(--nt-page);
@@ -38,6 +53,7 @@ export const StyledBaseSidebarWrapper = styled.div<{
 
     &.collapsed {
       transform: translateX(calc(-1 * var(--sidebar-width, ${defaultSidebarWidth}px)));
+      padding-top: 64px;
       border-color: transparent;
       background: transparent;
       cursor: pointer;
@@ -63,6 +79,7 @@ export const StyledBaseSidebarWrapper = styled.div<{
       &.hover-closing {
         border-color: var(--nt-border);
         background: var(--nt-page);
+        box-shadow: var(--nt-shadow-md);
         cursor: default;
 
         .sidebar-inner-content {
@@ -71,10 +88,6 @@ export const StyledBaseSidebarWrapper = styled.div<{
           opacity: 1;
         }
         .sidebar-action-box {
-          visibility: visible;
-          pointer-events: auto;
-        }
-        .sidebar-collapse-btn {
           visibility: visible;
           pointer-events: auto;
         }
@@ -170,16 +183,29 @@ export const StyledBaseRightPanelWrapper = styled.div<{
 }>`
   position: relative;
 
-  .sidebar-hover-trigger {
+  .sidebar-edge-toggle {
     position: fixed;
-    top: 64px;
-    bottom: 0;
-    z-index: 11;
-    width: 20px;
-    background: transparent;
+    top: 76px;
+    z-index: 12;
+
+    button {
+      display: grid;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      box-shadow: none;
+      color: var(--nt-text-secondary);
+      background: var(--nt-surface-muted);
+      place-items: center;
+    }
+    button:hover {
+      color: ${props => props.theme.colorPrimary};
+      background: var(--nt-accent-soft);
+    }
   }
-  .sidebar-hover-trigger-right {
-    right: 0;
+  .sidebar-edge-toggle-right {
+    right: 12px;
   }
 
   .right-panel-inner-box {
@@ -190,7 +216,9 @@ export const StyledBaseRightPanelWrapper = styled.div<{
     top: 64px;
     right: 0;
     padding: 20px 16px;
-    transition: transform 180ms cubic-bezier(0.2, 0, 0, 1);
+    transition:
+      transform 180ms cubic-bezier(0.2, 0, 0, 1),
+      box-shadow 180ms ease;
     transform: translateX(0);
     border-left: 1px solid var(--nt-border);
     background: var(--nt-page);
@@ -200,6 +228,7 @@ export const StyledBaseRightPanelWrapper = styled.div<{
     &.collapsed,
     &.auto-hidden {
       transform: translateX(var(--panel-width, ${defaultRightPanelWidth}px));
+      padding-top: 64px;
       border-color: transparent;
       background: transparent;
       cursor: pointer;
@@ -226,6 +255,7 @@ export const StyledBaseRightPanelWrapper = styled.div<{
         cursor: default;
         border-color: var(--nt-border);
         background: var(--nt-page);
+        box-shadow: var(--nt-shadow-md);
 
         .right-panel-inner-content {
           pointer-events: auto;
@@ -233,10 +263,6 @@ export const StyledBaseRightPanelWrapper = styled.div<{
           opacity: 1;
         }
         .right-panel-action-box {
-          visibility: visible;
-          pointer-events: auto;
-        }
-        .right-panel-collapse-btn {
           visibility: visible;
           pointer-events: auto;
         }

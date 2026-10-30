@@ -1,3 +1,4 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import { Popconfirm } from 'antd';
 
 type ConfirmProps = {
@@ -20,6 +21,7 @@ export default function Confirm({
 }: ConfirmProps) {
   return (
     <Popconfirm
+      icon={<UIIcons.CircleHelpIcon />}
       title={title}
       description={description}
       onConfirm={() => onConfirm?.()}

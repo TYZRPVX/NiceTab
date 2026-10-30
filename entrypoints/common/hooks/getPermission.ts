@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { CircleHelpIcon } from '~/entrypoints/common/components/icon/Icons';
+import { createElement, useEffect } from 'react';
 import { Modal } from 'antd';
 import { checkPermission } from '~/entrypoints/common/utils';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -30,6 +31,7 @@ export default function usePermission() {
 
   const getTabGroupsPermission = async () => {
     Modal.confirm({
+      icon: createElement(CircleHelpIcon),
       title: $fmt('common.confirm'),
       content: $fmt('home.getPermission.tabGroups.tip'),
       onOk: async () => {

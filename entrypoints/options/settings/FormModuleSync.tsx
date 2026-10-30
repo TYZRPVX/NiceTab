@@ -1,6 +1,7 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import { Space, Form, Radio, Button, Typography, TimePicker, Slider, theme } from 'antd';
 import dayjs, { type Dayjs } from 'dayjs';
-import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { PlusIcon, CircleMinusIcon } from '~/entrypoints/common/components/icon/Icons';
 import type { FormItemProps, RadioChangeEvent, FormInstance } from 'antd';
 import type { AutoSyncTimeUnits, SettingsProps, TimeRange } from '~/entrypoints/types';
 import type { LocaleKeys } from '~/entrypoints/common/locale';
@@ -186,6 +187,9 @@ export default function FormModuleSync(
                 <Space key={field.key} style={{ display: 'flex', marginBottom: 8 }}>
                   <Form.Item validateTrigger={['onBlur']} style={{ marginBottom: 0 }}>
                     <TimePicker.RangePicker
+                      suffixIcon={<UIIcons.ClockIcon />}
+                      separator={<UIIcons.ArrowRightIcon />}
+                      allowClear={{ clearIcon: <UIIcons.CircleXIcon /> }}
                       value={timeRangesValue[field.name]}
                       format="HH:mm"
                       minuteStep={15}
@@ -208,14 +212,14 @@ export default function FormModuleSync(
                     />
                   </Form.Item>
                   {fields.length > 1 && autoSync && (
-                    <MinusCircleOutlined onClick={() => remove(field.name)} />
+                    <CircleMinusIcon onClick={() => remove(field.name)} />
                   )}
                 </Space>
               ))}
               <Form.Item>
                 <Button
                   type="dashed"
-                  icon={<PlusOutlined />}
+                  icon={<PlusIcon />}
                   disabled={!autoSync}
                   onClick={() => add()}
                 >

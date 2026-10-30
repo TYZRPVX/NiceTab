@@ -2,11 +2,11 @@ import { useState, useCallback, useEffect, useMemo } from 'react';
 import { browser, Tabs } from 'wxt/browser';
 import { Tooltip } from 'antd';
 import {
-  RightOutlined,
-  DownOutlined,
-  CloseOutlined,
-  CoffeeOutlined,
-} from '@ant-design/icons';
+  ChevronRightIcon,
+  ChevronDownIcon,
+  XIcon,
+  CoffeeIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import { classNames, getDisplayGroupName } from '~/entrypoints/common/utils';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -118,14 +118,14 @@ export default function TabGroupItem({
       {
         key: 'discard',
         label: $fmt('common.hibernate'),
-        icon: <CoffeeOutlined />,
+        icon: <CoffeeIcon />,
         disabled: !discardableTabs?.length,
         onClick: handleGroupDiscard,
       },
       {
         key: 'remove',
         label: $fmt('common.remove'),
-        icon: <CloseOutlined />,
+        icon: <XIcon />,
         hoverColor: ENUM_COLORS.red,
         confirm: {
           title: $fmt('home.removeTitle'),
@@ -202,7 +202,7 @@ export default function TabGroupItem({
           destroyTooltipOnHide
         >
           <div className="collapse-icon-btn">
-            {collapsed ? <RightOutlined /> : <DownOutlined />}
+            {collapsed ? <ChevronRightIcon /> : <ChevronDownIcon />}
           </div>
         </Tooltip>
         <Tooltip

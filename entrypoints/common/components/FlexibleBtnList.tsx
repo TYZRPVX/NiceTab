@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Dropdown } from 'antd';
-import { MoreOutlined } from '@ant-design/icons';
+import { EllipsisVerticalIcon } from '~/entrypoints/common/components/icon/Icons';
 
 export type FlexibleOptionItem = {
   key: string;
@@ -140,7 +140,7 @@ export default function FlexibleBtnList({
               cursor: 'pointer',
             }}
           >
-            {moreBtnContent || <MoreOutlined />}
+            {moreBtnContent || <EllipsisVerticalIcon />}
           </div>
         </Dropdown>
       )}
@@ -164,7 +164,7 @@ export default function FlexibleBtnList({
         ))}
         {/* 测量更多按钮宽度 */}
         <div ref={moreBtnMeasureRef} style={{ marginLeft: gap }}>
-          {moreBtnContent || <MoreOutlined />}
+          {moreBtnContent || <EllipsisVerticalIcon />}
         </div>
       </div>
     </div>

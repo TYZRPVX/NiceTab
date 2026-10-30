@@ -1,12 +1,12 @@
 import type { TreeProps } from 'antd';
 import dayjs from 'dayjs';
 import {
-  PushpinOutlined,
-  TagOutlined,
-  ProductOutlined,
-  LockOutlined,
-  StarOutlined,
-} from '@ant-design/icons';
+  PinIcon,
+  TagIcon,
+  PanelsTopLeftIcon,
+  LockIcon,
+  StarIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import {
   getDisplayGroupName,
   getDisplayTagName,
@@ -198,13 +198,7 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
       key: tag.tagId,
       title: getDisplayTagName(tag),
       isLeaf: false,
-      icon: tag.static ? (
-        <PushpinOutlined />
-      ) : tag.isLocked ? (
-        <LockOutlined />
-      ) : (
-        <TagOutlined />
-      ),
+      icon: tag.static ? <PinIcon /> : tag.isLocked ? <LockIcon /> : <TagIcon />,
       originData: {
         ...tagMeta,
         createTime: newCreateTime(tag.createTime),
@@ -215,19 +209,19 @@ export const getTreeData = (tagList: TagItem[]): TreeDataNodeUnion[] => {
         const { tabList, ...groupMeta } = group;
         const previewTitle = tabList.find(item => item.title?.trim())?.title?.trim();
         return {
-        type: 'tabGroup',
-        parentKey: tag.tagId,
-        parentData: { isLocked: tag.isLocked, isStarred: tag.isStarred },
-        key: group.groupId,
-        title: getDisplayGroupName(group),
-        isLeaf: true,
-        icon: group.isLocked ? (
-          <LockOutlined />
-        ) : group.isStarred ? (
-          <StarOutlined />
-        ) : (
-          <ProductOutlined />
-        ),
+          type: 'tabGroup',
+          parentKey: tag.tagId,
+          parentData: { isLocked: tag.isLocked, isStarred: tag.isStarred },
+          key: group.groupId,
+          title: getDisplayGroupName(group),
+          isLeaf: true,
+          icon: group.isLocked ? (
+            <LockIcon />
+          ) : group.isStarred ? (
+            <StarIcon />
+          ) : (
+            <PanelsTopLeftIcon />
+          ),
           originData: {
             ...groupMeta,
             createTime: newCreateTime(group.createTime),
@@ -301,7 +295,7 @@ export const getCascaderData = async (
     value: tag.tagId,
     label: (
       <div className="cascader-label-custom cascader-label-tag">
-        <TagOutlined />
+        <TagIcon />
         <span className="label-name">
           {tag.static ? localeMessage?.['home.stagingArea'] : getDisplayTagName(tag)}
         </span>
@@ -316,7 +310,7 @@ export const getCascaderData = async (
         value: group.groupId,
         label: (
           <div className="cascader-label-custom cascader-label-group">
-            <ProductOutlined />
+            <PanelsTopLeftIcon />
             <span className="label-name">{getDisplayGroupName(group)}</span>
           </div>
         ),
@@ -340,7 +334,7 @@ export const getTotalCascaderData = async (
     value: tag.tagId,
     label: (
       <div className="cascader-label-custom cascader-label-tag">
-        <TagOutlined />
+        <TagIcon />
         <span className="label-name">
           {tag.static ? localeMessage?.['home.stagingArea'] : getDisplayTagName(tag)}
         </span>
@@ -354,7 +348,7 @@ export const getTotalCascaderData = async (
         value: group.groupId,
         label: (
           <div className="cascader-label-custom cascader-label-group">
-            <ProductOutlined />
+            <PanelsTopLeftIcon />
             <span className="label-name">{getDisplayGroupName(group)}</span>
           </div>
         ),

@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { Modal, Cascader, Typography, Button, Space } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusIcon } from '~/entrypoints/common/components/icon/Icons';
 import styled from 'styled-components';
 import { ContentGlobalContext } from '~/entrypoints/content/context';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
@@ -231,7 +231,7 @@ export default function SendTargetModal({
           <Button
             type="primary"
             size="small"
-            icon={<PlusOutlined />}
+            icon={<PlusIcon />}
             onClick={() => handleOpenCreateModal('tag')}
           >
             {$fmt('home.addTag')}
@@ -239,7 +239,7 @@ export default function SendTargetModal({
           <Button
             type="primary"
             size="small"
-            icon={<PlusOutlined />}
+            icon={<PlusIcon />}
             disabled={!targetOptions?.[0] || targetOptions[0]?.type !== 'tag'}
             onClick={() => handleOpenCreateModal('tabGroup')}
           >

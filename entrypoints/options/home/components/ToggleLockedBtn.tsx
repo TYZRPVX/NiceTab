@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { Tooltip } from 'antd';
 import ActionIconBtn from '~/entrypoints/common/components/ActionIconBtn';
-import { LockOutlined, UnlockOutlined } from '@ant-design/icons';
+import { LockIcon, LockOpenIcon } from '~/entrypoints/common/components/icon/Icons';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 
 export default function ToggleLockedBtn({
@@ -22,7 +22,7 @@ export default function ToggleLockedBtn({
     <Tooltip title={label} placement="top" mouseEnterDelay={0.3} destroyTooltipOnHide>
       <span className="action-icon">
         <ActionIconBtn label={label} size={20} onClick={handleToggle}>
-          {isLocked ? <UnlockOutlined /> : <LockOutlined />}
+          {isLocked ? <LockOpenIcon /> : <LockIcon />}
         </ActionIconBtn>
       </span>
     </Tooltip>

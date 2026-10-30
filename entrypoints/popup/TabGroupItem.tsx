@@ -1,6 +1,10 @@
 import { useRef, useState, useCallback, useMemo } from 'react';
 import { Tabs } from 'wxt/browser';
-import { RightOutlined, DownOutlined, CloseOutlined } from '@ant-design/icons';
+import {
+  ChevronRightIcon,
+  ChevronDownIcon,
+  XIcon,
+} from '~/entrypoints/common/components/icon/Icons';
 import { classNames, getDisplayGroupName } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { ENUM_COLORS } from '~/entrypoints/common/constants';
@@ -51,7 +55,7 @@ export default function TabGroupItem({ group, onAction, onGroupAction }: GroupIt
       {
         key: 'remove',
         label: $fmt('common.remove'),
-        icon: <CloseOutlined />,
+        icon: <XIcon />,
         hoverColor: ENUM_COLORS.red,
         confirm: {
           title: $fmt('home.removeTitle'),
@@ -80,7 +84,7 @@ export default function TabGroupItem({ group, onAction, onGroupAction }: GroupIt
     >
       <div className="group-title" onClick={onToggle}>
         <div className="collapse-icon-btn">
-          {collapsed ? <RightOutlined /> : <DownOutlined />}
+          {collapsed ? <ChevronRightIcon /> : <ChevronDownIcon />}
         </div>
         <div className="group-name" title={groupDisplayName}>
           {groupDisplayName}

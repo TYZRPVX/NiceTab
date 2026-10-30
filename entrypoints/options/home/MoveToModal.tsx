@@ -1,7 +1,7 @@
 import { useContext, useMemo, useState, useEffect } from 'react';
 import { theme, Checkbox, Modal, Cascader, Typography, Flex, Space, Tooltip } from 'antd';
 import type { CheckboxProps } from 'antd';
-import { QuestionCircleOutlined } from '@ant-design/icons';
+import { CircleHelpIcon } from '~/entrypoints/common/components/icon/Icons';
 import styled from 'styled-components';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import { tabListUtils } from '~/entrypoints/common/storage';
@@ -188,7 +188,7 @@ export default function MoveToModal({
             color={token.colorBgContainer}
             title={<Typography.Text>{$fmt('home.moveTo.copyTip')}</Typography.Text>}
           >
-            <QuestionCircleOutlined />
+            <CircleHelpIcon />
           </Tooltip>
           <Checkbox checked={autoMerge} onChange={onCheckboxChange}>
             {$fmt('home.moveTo.mergeLabel')}
@@ -202,7 +202,7 @@ export default function MoveToModal({
               </Flex>
             }
           >
-            <QuestionCircleOutlined />
+            <CircleHelpIcon />
           </Tooltip>
         </Space>
         <StyledCascaderWrapper>

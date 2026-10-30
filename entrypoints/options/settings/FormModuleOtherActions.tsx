@@ -1,3 +1,4 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import { Space, Form, Input, InputNumber, Radio, Typography, theme } from 'antd';
 import type { FormItemProps, FormInstance } from 'antd';
 import type { SettingsProps } from '~/entrypoints/types';
@@ -92,7 +93,7 @@ export default function FormModuleOtherActions(
           title: $fmt(`settings.${TAB_COUNT_THRESHOLD}.tooltip`),
         })}
       >
-        <InputNumber
+        <InputNumber controls={{ upIcon: <UIIcons.PlusIcon />, downIcon: <UIIcons.MinusIcon /> }}
           min={100}
           max={800}
           step={10}

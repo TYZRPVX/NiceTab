@@ -1,9 +1,10 @@
+import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
 import React, { useRef, useCallback, useEffect } from 'react';
 import { useTabDisplayTitle } from '~/entrypoints/common/hooks/tabDisplayTitle';
 import { Tabs } from 'wxt/browser';
 import { Checkbox, Popconfirm, Tooltip } from 'antd';
 import type { CheckboxProps } from 'antd';
-import { CloseOutlined, CoffeeOutlined, PushpinFilled } from '@ant-design/icons';
+import { XIcon, CoffeeIcon, PinIcon } from '~/entrypoints/common/components/icon/Icons';
 import { classNames } from '~/entrypoints/common/utils';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import Favicon from '~/entrypoints/common/components/Favicon';
@@ -72,7 +73,7 @@ export default function TabItem({
     >
       <Checkbox value={tab.id} onChange={handleSelectChange} />
 
-      {tab.pinned && <PushpinFilled />}
+      {tab.pinned && <PinIcon />}
       <Favicon pageUrl={tab.url!} favIconUrl={tab.favIconUrl}></Favicon>
       <Tooltip
         title={tabTitle}
@@ -98,12 +99,13 @@ export default function TabItem({
             aria-label={$fmt(tab.discarded ? 'common.hibernated' : 'common.hibernate')}
             onClick={event => handleAction(event, 'discard')}
           >
-            <CoffeeOutlined />
+            <CoffeeIcon />
           </StyledActionIconBtn>
         </Tooltip>
       )}
 
       <Popconfirm
+        icon={<UIIcons.CircleHelpIcon />}
         title={$fmt('home.removeTitle')}
         description={$fmt({
           id: 'home.tab.removeSelected',
@@ -127,7 +129,7 @@ export default function TabItem({
               $hoverColor="red"
               aria-label={$fmt('common.remove')}
             >
-              <CloseOutlined />
+              <XIcon />
             </StyledActionIconBtn>
           </Tooltip>
         </span>

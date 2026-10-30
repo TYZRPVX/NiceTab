@@ -82,10 +82,16 @@ export default function RightPanelLayout({
     >
       {hiddenUntilHover && (
         <div
-          className="sidebar-hover-trigger sidebar-hover-trigger-right"
+          className="sidebar-edge-toggle sidebar-edge-toggle-right"
           onPointerEnter={open}
           onPointerLeave={scheduleClose}
-        />
+        >
+          <ToggleSidebarBtn
+            collapsed
+            position="right"
+            onCollapseChange={autoHide && !collapsed ? undefined : onCollapseChange}
+          />
+        </div>
       )}
       <div
         className={classNames(

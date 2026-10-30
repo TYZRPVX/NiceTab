@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { theme, Button, Modal, Empty } from 'antd';
-import { DeleteOutlined, RollbackOutlined } from '@ant-design/icons';
+import { Trash2Icon, Undo2Icon } from '~/entrypoints/common/components/icon/Icons';
 import { Virtuoso } from 'react-virtuoso';
 import { useIntlUtls } from '~/entrypoints/common/hooks/global';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
@@ -173,7 +173,7 @@ export default function RecycleBin() {
           <div className="recycle-actions">
             <Button
               type="primary"
-              icon={<RollbackOutlined />}
+              icon={<Undo2Icon />}
               disabled={!recycleGroups.length}
               onClick={() => setRecoverModalVisible(true)}
             >
@@ -181,7 +181,7 @@ export default function RecycleBin() {
             </Button>
             <Button
               danger
-              icon={<DeleteOutlined />}
+              icon={<Trash2Icon />}
               disabled={!recycleGroups.length}
               onClick={() => setConfirmModalVisible(true)}
             >
