@@ -5,11 +5,7 @@ import type { SendTargetProps } from './tabList';
 
 // 页面上下文类型
 export type PageContextType =
-  | 'background'
-  | 'optionsPage'
-  | 'popupPage'
-  | 'contentScriptPage'
-  | 'newtabPage';
+  'background' | 'optionsPage' | 'popupPage' | 'contentScriptPage' | 'newtabPage';
 
 export type RuntimeMsgType =
   | 'setPrimaryColor'
@@ -26,7 +22,8 @@ export type RuntimeMsgType =
   | 'sync:sync-status-change--webdav'
   | 'sendTabsActionStart'
   | 'sendTabsActionConfirm'
-  | 'sendAllTabsFromCommandPage';
+  | 'sendAllTabsFromCommandPage'
+  | 'executeSendAllTabs';
 
 export interface RuntimeMsgSetPrimaryColor {
   msgType: 'setPrimaryColor';
@@ -68,7 +65,13 @@ export interface RuntimeMsgSetLocale {
 }
 export interface RuntimeMsgOpenAdminRoutePage {
   msgType: 'openAdminRoutePage';
-  data: { path: string; query?: Record<string, any> };
+  data: {
+    path: string;
+    query?: Record<string, any>;
+    needOpen?: boolean;
+    windowId?: number;
+    refresh?: boolean;
+  };
 }
 export interface RuntimeMsgReloadAllAdminPage {
   msgType: 'reloadAllAdminPage';
@@ -99,6 +102,11 @@ export interface RuntimeMsgSendAllTabsFromCommandPage {
   data: { commandTabId?: number };
 }
 
+export interface RuntimeMsgExecuteSendAllTabs {
+  msgType: 'executeSendAllTabs';
+  data: { targetData?: SendTargetProps; onlyCurrentWindow?: boolean; windowId: number };
+}
+
 export type RuntimeMsgBaseProps =
   | RuntimeMsgSetPrimaryColor
   | RuntimeMsgSetThemeData
@@ -114,7 +122,8 @@ export type RuntimeMsgBaseProps =
   | RuntimeMsgSyncStatusChangeWebdav
   | RuntimeMsgSendTabsActionStart
   | RuntimeMsgSendTabsActionConfirm
-  | RuntimeMsgSendAllTabsFromCommandPage;
+  | RuntimeMsgSendAllTabsFromCommandPage
+  | RuntimeMsgExecuteSendAllTabs;
 
 // runtime message event props
 export type RuntimeMessageEventProps = RuntimeMsgBaseProps & {
@@ -153,7 +162,9 @@ export type SendRuntimeMessageBaseProps<T extends RuntimeMsgType> =
                               ? RuntimeMsgSendTabsActionConfirm
                               : T extends 'sendAllTabsFromCommandPage'
                                 ? RuntimeMsgSendAllTabsFromCommandPage
-                                : never;
+                                : T extends 'executeSendAllTabs'
+                                  ? RuntimeMsgExecuteSendAllTabs
+                                  : never;
 
 // sendRuntimeMessage params
 export type SendRuntimeMessageParams<T extends RuntimeMsgType = any> =

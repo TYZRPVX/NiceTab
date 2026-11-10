@@ -35,7 +35,7 @@ const zhCN = {
   'settings.excludeDomainsForSending': '发送标签页时-以下域名的标签页不会发送到管理后台：',
   'settings.excludeDomainsForSending.tooltip': '多个域名可使用空格或者换行分隔；支持正则表达式；',
   'settings.excludeDomainsForSending.placeholder': '多个域名可使用空格或者换行分隔',
-  'settings.openAdminTabAfterSendTabs': '发送标签页时-是否打开NiceTab管理后台{mark}',
+  'settings.openAdminTabAfterSendTabs': '发送标签页时是否打开管理后台（发送所有标签页始终打开）{mark}',
   'settings.openAdminTabAfterSendTabs.yes': '自动打开NiceTab管理后台（推荐）',
   'settings.openAdminTabAfterSendTabs.no': '不要自动打开NiceTab管理后台',
   'settings.closeTabsAfterSendTabs': '发送标签页时-是否自动关闭标签页{mark}',

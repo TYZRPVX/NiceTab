@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import {
@@ -124,38 +124,59 @@ export default function DndComponent<IncomeData extends DragData>({
     return isDragItemSelected ? (data.selectedValues || []).length > 1 : false;
   }, [data]);
 
+  // pragmatic-dnd 的回调都在拖拽时才执行，这里通过 ref 读取最新值，避免每次渲染重新注册
+  const latestRef = useRef({
+    data,
+    canDrag,
+    canDrop,
+    isMultiSelect,
+    isDragItemSelected,
+    showDragPreview,
+    onDragStateChange,
+    onDrop,
+    onSourceDrop,
+  });
+  latestRef.current = {
+    data,
+    canDrag,
+    canDrop,
+    isMultiSelect,
+    isDragItemSelected,
+    showDragPreview,
+    onDragStateChange,
+    onDrop,
+    onSourceDrop,
+  };
+
   // 拖拽状态变化
-  const handleDragStateChange = useCallback(
-    (value: DraggableStateItem) => {
-      onDragStateChange?.(value, data);
-      setDraggableState(value);
-    },
-    [data, onDragStateChange, setDraggableState],
-  );
+  const handleDragStateChange = useCallback((value: DraggableStateItem) => {
+    latestRef.current.onDragStateChange?.(value, latestRef.current.data);
+    setDraggableState(value);
+  }, []);
 
   const getDragData = useCallback(() => {
     return {
-      ...data,
+      ...latestRef.current.data,
       // 多选拖拽时标记为多选操作
-      isMultiSelect,
+      isMultiSelect: latestRef.current.isMultiSelect,
     };
-  }, [data, isMultiSelect]);
+  }, []);
 
   useEffect(() => {
     if (!ref.current) return;
     const element = ref.current;
-    const keyData: IncomeData = { ...data, [dndKey]: true };
 
     return combine(
       draggable({
         element,
         canDrag() {
-          return canDrag;
+          return latestRef.current.canDrag;
         },
         getInitialData(): IncomeData {
           return getDragData();
         },
         onGenerateDragPreview({ nativeSetDragImage }) {
+          const { showDragPreview, isMultiSelect, isDragItemSelected } = latestRef.current;
           const handleDragPreview = () => {
             setCustomNativeDragPreview({
               nativeSetDragImage,
@@ -181,20 +202,15 @@ export default function DndComponent<IncomeData extends DragData>({
           handleDragPreview();
         },
         onDragStart() {
-          // console.log('--------------draggable--onDragStart', data);
-
-          // setIsDragging(true);
           handleDragStateChange(draggingState);
           eventEmitter.emit('home:is-dragging', true);
         },
         onDrop({ location, source }) {
-          // console.log('--------------draggable--onDrop');
-          // setIsDragging(false);
           handleDragStateChange(idleState);
           const target = location.current.dropTargets[0];
 
           if (source && target) {
-            onSourceDrop?.({
+            latestRef.current.onSourceDrop?.({
               sourceData: source?.data as IncomeData,
               targetData: target?.data as IncomeData,
             });
@@ -205,7 +221,7 @@ export default function DndComponent<IncomeData extends DragData>({
       dropTargetForElements({
         element,
         getData({ input }) {
-          // console.log('dropTargetForElements-getData--input', input);
+          const keyData: IncomeData = { ...latestRef.current.data, [dndKey]: true };
           return attachClosestEdge(keyData, {
             element,
             input,
@@ -213,8 +229,7 @@ export default function DndComponent<IncomeData extends DragData>({
           });
         },
         canDrop({ source }) {
-          // console.log('dropTargetForElements-canDrop', source);
-          return canDrop && source?.data?.dndKey === dndKey;
+          return latestRef.current.canDrop && source?.data?.dndKey === dndKey;
         },
         onDrag({ self, source }) {
           const isSource = source.element === element;
@@ -223,10 +238,8 @@ export default function DndComponent<IncomeData extends DragData>({
             return;
           }
 
+          const { data } = latestRef.current;
           const closestEdge = extractClosestEdge(self?.data);
-          // console.log('dropTargetForElements--self', self.data)
-          // console.log('dropTargetForElements--source', source.data)
-          // console.log('dropTargetForElements--closestEdge', closestEdge)
           const sourceIndex = +(source?.data?.index || 0);
 
           const isItemBeforeSource = data.index === sourceIndex - 1;
@@ -256,36 +269,29 @@ export default function DndComponent<IncomeData extends DragData>({
           }, 30);
         },
         onDrop({ location, source }) {
-          // console.log('dropTargetForElements--onDrop');
           setClosestEdge(null);
 
           const target = location.current.dropTargets[0];
           if (!source || !target) {
             return;
           }
-          // console.log('dropTargetForElements--location', location);
-          // console.log('dropTargetForElements--source', source.data);
-          // console.log('dropTargetForElements--target', target.data);
 
           const sourceData = source.data as IncomeData;
           const targetData = target.data as IncomeData;
 
           const closestEdgeOfTarget = extractClosestEdge(targetData);
-          // console.log('dropTargetForElements--closestEdgeOfTarget', closestEdgeOfTarget);
           const sourceIndex = +(sourceData?.index || 0);
           const targetIndex =
             +(targetData?.index || 0) + (closestEdgeOfTarget === 'top' ? 0 : 1);
           if (targetIndex < 0) {
             return;
           }
-          // console.log('dropTargetForElements--sourceIndex', sourceIndex);
-          // console.log('dropTargetForElements--targetIndex', targetIndex);
 
-          onDrop && onDrop({ sourceData, targetData, sourceIndex, targetIndex });
+          latestRef.current.onDrop?.({ sourceData, targetData, sourceIndex, targetIndex });
         },
       }),
     );
-  }, [data, dndKey, isMultiSelect, handleDragStateChange]);
+  }, [dndKey, getDragData, handleDragStateChange]);
 
   return (
     <StyledDndWrapper

@@ -35,7 +35,7 @@ const zhTW: Record<LocaleKey, string> = {
   "settings.excludeDomainsForSending": "傳送分頁時-以下域名的分頁不會傳送到管理後台：",
   "settings.excludeDomainsForSending.tooltip": "多個域名可使用空格或者換行分隔；支持正規表示式；",
   "settings.excludeDomainsForSending.placeholder": "多個域名可使用空格或者換行分隔",
-  "settings.openAdminTabAfterSendTabs": "傳送分頁時-是否開啟NiceTab管理後台{mark}",
+  "settings.openAdminTabAfterSendTabs": "傳送分頁時是否開啟管理後台（傳送全部分頁一律開啟）{mark}",
   "settings.openAdminTabAfterSendTabs.yes": "自動開啟NiceTab管理後台（推薦）",
   "settings.openAdminTabAfterSendTabs.no": "不要自動開啟NiceTab管理後台",
   "settings.closeTabsAfterSendTabs": "傳送分頁時-是否自動關閉分頁{mark}",

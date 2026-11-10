@@ -262,6 +262,20 @@ export default function Home() {
     });
   }, []);
 
+  const homeContextValue = useMemo(
+    () => ({
+      treeDataHook,
+      selectionBoxHook: {
+        isSelecting,
+        isSelectMoving,
+        actionType,
+        selectionBoxData,
+        setIsAllowed,
+      },
+    }),
+    [treeDataHook, isSelecting, isSelectMoving, actionType, selectionBoxData],
+  );
+
   return (
     <>
       <StyledSelectionBox
@@ -274,18 +288,7 @@ export default function Home() {
           height: selectionBoxData.height + 'px',
         }}
       ></StyledSelectionBox>
-      <HomeContext.Provider
-        value={{
-          treeDataHook,
-          selectionBoxHook: {
-            isSelecting,
-            isSelectMoving,
-            actionType,
-            selectionBoxData,
-            setIsAllowed,
-          },
-        }}
-      >
+      <HomeContext.Provider value={homeContextValue}>
         <StyledMainWrapper
           className={classNames('home-wrapper')}
           style={

@@ -248,19 +248,14 @@ export default function Settings() {
   }, [locale]);
 
   const { urlParams } = useUrlParams();
+  // 仅同步表单值；全局 settings 已由 Root 初始化并监听 storage 变化，这里不再回写，避免整页重渲染
   useEffect(() => {
     settingsUtils.getSettings().then(settings => {
       setInitialFormValues(settings);
       form?.setFieldsValue(settings);
-      NiceGlobalContext.setSettings(settings);
     });
   }, [urlParams, NiceGlobalContext.themeType]);
   useEffect(() => {
-    settingsUtils.getSettings().then(settings => {
-      setInitialFormValues(settings);
-      form?.setFieldsValue(settings);
-    });
-
     eventEmitter.on('settings:values-change', onValuesChange);
     return () => {
       eventEmitter.off('settings:values-change', onValuesChange);

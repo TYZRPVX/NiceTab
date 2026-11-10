@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useState,
   useMemo,
+  useRef,
 } from 'react';
 import type { TreeProps } from 'antd';
 import type { TagItem, GroupItem, TabItem, CountInfo } from '~/entrypoints/types';
@@ -58,7 +59,7 @@ export const HomeContext = createContext<HomeContextProps>({
   },
 });
 
-export function useTreeData() {
+function useTreeDataInner() {
   const [loading, setLoading] = useState<boolean>(true);
   const [countInfo, setCountInfo] = useState<CountInfo>();
   const [tagList, setTagList] = useState<TagItem[]>([]);
@@ -146,12 +147,14 @@ export function useTreeData() {
           selectedTabGroupKey: tabGroupKey as string,
         },
         () => {
-          // 清除urlParams上的tagId和groupId
-          setSearchParams({});
+          // 清除urlParams上的tagId和groupId；URL 已干净时跳过，避免多余的路由重渲染
+          if (Object.keys(urlParams).length > 0) {
+            setSearchParams({});
+          }
         },
       );
     },
-    [setSearchParams],
+    [setSearchParams, urlParams],
   );
   const onSelect = useCallback(
     (selectedKeys: React.Key[], { node }: { node: TreeDataNodeUnion }) => {
@@ -846,4 +849,71 @@ export function useTreeData() {
     selectedKeyChange,
     init,
   };
+}
+
+export function useTreeData() {
+  const hook = useTreeDataInner();
+  const {
+    urlParams,
+    loading,
+    countInfo,
+    tagList,
+    treeData,
+    selectedTagKey,
+    selectedTabGroupKey,
+    selectedKeys,
+    expandedKeys,
+    selectedTag,
+    selectedTagData,
+    refreshKey,
+    highlightTabId,
+    ...actions
+  } = hook;
+
+  // 方法通过 ref 转发到最新实现，保证引用稳定，使下游 memo 组件生效（常量内存：一份 ref + 一组包装函数）
+  const actionsRef = useRef(actions);
+  actionsRef.current = actions;
+  const stableActions = useMemo(() => {
+    const result = {} as typeof actions;
+    (Object.keys(actions) as Array<keyof typeof actions>).forEach(key => {
+      (result as any)[key] = (...args: any[]) =>
+        (actionsRef.current[key] as (...args: any[]) => any)(...args);
+    });
+    return result;
+  }, []);
+
+  return useMemo(
+    () => ({
+      urlParams,
+      loading,
+      countInfo,
+      tagList,
+      treeData,
+      selectedTagKey,
+      selectedTabGroupKey,
+      selectedKeys,
+      expandedKeys,
+      selectedTag,
+      selectedTagData,
+      refreshKey,
+      highlightTabId,
+      ...stableActions,
+    }),
+    [
+      urlParams,
+      loading,
+      countInfo,
+      tagList,
+      treeData,
+      selectedTagKey,
+      selectedTabGroupKey,
+      selectedKeys,
+      expandedKeys,
+      selectedTag,
+      selectedTagData,
+      refreshKey,
+      highlightTabId,
+      stableActions,
+    ],
+  );
 }

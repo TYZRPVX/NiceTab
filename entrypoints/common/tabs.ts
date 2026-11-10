@@ -130,55 +130,172 @@ export async function executeContentScript(
   }
 }
 
-export async function getAdminTabInfo(windowId?: number) {
-  const adminTabUrl = browser.runtime.getURL('/options.html');
-  const queryInfo: Tabs.QueryQueryInfoType = { url: `${adminTabUrl}*` };
-  if (windowId) {
-    queryInfo.windowId = windowId;
-  } else {
-    queryInfo.currentWindow = true;
-  }
-  const [tab] = await browser.tabs.query(queryInfo);
-
-  return { tab, adminTabUrl };
+let isBackgroundContext = false;
+export function initializeAdminPageCoordinator() {
+  isBackgroundContext = true;
 }
-// 打开管理后台
+
+// Only in-flight work is retained, one entry per busy window; entries expire on completion.
+const adminPageTasks = new Map<number, Promise<void>>();
+
+function inAdminWindow(windowId: number, task: () => Promise<void>) {
+  const previous = adminPageTasks.get(windowId) || Promise.resolve();
+  const next = previous.catch(() => undefined).then(task);
+  adminPageTasks.set(windowId, next);
+  void next
+    .finally(() => {
+      if (adminPageTasks.get(windowId) === next) adminPageTasks.delete(windowId);
+    })
+    .catch(() => undefined);
+  return next;
+}
+
+function isExtensionPage(tab: Tabs.Tab, path: string) {
+  const expected = new URL(browser.runtime.getURL(path));
+  return [tab.pendingUrl, tab.url].some(value => {
+    if (!value) return false;
+    try {
+      const url = new URL(value);
+      // Extension URL origins can be opaque; compare protocol and host explicitly.
+      return (
+        url.protocol === expected.protocol &&
+        url.host === expected.host &&
+        url.pathname === expected.pathname
+      );
+    } catch {
+      return false;
+    }
+  });
+}
+
+export function isAdminTab(tab: Tabs.Tab) {
+  return isExtensionPage(tab, '/options.html');
+}
+
+async function getAdminTabs(windowId: number) {
+  return (await browser.tabs.query({ windowId }))
+    .filter(isAdminTab)
+    .sort(
+      (a, b) =>
+        Number(b.pinned) - Number(a.pinned) ||
+        Number(b.active) - Number(a.active) ||
+        a.index - b.index,
+    );
+}
+
+function reportAdminError(
+  operation: string,
+  windowId: number,
+  tabId: number | undefined,
+  error: unknown,
+) {
+  const message = (error instanceof Error ? error.message : String(error)).replace(
+    /[a-z][a-z0-9+.-]*:\/\/[^\s]+/gi,
+    '[URL]',
+  );
+  console.error('NiceTab admin page', { operation, windowId, tabId, message });
+}
+
+async function closeDuplicateAdminTabs(windowId: number, keepId: number) {
+  const keeper = await browser.tabs.get(keepId);
+  if (keeper.windowId !== windowId || !isAdminTab(keeper)) return;
+  for (const candidate of await getAdminTabs(windowId)) {
+    if (candidate.id === undefined || candidate.id === keepId) continue;
+    const current = await browser.tabs.get(candidate.id).catch(() => undefined);
+    if (current?.windowId === windowId && isAdminTab(current)) {
+      await browser.tabs.remove(candidate.id);
+    }
+  }
+}
+
+export async function deduplicateAdminPages(windowId: number) {
+  // Opening already performs cleanup; do not enqueue one task for every update event.
+  if (adminPageTasks.has(windowId)) return;
+  await inAdminWindow(windowId, async () => {
+    const [keeper] = await getAdminTabs(windowId);
+    if (keeper?.id !== undefined) await closeDuplicateAdminTabs(windowId, keeper.id);
+  });
+}
+
+export async function getAdminTabInfo(windowId?: number) {
+  const targetWindowId = windowId ?? (await browser.windows.getCurrent()).id;
+  const [tab] = targetWindowId === undefined ? [] : await getAdminTabs(targetWindowId);
+  return { tab, adminTabUrl: browser.runtime.getURL('/options.html') };
+}
+
+// Open/reuse exactly one admin page in the captured window.
 export async function openAdminRoutePage(
   route: { path: string; query?: Record<string, string> },
   needOpen = true,
+  windowId?: number,
+  refresh = false,
 ) {
-  const paramsStr = objectToUrlParams(route?.query || {});
-  const settings = await settingsUtils.getSettings();
-  const { tab, adminTabUrl } = await getAdminTabInfo();
-  const urlWithParams = `${adminTabUrl}#${route.path || '/home'}${
-    paramsStr ? `?${paramsStr}` : ''
-  }`;
-
-  // 如果发送标签页后不需要打开管理后台页面
-  if (!needOpen) {
-    if (!tab?.id) return;
-    // 如果存在打开的nicetab管理后台页，则刷新管理后台页
-    await browser.tabs.update(tab.id, { url: urlWithParams });
+  const targetWindowId = windowId ?? (await browser.windows.getCurrent()).id;
+  if (targetWindowId === undefined) throw new Error('No target window');
+  if (!isBackgroundContext) {
+    const result = (await browser.runtime.sendMessage({
+      msgType: 'openAdminRoutePage',
+      data: { ...route, needOpen, windowId: targetWindowId, refresh },
+    })) as { ok?: boolean } | undefined;
+    if (!result?.ok) throw new Error('Could not open NiceTab admin page');
     return;
   }
-
-  if (tab?.id) {
-    await browser.tabs.move(tab.id, { index: 0 });
-    await browser.tabs.update(tab.id, {
-      highlighted: true,
-      pinned: !!settings[AUTO_PIN_ADMIN_TAB],
-      url: urlWithParams,
-    });
-    // browser.tabs.reload(tab.id); // 这个方法会清空路由参数，切记
-  } else {
-    await browser.tabs.create({
-      index: 0,
-      url: urlWithParams,
-      pinned: !!settings[AUTO_PIN_ADMIN_TAB],
-    });
-  }
-
-  cancelHighlightTabs();
+  await inAdminWindow(targetWindowId, async () => {
+    const settings = await settingsUtils.getSettings();
+    const pinned = settings[AUTO_PIN_ADMIN_TAB] !== false;
+    const paramsStr = objectToUrlParams(route?.query || {});
+    const url = `${browser.runtime.getURL('/options.html')}#${route.path || '/home'}${
+      paramsStr ? `?${paramsStr}` : ''
+    }`;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      let tabId: number | undefined;
+      let operation = 'query';
+      try {
+        const [existing] = await getAdminTabs(targetWindowId);
+        if (!existing && !needOpen) return;
+        tabId = existing?.id;
+        operation = 'pin';
+        if (tabId !== undefined) {
+          await browser.tabs.update(tabId, { pinned });
+        } else {
+          const created = await browser.tabs.create({
+            windowId: targetWindowId,
+            url,
+            pinned,
+            active: needOpen,
+          });
+          tabId = created.id;
+        }
+        if (tabId === undefined) throw new Error('Admin tab has no ID');
+        const verified = await browser.tabs.get(tabId);
+        if (verified.pinned !== pinned)
+          throw new Error('Browser did not apply the requested pinned state');
+        operation = 'navigate';
+        if (existing) {
+          await browser.tabs.update(tabId, {
+            url,
+            ...(needOpen ? { active: true } : {}),
+          });
+          if (refresh) await browser.tabs.reload(tabId);
+        }
+        operation = 'deduplicate';
+        await closeDuplicateAdminTabs(targetWindowId, tabId);
+        if (needOpen) {
+          // Moving an unpinned tab before pinned tabs may fail; pinning must not depend on it.
+          await browser.tabs.move(tabId, { index: 0 }).catch(error => {
+            reportAdminError('move', targetWindowId, tabId, error);
+          });
+        }
+        return;
+      } catch (error) {
+        reportAdminError(operation, targetWindowId, tabId, error);
+        const stillExists =
+          tabId === undefined || (await browser.tabs.get(tabId).catch(() => undefined));
+        if (attempt === 0 && !stillExists) continue;
+        throw error;
+      }
+    }
+  });
 }
 // 多窗口时，刷新其他窗口的管理后台页面
 export async function reloadOtherAdminPage() {
@@ -206,8 +323,7 @@ export async function openAdminTab(
   needOpen?: boolean,
 ) {
   const settings = settingsData || (await settingsUtils.getSettings());
-  const openAdminTabAfterSendTabs =
-    needOpen ?? settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
+  const openAdminTabAfterSendTabs = needOpen ?? settings[OPEN_ADMIN_TAB_AFTER_SEND_TABS];
   await openAdminRoutePage({ path: '/home', query: params }, openAdminTabAfterSendTabs);
 }
 // 获取过滤后的标签页
@@ -216,10 +332,9 @@ export async function getFilteredTabs(
   settings: SettingsProps,
   validator?: (tab: Tabs.Tab) => boolean,
 ) {
-  const { tab: adminTab } = await getAdminTabInfo();
   const result = tabs.filter(tab => {
     if (!tab?.id) return false;
-    if (adminTab && adminTab.id === tab.id) return false;
+    if (isAdminTab(tab) || isExtensionPage(tab, '/command.html')) return false;
     // 如果设置不允许发送固定标签页，则过滤掉固定标签页
     if (tab.pinned && !settings[ALLOW_SEND_PINNED_TABS]) {
       return false;
@@ -319,18 +434,27 @@ async function sendAllTabs(
   {
     onlyCurrentWindow = true,
     excludedTabIds = [],
-    forceOpenAdmin = false,
+    windowId,
   }: {
     onlyCurrentWindow?: boolean;
     excludedTabIds?: number[];
-    forceOpenAdmin?: boolean;
+    windowId?: number;
   } = {},
 ) {
+  const targetWindowId = windowId ?? (await browser.windows.getCurrent()).id;
+  if (targetWindowId === undefined) throw new Error('No target window');
+  if (!isBackgroundContext) {
+    const result = (await browser.runtime.sendMessage({
+      msgType: 'executeSendAllTabs',
+      data: { targetData, onlyCurrentWindow, windowId: targetWindowId },
+    })) as { ok?: boolean; sentTabs?: boolean } | undefined;
+    if (!result?.ok) throw new Error('Could not complete Send All Tabs');
+    return !!result.sentTabs;
+  }
   const tabs = await browser.tabs.query(
     onlyCurrentWindow
       ? {
-          // url: matchUrls,
-          currentWindow: true,
+          windowId: targetWindowId,
         }
       : {},
   );
@@ -340,17 +464,23 @@ async function sendAllTabs(
   const filteredTabs = (await getFilteredTabs(tabs, settings)).filter(
     tab => !excludedTabIds.includes(tab.id as number),
   );
-  if (!filteredTabs?.length) return false;
+  if (!filteredTabs?.length) {
+    await openAdminRoutePage({ path: '/home' }, true, targetWindowId, true);
+    return false;
+  }
   const { tagId, groupId } = await tabListUtils.createTabs(filteredTabs, targetData);
-  await openAdminTab(settings, { tagId, groupId }, forceOpenAdmin || undefined);
+  await openAdminRoutePage(
+    { path: '/home', query: { tagId, groupId } },
+    true,
+    targetWindowId,
+    true,
+  );
   const actionAutoCloseFlags = settings[ACTION_AUTO_CLOSE_FLAGS];
   if (
     settings[CLOSE_TABS_AFTER_SEND_TABS] ||
     actionAutoCloseFlags?.includes('sendAllTabs')
   ) {
-    setTimeout(() => {
-      removeTabsAfterSend(filteredTabs, settings);
-    }, 30);
+    await removeTabsAfterSend(filteredTabs, settings);
   } else {
     // 如果发送标签页后打开管理后台，则跳转之后将之前高亮的标签页取消高亮
     cancelHighlightTabs(filteredTabs);
@@ -358,20 +488,9 @@ async function sendAllTabs(
   return true;
 }
 
-export async function sendAllTabsFromCommandPage(commandTabId?: number) {
-  try {
-    const sentTabs = await sendAllTabs({}, {
-      excludedTabIds: commandTabId ? [commandTabId] : [],
-      forceOpenAdmin: true,
-    });
-    if (!sentTabs) {
-      await openAdminRoutePage({ path: '/home' });
-    }
-  } finally {
-    if (commandTabId) {
-      await browser.tabs.remove(commandTabId).catch(() => undefined);
-    }
-  }
+export async function sendAllTabsFromCommandPage(commandTabId: number, windowId: number) {
+  await sendAllTabs({}, { excludedTabIds: [commandTabId], windowId });
+  await browser.tabs.remove(commandTabId).catch(() => undefined);
 }
 // 发送当前选中的标签页所在的标签组（支持多选）
 async function sendCurrentGroup(targetData: SendTargetProps = {}, tab?: Tabs.Tab) {
@@ -725,6 +844,9 @@ export default {
   sendTabMessage,
   executeContentScript,
   getAdminTabInfo,
+  initializeAdminPageCoordinator,
+  isAdminTab,
+  deduplicateAdminPages,
   openAdminRoutePage,
   openAdminTab,
   reloadOtherAdminPage,

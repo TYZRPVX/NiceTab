@@ -37,7 +37,7 @@ const enUS: Record<LocaleKey, string> = {
   'settings.excludeDomainsForSending': 'Exclude domains for sending tabs:',
   'settings.excludeDomainsForSending.tooltip': 'Multiple domain names can be separated by spaces or newlines. Supports "Regular Expression" syntax.',
   'settings.excludeDomainsForSending.placeholder': 'Multiple domain names can be separated by spaces or newlines',
-  'settings.openAdminTabAfterSendTabs': 'Open NiceTab Admin Page when sending tabs?',
+  'settings.openAdminTabAfterSendTabs': 'Open NiceTab Admin Page when sending tabs? (Send All Tabs always opens it.)',
   'settings.openAdminTabAfterSendTabs.yes': 'Automatically open (recommended)',
   'settings.openAdminTabAfterSendTabs.no': 'Do not',
   'settings.closeTabsAfterSendTabs': 'Automatically close tabs when sending tabs?',

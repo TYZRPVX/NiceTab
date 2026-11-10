@@ -1,4 +1,4 @@
-import { Tabs } from 'wxt/browser';
+import { Tabs, Runtime } from 'wxt/browser';
 import { debounce } from 'lodash-es';
 import contextMenusRegister, {
   strategyHandler,
@@ -44,9 +44,8 @@ function isFirefoxBuild() {
 }
 
 function getOffscreenApi(): OffscreenApi | undefined {
-  return (
-    globalThis as typeof globalThis & { chrome?: { offscreen?: OffscreenApi } }
-  ).chrome?.offscreen;
+  return (globalThis as typeof globalThis & { chrome?: { offscreen?: OffscreenApi } })
+    .chrome?.offscreen;
 }
 
 function actionIconPaths(theme: EffectiveTheme) {
@@ -174,22 +173,22 @@ async function initPopup() {
   }
 }
 
-// 限制最多可固定一个NiceTab管理页面
-async function adminPageLimitControl(tabId: number) {
-  const adminTabUrl = browser.runtime.getURL('/options.html');
-  const tabs = await browser.tabs.query({
-    url: `${adminTabUrl}*`,
-    currentWindow: true,
+// 每个窗口仅保留一个 NiceTab 管理页面
+async function adminPageLimitControl(
+  _tabId: number,
+  changeInfo: Tabs.OnUpdatedChangeInfoType,
+  tab: Tabs.Tab,
+) {
+  if (tab.windowId === undefined || !tabUtils.isAdminTab(tab)) return;
+  if (
+    changeInfo.url === undefined &&
+    changeInfo.pinned === undefined &&
+    changeInfo.status !== 'complete'
+  )
+    return;
+  await tabUtils.deduplicateAdminPages(tab.windowId).catch(() => {
+    console.error('NiceTab admin deduplication failed', { windowId: tab.windowId });
   });
-  let pinnedAdminPageCount = 0;
-  for (let tab of tabs) {
-    if (tab.pinned) {
-      pinnedAdminPageCount++;
-    }
-    if (pinnedAdminPageCount > 1) {
-      browser.tabs.remove(tabId);
-    }
-  }
 }
 
 // 初始化监听 tabs 更新
@@ -260,6 +259,7 @@ async function handleNewTabRedirect(tabId: number | undefined, url: string) {
   }
 }
 export default defineBackground(() => {
+  tabUtils.initializeAdminPageCoordinator();
   // console.log('Hello background!', { id: browser.runtime.id });
   initTabsUpdateListener();
   // 初始化新标签页重定向监听
@@ -367,58 +367,87 @@ export default defineBackground(() => {
     // autoSaveOpenedTabsAlarm.clearAlarm();
   });
 
-  browser.runtime.onMessage.addListener(async (msg: unknown) => {
-    // console.log('browser.runtime.onMessage--background--msg', msg);
-    const {
-      msgType,
-      data,
-      targetPageContext = 'background',
-    } = (msg || {}) as RuntimeMessageEventProps;
+  browser.runtime.onMessage.addListener(
+    async (msg: unknown, sender: Runtime.MessageSender) => {
+      // console.log('browser.runtime.onMessage--background--msg', msg);
+      const {
+        msgType,
+        data,
+        targetPageContext = 'background',
+      } = (msg || {}) as RuntimeMessageEventProps;
 
-    if (msgType === 'setPrimaryColor') {
-      const colorPrimary = data?.colorPrimary || PRIMARY_COLOR;
-      await themeUtils.setThemeData({ colorPrimary });
-      if (targetPageContext === 'contentScriptPage') {
-        tabUtils.sendTabMessage({ msgType: 'setThemeData', data: { colorPrimary } });
-      }
-      setBadge();
-    } else if (msgType === 'setThemeData') {
-      await themeUtils.setThemeData(data);
-      if (targetPageContext === 'contentScriptPage') {
-        tabUtils.sendTabMessage({ msgType: 'setThemeData', data });
-      }
-      setBadge();
-    } else if (msgType === 'setThemeType') {
-      if (targetPageContext === 'contentScriptPage') {
-        tabUtils.sendTabMessage({ msgType: 'setThemeType', data });
-      }
-      void refreshActionIcon();
-    } else if (msgType === 'theme:effective-change') {
-      if (data?.theme === 'light' || data?.theme === 'dark') {
-        await applyActionIcon(data.theme);
-      }
-    } else if (msgType === 'theme:system-preference') {
-      if (data?.theme === 'light' || data?.theme === 'dark') {
-        systemTheme = data.theme;
-        const settings = await settingsUtils.getSettings();
-        if (settings.themeType === 'auto') {
-          await applyActionIcon(systemTheme);
+      if (msgType === 'setPrimaryColor') {
+        const colorPrimary = data?.colorPrimary || PRIMARY_COLOR;
+        await themeUtils.setThemeData({ colorPrimary });
+        if (targetPageContext === 'contentScriptPage') {
+          tabUtils.sendTabMessage({ msgType: 'setThemeData', data: { colorPrimary } });
+        }
+        setBadge();
+      } else if (msgType === 'setThemeData') {
+        await themeUtils.setThemeData(data);
+        if (targetPageContext === 'contentScriptPage') {
+          tabUtils.sendTabMessage({ msgType: 'setThemeData', data });
+        }
+        setBadge();
+      } else if (msgType === 'setThemeType') {
+        if (targetPageContext === 'contentScriptPage') {
+          tabUtils.sendTabMessage({ msgType: 'setThemeType', data });
+        }
+        void refreshActionIcon();
+      } else if (msgType === 'theme:effective-change') {
+        if (data?.theme === 'light' || data?.theme === 'dark') {
+          await applyActionIcon(data.theme);
+        }
+      } else if (msgType === 'theme:system-preference') {
+        if (data?.theme === 'light' || data?.theme === 'dark') {
+          systemTheme = data.theme;
+          const settings = await settingsUtils.getSettings();
+          if (settings.themeType === 'auto') {
+            await applyActionIcon(systemTheme);
+          }
+        }
+      } else if (msgType === 'setLocale') {
+        if (targetPageContext === 'contentScriptPage') {
+          tabUtils.sendTabMessage({ msgType: 'setLocale', data });
+        }
+        setBadge();
+      } else if (msgType === 'openAdminRoutePage') {
+        try {
+          await tabUtils.openAdminRoutePage(
+            data || {},
+            data?.needOpen,
+            data?.windowId ?? sender.tab?.windowId,
+            data?.refresh,
+          );
+          return { ok: true };
+        } catch {
+          return { ok: false };
+        }
+      } else if (msgType === 'executeSendAllTabs') {
+        try {
+          const sentTabs = await tabUtils.sendAllTabs(data.targetData, {
+            onlyCurrentWindow: data.onlyCurrentWindow,
+            windowId: sender.tab?.windowId ?? data.windowId,
+          });
+          return { ok: true, sentTabs };
+        } catch {
+          return { ok: false };
+        }
+      } else if (msgType === 'sendTabsActionStart') {
+        strategyHandler(data.actionName);
+      } else if (msgType === 'sendTabsActionConfirm') {
+        handleSendTabsAction(data.actionName, data.targetData);
+      } else if (msgType === 'sendAllTabsFromCommandPage') {
+        if (sender.tab?.id === undefined || sender.tab.windowId === undefined) {
+          return { ok: false };
+        }
+        try {
+          await tabUtils.sendAllTabsFromCommandPage(sender.tab.id, sender.tab.windowId);
+          return { ok: true };
+        } catch {
+          return { ok: false };
         }
       }
-    } else if (msgType === 'setLocale') {
-      if (targetPageContext === 'contentScriptPage') {
-        tabUtils.sendTabMessage({ msgType: 'setLocale', data });
-      }
-      setBadge();
-    } else if (msgType === 'openAdminRoutePage') {
-      await tabUtils.openAdminRoutePage(data || {});
-      tabUtils.cancelHighlightTabs();
-    } else if (msgType === 'sendTabsActionStart') {
-      strategyHandler(data.actionName);
-    } else if (msgType === 'sendTabsActionConfirm') {
-      handleSendTabsAction(data.actionName, data.targetData);
-    } else if (msgType === 'sendAllTabsFromCommandPage') {
-      await tabUtils.sendAllTabsFromCommandPage(data?.commandTabId);
-    }
-  });
+    },
+  );
 });
