@@ -21,6 +21,8 @@ const {
   LANGUAGE,
   THEME_TYPE,
   RECYCLE_RETENTION_DAYS,
+  AUTO_CLEANUP_SAVED_GROUPS,
+  SAVED_GROUP_RETENTION_DAYS,
   OPEN_ADMIN_TAB_AFTER_BROWSER_LAUNCH,
   OPEN_ADMIN_TAB_AFTER_WINDOW_CREATED,
   AUTO_PIN_ADMIN_TAB,
@@ -34,6 +36,7 @@ export default function FormModuleCommon(
   const { $fmt } = useIntlUtls();
   const NiceGlobalContext = useContext(GlobalContext);
   const { form, ...formItemProps } = props;
+  const autoCleanup = Form.useWatch(AUTO_CLEANUP_SAVED_GROUPS, form);
 
   const handleThemeChange = (color: string) => {
     const themeData = { colorPrimary: color };
@@ -75,6 +78,29 @@ export default function FormModuleCommon(
       </Form.Item>
       <Form.Item label={$fmt('common.theme')}>
         <ColorList colors={THEME_COLORS} gap={12} onItemClick={handleThemeChange} />
+      </Form.Item>
+      <Form.Item<SettingsProps>
+        label={$fmt('settings.autoCleanupSavedGroups')}
+        name={AUTO_CLEANUP_SAVED_GROUPS}
+        extra={$fmt('settings.autoCleanupSavedGroups.description')}
+      >
+        <Radio.Group>
+          <Radio value={true}>{$fmt('common.yes')}</Radio>
+          <Radio value={false}>{$fmt('common.no')}</Radio>
+        </Radio.Group>
+      </Form.Item>
+      <Form.Item<SettingsProps>
+        label={$fmt('settings.savedGroupRetentionDays')}
+        name={SAVED_GROUP_RETENTION_DAYS}
+        rules={[{ type: 'number', required: true, min: 1, max: 3650 }]}
+      >
+        <InputNumber
+          controls={{ upIcon: <UIIcons.PlusIcon />, downIcon: <UIIcons.MinusIcon /> }}
+          min={1}
+          max={3650}
+          precision={0}
+          disabled={autoCleanup === false}
+        />
       </Form.Item>
       <Form.Item<SettingsProps>
         label={$fmt(`settings.${RECYCLE_RETENTION_DAYS}`)}

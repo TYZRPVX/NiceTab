@@ -24,6 +24,10 @@ const zhCN = {
   'settings.autoPinAdminTab.no': '不固定',
   'settings.restoreSnapshotAfterBrowserLaunch': '启动时从快照恢复标签页？',
   'settings.autoCreateSnapshotInterval': '自动保存快照的间隔（分钟）',
+  'settings.autoCleanupSavedGroups': '自动清理旧标签组？',
+  'settings.autoCleanupSavedGroups.description':
+    '每天检查所有分类，将超过保留期限的标签组移入回收站。星标组、锁定组及锁定分类中的组始终保留。按创建时间计算，打开或编辑不会延长期限；从回收站还原会重置创建时间。移入回收站后按回收站保留期限处理。',
+  'settings.savedGroupRetentionDays': '标签组保留时间（1–3650 天）',
   'settings.recycleRetentionDays': '回收站保留时间（1–365 天）',
 
   /* 发送标签页配置 */

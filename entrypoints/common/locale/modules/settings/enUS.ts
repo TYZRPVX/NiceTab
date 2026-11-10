@@ -27,6 +27,10 @@ const enUS: Record<LocaleKey, string> = {
   'settings.restoreSnapshotAfterBrowserLaunch':
     'Restore tabs from the saved snapshot on startup?',
   'settings.autoCreateSnapshotInterval': 'Save a snapshot every (minutes)',
+  'settings.autoCleanupSavedGroups': 'Automatically clean up old saved groups?',
+  'settings.autoCleanupSavedGroups.description':
+    'Checks all categories daily. Groups older than the retention period move to the recycle bin. Starred groups, locked groups and groups in locked categories are kept. Age is based on creation time; opening or editing a group does not extend it. Restoring a group resets its creation time. Recycled items follow the recycle bin retention setting.',
+  'settings.savedGroupRetentionDays': 'Keep saved groups for (1–3650 days)',
   'settings.recycleRetentionDays': 'Keep deleted items for (1–365 days)',
 
   /* 发送标签页配置 */

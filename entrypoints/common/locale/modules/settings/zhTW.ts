@@ -26,6 +26,10 @@ const zhTW: Record<LocaleKey, string> = {
   'settings.autoPinAdminTab.no': '不釘選',
   'settings.restoreSnapshotAfterBrowserLaunch': '啟動時從快照還原分頁？',
   'settings.autoCreateSnapshotInterval': '自動儲存快照的間隔（分鐘）',
+  'settings.autoCleanupSavedGroups': '自動清理舊群組？',
+  'settings.autoCleanupSavedGroups.description':
+    '每天檢查所有分類，將超過保留期限的群組移至資源回收筒。加上星號的群組、鎖定群組及鎖定分類中的群組一律保留。依建立時間計算，開啟或編輯不會延長期限；從資源回收筒還原會重設建立時間。移入資源回收筒後依其保留期限處理。',
+  'settings.savedGroupRetentionDays': '群組保留時間（1–3650 天）',
   'settings.recycleRetentionDays': '資源回收筒保留時間（1–365 天）',
   'settings.showSendTargetModal': '每次儲存時選擇存放位置？',
   'settings.showSendTargetModal.tooltip':

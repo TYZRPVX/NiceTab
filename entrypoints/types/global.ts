@@ -170,6 +170,8 @@ export type SettingsProps = {
   autoPinAdminTab?: boolean; // 是否固定管理后台
   restoreSnapshotAfterBrowserLaunch?: boolean; // 启动浏览器时是否恢复快照
   autoCreateSnapshotInterval?: number; // 自动创建快照间隔
+  autoCleanupSavedGroups?: boolean; // 自动清理旧标签组
+  savedGroupRetentionDays?: number; // 已保存标签组保留天数
   recycleRetentionDays?: number; // 回收站保留天数
   /* 发送标签页配置 */
   showSendTargetModal?: boolean; // 发送标签页时是否显示目标分类选择弹窗

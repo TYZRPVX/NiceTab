@@ -13,7 +13,11 @@ import {
   settingsUtils,
   stateUtils,
 } from '~/entrypoints/common/storage';
-import { autoSyncAlarm, autoSaveOpenedTabsAlarm } from '~/entrypoints/common/alarms';
+import {
+  autoSyncAlarm,
+  autoSaveOpenedTabsAlarm,
+  autoCleanupSavedGroupsAlarm,
+} from '~/entrypoints/common/alarms';
 import {
   PRIMARY_COLOR,
   // TAB_EVENTS,
@@ -274,6 +278,9 @@ export default defineBackground(() => {
     initPopup();
     initNewTabRedirectListener();
     autoSyncAlarm.checkReset(settings, oldSettings);
+    void autoCleanupSavedGroupsAlarm.checkReset(settings, oldSettings).catch(() => {
+      console.error('NiceTab could not update the saved-group cleanup schedule.');
+    });
     void refreshActionIcon();
   });
 
@@ -293,6 +300,9 @@ export default defineBackground(() => {
 
   // 创建自动同步闹钟
   autoSyncAlarm.create();
+  void autoCleanupSavedGroupsAlarm.create().catch(() => {
+    console.error('NiceTab could not schedule saved-group cleanup.');
+  });
   // // 创建自动保存已打开标签页的闹钟
   // autoSaveOpenedTabsAlarm.create();
   // 清空自动保存快照的闹钟（不使用闹钟，采用tabs.onUpdated事件监听）

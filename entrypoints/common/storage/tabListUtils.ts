@@ -254,7 +254,7 @@ export default class TabListUtils {
     this.tagList = list?.length ? list : [this.createStagingAreaTag()];
     normalizeLegacyGeneratedNames(this.tagList);
     this.setCountInfo();
-    storage.setItem(this.storageKey, this.tagList);
+    await storage.setItem(this.storageKey, this.tagList);
   }
   setCountInfo() {
     let tagCount = 0,

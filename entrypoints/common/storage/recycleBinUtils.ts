@@ -29,7 +29,7 @@ export default class RecycleBinUtils extends TabListUtils {
   async setTagList(list?: TagItem[]) {
     this.tagList = list || [];
     this.setCountInfo();
-    storage.setItem(this.storageKey, this.tagList);
+    await storage.setItem(this.storageKey, this.tagList);
   }
 
   // 批量添加分类
@@ -132,7 +132,11 @@ export default class RecycleBinUtils extends TabListUtils {
 
   // 批量还原标签组（内部调用：多分类循环还原）
   recoverTabGroupsBasic(storeTagList: TagItem[], tag: TagItem, groups: GroupItem[]) {
-    const restoredGroups = groups.map(({ recycleTime: _recycleTime, ...group }) => group);
+    const restoredAt = newCreateTime();
+    const restoredGroups = groups.map(({ recycleTime: _recycleTime, ...group }) => ({
+      ...group,
+      createTime: restoredAt,
+    }));
     let isTagInListStore = false;
     for (let storeTag of storeTagList) {
       if (storeTag.tagId === tag.tagId) {
@@ -143,6 +147,7 @@ export default class RecycleBinUtils extends TabListUtils {
             if (storeGroup.groupId === group.groupId) {
               isGroupInListStore = true;
               storeGroup.tabList = [...group.tabList, ...storeGroup.tabList];
+              storeGroup.createTime = restoredAt;
               break;
             }
           }
