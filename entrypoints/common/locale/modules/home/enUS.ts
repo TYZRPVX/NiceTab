@@ -1,77 +1,66 @@
 import { LocaleKey } from './zhCN';
 
 const enUS: Record<LocaleKey, string> = {
-  'home.tag': 'Tag',
-  'home.tabGroup': 'Tab Group',
+  'home.tag': 'Category',
+  'home.tabGroup': 'Tab group',
   'home.tab': 'Tab',
-  'home.stagingArea': 'Staging Area',
-  'home.tabGroupList': 'Tab Group List',
+  'home.stagingArea': 'Staging area',
+  'home.tabGroupList': 'Saved groups',
   'home.date.today': 'Today',
   'home.date.yesterday': 'Yesterday',
   'home.date.unknown': 'Unknown date',
   'home.date.starred': 'Starred',
-  'home.expand': 'Expand the {name}',
-  'home.collapse': 'Collapse the {name}',
-  'home.expandAll': 'Expand All',
-  'home.collapseAll': 'Collapse All',
-  'home.addTag': 'Create Tag',
-  'home.clearAll': 'Clear All',
-  'home.recoverAll': 'Recover All',
-  'home.emptyTip': 'No Data',
-  'home.searchTagAndGroup': 'Search Tag/Group',
-  'home.searchTabAndUrl': 'Search Tab and URL',
-  'home.moveAllGroupTo': 'Move All Groups to ...',
-  'home.createTabGroup': 'Create Tab Group',
-  'home.helpInfo': 'Help Info',
-  'home.removeTitle': 'Remove Reminder',
-  'home.removeDesc': 'Are you sure you want to remove the {type}?',
-  'home.clearTitle': 'Clear Reminder',
-  'home.clearDesc': 'Are you sure you want to clear all the list?',
-  'home.dedupTitle': 'Dedup Reminder',
-  'home.dedupDesc': 'Are you sure you want to perform deduplication?',
-  'home.recoverTitle': 'Recover Reminder',
-  'home.recoverDesc': 'Are you sure you want to recover the {type}?',
-  'home.recoverAllDesc': 'Are you sure you want to recover All?',
-  'home.copyLinks': 'Copy Links',
+  'home.expand': 'Expand {name}',
+  'home.collapse': 'Collapse {name}',
+  'home.expandAll': 'Expand all',
+  'home.collapseAll': 'Collapse all',
+  'home.addTag': 'New category',
+  'home.clearAll': 'Clear all',
+  'home.recoverAll': 'Restore all',
+  'home.emptyTip': 'Nothing here yet',
+  'home.searchTagAndGroup': 'Search categories and groups',
+  'home.searchTabAndUrl': 'Search titles and URLs',
+  'home.moveAllGroupTo': 'Move all groups to…',
+  'home.createTabGroup': 'New tab group',
+  'home.helpInfo': 'Help',
+  'home.removeTitle': 'Delete item?',
+  'home.removeDesc': 'Delete this {type}?',
+  'home.clearTitle': 'Clear this list?',
+  'home.clearDesc': 'Delete all items in this list?',
+  'home.dedupTitle': 'Remove duplicates?',
+  'home.dedupDesc': 'Remove duplicate items from this list?',
+  'home.recoverTitle': 'Restore item?',
+  'home.recoverDesc': 'Restore this {type} to your saved tabs?',
+  'home.recoverAllDesc': 'Restore all items from the recycle bin?',
+  'home.copyLinks': 'Copy links',
 
-  'home.tag.remove': 'Remove',
-  'home.tag.recover': 'Recover',
-  'home.tag.countInfo': 'Current Counts',
-  'home.tag.lock': 'Lock the Tag',
-  'home.tag.unlock': 'Unlock the Tag',
-  'home.tag.open': 'Open Tag',
+  'home.tag.remove': 'Delete category',
+  'home.tag.recover': 'Restore',
+  'home.tag.countInfo': 'Category totals',
+  'home.tag.lock': 'Lock category',
+  'home.tag.unlock': 'Unlock category',
+  'home.tag.open': 'Open tabs in category',
 
-  'home.tabGroup.add': 'Create Tab Group',
-  'home.tabGroup.remove': 'Remove',
-  'home.tabGroup.restore': 'Restore',
-  'home.tabGroup.lock': 'Lock',
-  'home.tabGroup.unlock': 'Unlock',
-  'home.tabGroup.star': 'Top',
-  'home.tabGroup.unstar': 'Untop',
-  'home.tabGroup.recover': 'Recover',
-  'home.tabGroup.open': 'Open Group',
-  'home.tabGroup.addGroupBefore': 'Create Group Before',
-  'home.tabGroup.addGroupAfter': 'Create Group After',
-  'home.tabGroup.tabsSortAsc': 'Title Ascending',
-  'home.tabGroup.tabsSortDesc': 'Title Descending',
+  'home.tabGroup.add': 'New tab group',
+  'home.tabGroup.remove': 'Delete group',
+  'home.tabGroup.restore': 'Open tabs',
+  'home.tabGroup.lock': 'Lock group',
+  'home.tabGroup.unlock': 'Unlock group',
+  'home.tabGroup.star': 'Star group',
+  'home.tabGroup.unstar': 'Unstar group',
+  'home.tabGroup.recover': 'Restore',
+  'home.tabGroup.open': 'Open tabs in group',
+  'home.tabGroup.addGroupBefore': 'New group above',
+  'home.tabGroup.addGroupAfter': 'New group below',
+  'home.tabGroup.tabsSortAsc': 'Sort titles A–Z',
+  'home.tabGroup.tabsSortDesc': 'Sort titles Z–A',
 
-  'home.tabGroup.count': `{count, plural,
-    =0 {No Groups}
-    one {# Group}
-    other {# Groups}
-  }`,
-  'home.tabGroup.name': 'Group Name',
-  'home.tabGroup.createTime': 'Create Time',
-  'home.tab.count': `{count, plural,
-    =0 {No Tabs}
-    one {# Tab}
-    other {# Tabs}
-  }`,
-  'home.tab.selectedCount': `{count, plural,
-    =0 {No Tabs}
-    one {# Tab}
-    other {# Tabs}
-  } Selected`,
+  'home.tabGroup.count': '{count, plural, =0 {No groups} one {# group} other {# groups}}',
+  'home.tabGroup.name': 'Group name',
+  'home.tabGroup.createTime': 'Created',
+  'home.tab.count': '{count, plural, =0 {No tabs} one {# tab} other {# tabs}}',
+  'home.tab.selectedCount':
+    '{count, plural, =0 {No tabs selected} one {# tab selected} other {# tabs selected}}',
   'home.tab.name': 'Name',
   'home.tab.url': 'URL',
   'home.tab.removeSelected': `Are you sure you want to remove {count, plural,
@@ -80,17 +69,19 @@ const enUS: Record<LocaleKey, string> = {
     other {these # tabs}
   }?`,
 
-  'home.createSnapshot': 'Create Snapshot',
-  'home.createSnapshot.tip': 'Save the currently opened tabs as a snapshot',
-  'home.restoreSnapshot': 'Restore Snapshot',
+  'home.createSnapshot': 'Save snapshot',
+  'home.createSnapshot.tip': 'Save a snapshot of the currently open tabs',
+  'home.restoreSnapshot': 'Restore snapshot',
 
-  'home.getPermission.tabGroups': 'Get "tabGroups" Permission',
-  'home.getPermission.tabGroups.tip': 'Grant "tabGroups" permission to access the native tab group feature for a better experience!',
+  'home.getPermission.tabGroups': 'Allow browser tab group access',
+  'home.getPermission.tabGroups.tip':
+    'Allow NiceTab to work with your browser’s tab groups.',
 
-  'home.displayPinnedTabs': 'Display Pinned Tabs?',
+  'home.displayPinnedTabs': 'Show pinned tabs',
 
   'home.help.tip.userGuide': 'For more information, please refer to the {userGuide}.',
-  'home.help.reminder.start': 'For security reasons, Firefox may not allow privileged URLs such as:',
+  'home.help.reminder.start':
+    'For security reasons, Firefox may not allow privileged URLs such as:',
   'home.help.reminder.list': `
     <li>chrome: URLs</li>
     <li>javascript: URLs</li>
@@ -98,46 +89,32 @@ const enUS: Record<LocaleKey, string> = {
     <li>file: URLs</li>
     <li>Firefox's privileged about: URLs (e.g. about:config, about:addons, about:debugging). Non-privileged URLs (e.g. about:blank) are allowed.</li>
   `,
-  'home.help.reminder.end': 'If the URL of a page matches any of the above cases, opening the tab may not work. Please manually copy the URL to open it.',
+  'home.help.reminder.end':
+    'If the URL of a page matches any of the above cases, opening the tab may not work. Please manually copy the URL to open it.',
 
-  'home.help.content': `
-    <li>The List page consists of three parts: the left Directory Tree (category and tab group directory index), the middle Stored Tab List (all tab groups and tabs in the currently selected category), and the right Opened Tabs Panel.</li>
-    <li>The left Directory Tree uses primary items to represent tags (categories) and secondary items to represent tab groups. It supports searching for both categories and tab groups. The middle list displays all tab groups within the currently selected category, along with the tabs contained in each tab group.</li>
-    <li>Tabs in the middle list support drag-and-drop reordering and moving between tab groups. You can also drag tabs from the middle list onto tab groups in the left Directory Tree to move them across categories. Alternatively, click the "Move To" button to relocate tab groups and tabs.</li>
-    <li>The collapsible panel on the right side of the page displays the tabs and tab groups currently opened in the browser window. Tabs in this panel support quick multi-selection and batch drag-and-drop to the middle list or to nodes in the left Directory Tree. You can also drag entire tab groups directly.</li>
-    <li>For more detailed information and usage tips, please refer to the "User Guide".</li>
-    <li>When a tab group is locked, the group and its tabs cannot be removed or moved out. However, tabs from other tab groups can be moved into the locked group. To remove a tab group, you need to first unlock it.</li>
-    <li>When a tab group is starred, it will be placed at the top of the current category. Moving other tab groups to a position before the starred tab group will automatically star them as well. If a starred tab group is moved to a position after a non-starred tab group, the star status will be automatically released.</li>
-    <li>The Staging Area is a special category, fixed at the top of the list. When sending tabs, they will be saved to the Staging Area.</li>
-    <li>When opening a tab group, each of the tabs within the tab group will be opened in the browser. If the "Automatically remove tabs from list when opening tabs or tab group" setting is enabled, the tabs will be removed from the list after they are opened.</li>
-    <li>
-      <strong>Left Click</strong>: this will open a new tab and jump to it.<br>
-      <strong>Alt + Left Click</strong>: this will silently open a new tab and stay on the NiceTab page.
-      You can modify the preference settings to adjust your click behavior.
-    </li>
-    <li>The "Ascending" and "Descending" only work for unstarred tab groups in the current category.</li>
-    <li>Tags (categories), tab groups, and tabs in the left Directory Tree support drag-and-drop reordering. When a category or tab group is selected, you can sort them using keyboard shortcuts. The shortcut mappings are shown in the table below:</li>
-  `,
-  'home.help.hotkey.1': `The above shortcuts are only available for the home page. In addition, the extension also registers browser shortcuts for several commonly used actions, (such as`,
-  'home.help.hotkey.2': `); You can also go to the extension page by yourself and `,
-  'home.help.hotkey.modify': `modify the shortcuts`,
+  'home.help.content':
+    '<li>Use the sidebar to browse categories and groups. The middle list shows saved tabs in the selected category. The panel on the right shows tabs open in the current browser window.</li><li>Drag saved tabs to reorder them or move them between groups. Drag onto a group in the sidebar to move across categories, or use “Move to”.</li><li>Drag open tabs or entire browser groups from the right panel into your saved list. You can select several tabs at once.</li><li>Locked groups protect their saved tabs from deletion or removal. You can still add tabs to them. Unlock a group before deleting it.</li><li>Starred groups stay above other groups in their category. Moving a group into or out of the starred section changes its star status.</li><li>The Staging area stays at the top of the sidebar. Tabs are saved there unless you choose another destination.</li><li>Opening a saved group opens its tabs in the browser. Your settings control whether those entries stay in NiceTab afterward; locked entries are kept.</li><li><strong>Click</strong> to open a tab and switch to it. <strong>Alt + click</strong> opens it in the background by default. You can change these keys in Settings.</li><li>Group sorting applies to unstarred groups in the selected category. You can also reorder categories and groups by dragging or using the shortcuts below.</li>',
+  'home.help.hotkey.1':
+    'These shortcuts work on the saved tabs page. Browser-wide shortcuts are also available for actions such as',
+  'home.help.hotkey.2': '. To change them, open the browser’s extension settings and ',
+  'home.help.hotkey.modify': 'edit keyboard shortcuts',
   'home.help.hotkey.modifyTip':
-    'After modifying the shortcuts, they will take effect immediately. The names of the shortcut keys in the ContextMenu will automatically update after switching browser tabs.',
+    'Shortcut changes take effect immediately. Switch browser tabs to refresh shortcut labels in the context menu.',
 
-  'home.moveTo.missingTip': 'Please select a {type}',
-  'home.moveTo.copyLabel': 'Copy Selected Items?',
-  'home.moveTo.copyTip': 'If this option is checked, the selected items will be copied to the target category/group.',
-  'home.moveTo.mergeLabel': 'Merge Duplicate Items?',
+  'home.moveTo.missingTip': 'Choose a {type}',
+  'home.moveTo.copyLabel': 'Copy instead of move',
+  'home.moveTo.copyTip':
+    'Keep the originals and add copies to the destination category or group.',
+  'home.moveTo.mergeLabel': 'Merge duplicates',
   'home.moveTo.mergeTip.1':
-    '1. If this option is checked, when moving tabs, tabs with the same URL in the target group will be de-duplicated.',
+    'When moving tabs, merge matching URLs in the destination group.',
   'home.moveTo.mergeTip.2':
-    '2. If this option is checked, when moving a tab group, it will be merged into the group with the same name in the target category (tag).',
-  'home.tip.tooManyTabs':
-    'The number of tabs exceeds the set value, enabling virtual scrolling.',
+    'When moving groups, merge groups with the same name in the destination category.',
+  'home.tip.tooManyTabs': 'This large list loads as you scroll.',
   'home.tip.addScope':
     'The next version will add new features that require additional authorization. Once the new version is released, the NiceTab extension will be automatically disabled. If you want to continue using it, please manually enable it.',
-  'home.tip.multiSelection': 'Shift multi-select: Step1, Shift + Click A (got highlighted A); Step2, Shift + Click B (A to B selected). It is also applicable to the tab list in the middle of the page',
-
+  'home.tip.multiSelection':
+    'Shift-click the first item, then Shift-click the last item to select a range. This also works in the saved tab list.',
 };
 
 export default enUS;

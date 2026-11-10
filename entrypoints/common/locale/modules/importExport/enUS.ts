@@ -3,35 +3,31 @@ import { LocaleKey } from './zhCN';
 const enUS: Record<LocaleKey, string> = {
   'importExport.import': 'Import',
   'importExport.export': 'Export',
-  'importExport.moduleTitle': `{action, select,
-    import {Import}
-    export {Export}
-    other {Import & Export}
-  } Tabs`,
-  'importExport.formatType': `Choose {action, select,
-    import {Import}
-    export {Export}
-    other {''}
-  } Format:`,
+  'importExport.moduleTitle':
+    '{action, select, import {Import tabs} export {Export tabs} other {Import and export tabs}}',
+  'importExport.formatType':
+    '{action, select, import {Import format} export {Export format} other {Format}}',
   'importExport.formatType.optionLabel': `{label}`,
 
-  'importExport.importMode': 'Choose Import Mode:',
-  'importExport.importMode.optionLabel': '{label}',
-  'importExport.importContent': 'Content to Import:',
-  'importExport.importFromText': 'Import from Text',
-  'importExport.importFromFile': 'Import from File',
+  'importExport.importMode': 'Import mode',
+  'importExport.importMode.optionLabel':
+    '{label, select, Append {Add as new items} Overwrite {Replace existing data} Merge {Merge with existing data} other {Add as new items}}',
+  'importExport.importContent': 'Content to import',
+  'importExport.importFromText': 'Import from text',
+  'importExport.importFromFile': 'Import from file',
   'importExport.importFromHTML': 'Import from HTML',
-  'importExport.importSuccess': 'Import Successful',
-  'importExport.importFailed': 'Import Failed! Please check whether the format is correct',
+  'importExport.importSuccess': 'Import complete',
+  'importExport.importFailed':
+    'Could not import. Check that the content matches the selected format.',
 
-  'importExport.exportContent': 'Content to Export:',
-  'importExport.getContent': 'Get Content',
-  'importExport.copy': 'Copy to Clipboard',
-  'importExport.exportToFile': 'Export to Local File',
+  'importExport.exportContent': 'Content to export',
+  'importExport.getContent': 'Generate export',
+  'importExport.copy': 'Copy to clipboard',
+  'importExport.exportToFile': 'Download file',
   'importExport.saveAsHtml': 'Save as HTML',
-  'importExport.CopySuccess': 'Copy Successful',
-  'importExport.CopyFailed': 'Copy Failed',
-  'importExport.settingsModuleTitle': `Import/Export Settings`,
+  'importExport.CopySuccess': 'Copied to clipboard',
+  'importExport.CopyFailed': 'Could not copy',
+  'importExport.settingsModuleTitle': 'Import and export preferences',
 };
 
 export default enUS;

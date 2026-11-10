@@ -1,35 +1,35 @@
 {
   "action_openAdminTab": {
-    "message": "Open NiceTab-Admin-Page"
+    "message": "Open NiceTab"
   },
   "action_sendAllTabs": {
-    "message": "Send All Tabs"
+    "message": "Save all tabs"
   },
   "action_sendAllWindowsTabs": {
-    "message": "Send All Tabs - All Windows"
+    "message": "Save tabs from all windows"
   },
   "action_sendCurrentGroup": {
-    "message": "Send Current Group"
+    "message": "Save current tab group"
   },
   "action_sendCurrentTab": {
-    "message": "Send Current Tab"
+    "message": "Save current tab"
   },
   "action_sendOtherTabs": {
-    "message": "Send Other Tabs"
+    "message": "Save other tabs"
   },
   "action_sendLeftTabs": {
-    "message": "Send Left Tabs"
+    "message": "Save tabs to the left"
   },
   "action_sendRightTabs": {
-    "message": "Send Right Tabs"
+    "message": "Save tabs to the right"
   },
   "action_globalSearch": {
-    "message": "Global Search"
+    "message": "Search all saved tabs"
   },
   "action_startSync": {
-    "message": "Start Sync"
+    "message": "Sync now"
   },
   "action_hibernateTabs": {
-    "message": "Hibernate Other Tabs"
+    "message": "Put other tabs to sleep"
   }
 }

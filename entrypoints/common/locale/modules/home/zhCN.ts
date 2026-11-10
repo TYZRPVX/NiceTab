@@ -3,7 +3,7 @@ const zhCN = {
   'home.tabGroup': '标签组',
   'home.tab': '标签页',
   'home.stagingArea': '中转站',
-  'home.tabGroupList': '标签组列表',
+  'home.tabGroupList': '已保存标签组',
   'home.date.today': '今天',
   'home.date.yesterday': '昨天',
   'home.date.unknown': '未知日期',
@@ -12,71 +12,72 @@ const zhCN = {
   'home.collapse': '折叠{name}',
   'home.expandAll': '全部展开',
   'home.collapseAll': '全部折叠',
-  'home.addTag': '创建分类',
-  'home.clearAll': '全部清空',
+  'home.addTag': '新建分类',
+  'home.clearAll': '清空全部',
   'home.recoverAll': '全部还原',
-  'home.emptyTip': '暂无数据',
-  'home.searchTagAndGroup': '搜索分类/标签组',
-  'home.searchTabAndUrl': '搜索标签页和链接',
-  'home.moveAllGroupTo': '移动所有标签组到...',
-  'home.createTabGroup': '创建标签组',
-  'home.helpInfo': '帮助信息',
-  'home.removeTitle': '删除提醒',
-  'home.removeDesc': '您确定要删除该{type}吗？',
-  'home.clearTitle': '删除提醒',
-  'home.clearDesc': '您确定要清空列表吗？',
-  'home.dedupTitle': '去重提醒',
-  'home.dedupDesc': '您确定要进行去重操作吗？',
-  'home.recoverTitle': '还原提醒',
-  'home.recoverDesc': '您确定要还原该{type}吗？',
-  'home.recoverAllDesc': '您确定要全部还原吗？',
+  'home.emptyTip': '暂无内容',
+  'home.searchTagAndGroup': '搜索分类和标签组',
+  'home.searchTabAndUrl': '搜索标题和网址',
+  'home.moveAllGroupTo': '移动全部标签组到…',
+  'home.createTabGroup': '新建标签组',
+  'home.helpInfo': '使用帮助',
+  'home.removeTitle': '删除项目？',
+  'home.removeDesc': '确定删除此{type}？',
+  'home.clearTitle': '清空列表？',
+  'home.clearDesc': '确定删除此列表中的全部项目？',
+  'home.dedupTitle': '移除重复项？',
+  'home.dedupDesc': '确定移除此列表中的重复项？',
+  'home.recoverTitle': '还原项目？',
+  'home.recoverDesc': '将此{type}还原到已保存列表？',
+  'home.recoverAllDesc': '还原回收站中的全部项目？',
   'home.copyLinks': '复制链接',
 
-  'home.tag.remove': '删除',
+  'home.tag.remove': '删除分类',
   'home.tag.recover': '还原',
-  'home.tag.countInfo': '当前分类统计',
-  'home.tag.lock': '锁定该分类',
-  'home.tag.unlock': '解锁该分类',
-  'home.tag.open': '打开分类',
+  'home.tag.countInfo': '分类统计',
+  'home.tag.lock': '锁定分类',
+  'home.tag.unlock': '解锁分类',
+  'home.tag.open': '打开分类中的标签页',
 
-  'home.tabGroup.add': '创建标签组',
-  'home.tabGroup.remove': '删除该组',
-  'home.tabGroup.restore': '恢复该组',
-  'home.tabGroup.lock': '锁定该组',
-  'home.tabGroup.unlock': '取消锁定',
-  'home.tabGroup.star': '星标该组',
+  'home.tabGroup.add': '新建标签组',
+  'home.tabGroup.remove': '删除标签组',
+  'home.tabGroup.restore': '打开组内标签页',
+  'home.tabGroup.lock': '锁定标签组',
+  'home.tabGroup.unlock': '解锁标签组',
+  'home.tabGroup.star': '星标标签组',
   'home.tabGroup.unstar': '取消星标',
-  'home.tabGroup.recover': '还原该组',
-  'home.tabGroup.open': '打开该组',
+  'home.tabGroup.recover': '还原',
+  'home.tabGroup.open': '打开组内标签页',
   'home.tabGroup.addGroupBefore': '在上方新建标签组',
   'home.tabGroup.addGroupAfter': '在下方新建标签组',
-  'home.tabGroup.tabsSortAsc': '标签名称升序',
-  'home.tabGroup.tabsSortDesc': '标签名称降序',
+  'home.tabGroup.tabsSortAsc': '按标题升序排列',
+  'home.tabGroup.tabsSortDesc': '按标题降序排列',
 
-  'home.tabGroup.count': '{count}个标签组',
+  'home.tabGroup.count': '{count} 个标签组',
   'home.tabGroup.name': '标签组名称',
   'home.tabGroup.createTime': '创建时间',
-  'home.tab.count': '{count}个标签页',
+  'home.tab.count': '{count} 个标签页',
   'home.tab.name': '名称',
   'home.tab.url': '网址',
-  'home.tab.selectedCount': '{count} 个标签页',
+  'home.tab.selectedCount': '已选择 {count} 个标签页',
   'home.tab.removeSelected': `您确定要删除{count, plural,
     =0 {标签页}
     =1 {这个标签页}
     other {这#个标签页}
   }吗？`,
 
-  'home.createSnapshot': '创建快照',
-  'home.createSnapshot.tip': '将当前打开的标签页保存为快照',
+  'home.createSnapshot': '保存快照',
+  'home.createSnapshot.tip': '为当前已打开标签页保存快照',
   'home.restoreSnapshot': '恢复快照',
 
-  'home.getPermission.tabGroups': '获取标签组权限',
-  'home.getPermission.tabGroups.tip': '授权 tabGroups 权限，可对接原生标签组功能，体验更佳！',
+  'home.getPermission.tabGroups': '允许访问浏览器标签组',
+  'home.getPermission.tabGroups.tip': '授权后，NiceTab 可以使用浏览器的原生标签组功能。',
 
-  'home.displayPinnedTabs': '是否展示固定标签页',
+  'home.displayPinnedTabs': '显示固定标签页',
 
   'home.help.tip.userGuide': '更多信息请查看{userGuide}。',
-  'home.help.reminder.start': '出于安全原因，在 Firefox 中，可能不允许使用特权 URL，例如：',
+  'home.help.reminder.start':
+    '出于安全原因，在 Firefox 中，可能不允许使用特权 URL，例如：',
   'home.help.reminder.list': `
     <li>chrome: URL</li>
     <li>javascript: URL</li>
@@ -84,42 +85,29 @@ const zhCN = {
     <li>file: URL</li>
     <li>Firefox 的特权 about: URL（例如，about:config、about:addons、about:debugging）。非特权 URL（例如 about:blank）是允许的</li>
   `,
-  'home.help.reminder.end': '如果页面链接符合上述场景，点击链接可能无法打开页面，请手动复制链接进行访问。',
+  'home.help.reminder.end':
+    '如果页面链接符合上述场景，点击链接可能无法打开页面，请手动复制链接进行访问。',
 
-  'home.help.content': `
-    <li>列表页由左侧目录树（分类和标签组目录索引）、中间列表（当前选中分类中的所有标签组及标签页）和右侧已打开标签页面板三部分组成。</li>
-    <li>左侧列表一级菜单表示分类，二级菜单表示标签组，左侧列表支持分类和标签组的搜索；中间列表展示的是当前选中分类中的所有标签组以及标签组中的标签页。</li>
-    <li>中间列表中的标签页支持拖拽排序以及跨组移动，您还可以将中间列表中的标签页拖拽到左侧列表的标签组中，以实现跨分类移动；另外可点击”移动到”按钮进行标签组和标签页的移动操作。</li>
-    <li>页面右侧的折叠面板展示当前浏览器窗口中打开的标签页和标签组，该面板的标签页支持快捷多选、批量拖拽到中间列表以及左侧的目录树节点中，你也可以直接拖拽整个分组。</li>
-    <li>更多详细信息和使用技巧，请查看“用户指南”。</li>
-    <li>标签组锁定后可以移动，该标签组以及组内的标签页，将禁止删除和移出，但可以将其他标签组的标签页移入该标签组；如果想要删除或移出，可先解锁该标签组。</li>
-    <li>标签组星标后将在当前分类中置顶，移动其他标签组到星标状态的标签组之前，将自动被星标；移动星标状态的标签组到非星标的标签组之后，将自动解除星标状态。</li>
-    <li>中转站是一个特殊分类，固定在第一位，发送标签页时会自动保存到中转站，您可根据需要处理中转站中的标签组和标签页（移动、删除等操作）。</li>
-    <li>点击打开标签组时，会在浏览器中依次打开该标签组中的标签页，如果设置了“打开标签页时自动从列表中删除”，则该标签组中的标签页会被删除。</li>
-    <li>
-      <strong>单击标签页</strong>：会打开新标签页并激活该标签页。<br>
-      <strong>Alt键 + 单击标签页</strong>：则会静默打开新标签页，停留在NiceTab后台页面。<br>
-      您可以修改偏好设置来调整点击行为。
-    </li>
-    <li>“升序”和“降序”功能只对当前分类中的非星标的标签组进行排序。</li>
-    <li>左侧列表中的分类/标签组/标签页支持拖拽排序，当分类/标签组处在选中状态时，可通过快捷键进行排序，快捷键映射见下表：</li>
-  `,
-  'home.help.hotkey.1': `上述的快捷键，只限在本页使用，另外扩展插件还针对常用的几个操作注册了浏览器快捷键，(如`,
-  'home.help.hotkey.2': `)；您还可以自行前往扩展程序页面`,
+  'home.help.content':
+    '<li>左侧浏览分类和标签组，中间显示所选分类的已保存标签页，右侧面板显示当前浏览器窗口中打开的标签页。</li><li>拖动已保存标签页可调整顺序或跨组移动；拖到左侧标签组可跨分类移动，也可使用“移动到”。</li><li>将右侧已打开的标签页或整个浏览器标签组拖入已保存列表，即可保存；支持一次选择多个标签页。</li><li>锁定的标签组会保护组内标签页，防止删除或移出，但仍可加入标签页。删除标签组前需先解锁。</li><li>星标标签组排在分类顶部。将标签组移入或移出星标区域，会相应添加或取消星标。</li><li>中转站固定显示在左侧顶部。未指定其他位置时，标签页会保存到中转站。</li><li>打开标签组会在浏览器中打开组内标签页。是否继续保留在 NiceTab 中由设置决定；锁定项会保留。</li><li><strong>单击</strong>打开并切换到标签页；默认按住 <strong>Alt 再单击</strong>可在后台打开。可在设置中修改按键。</li><li>标签组排序仅作用于当前分类中未星标的组。也可拖动分类和标签组，或使用下方快捷键调整顺序。</li>',
+  'home.help.hotkey.1': '以上快捷键在已保存标签页中使用。部分操作另有浏览器快捷键，例如',
+  'home.help.hotkey.2': '。如需调整，请前往浏览器的扩展设置',
   'home.help.hotkey.modify': `修改快捷键`,
-  'home.help.hotkey.modifyTip': '快捷键修改完后，会立即生效，但右键菜单中的快捷键按键名需在切换浏览器tab后自动更新。',
+  'home.help.hotkey.modifyTip':
+    '快捷键修改后立即生效。切换浏览器标签页后，右键菜单中的快捷键提示会更新。',
 
   'home.moveTo.missingTip': '请选择{type}',
-  'home.moveTo.copyLabel': '复制所选项',
-  'home.moveTo.copyTip': '勾选后，则将所选项复制到目标分类/分组中。',
-  'home.moveTo.mergeLabel': '是否合并重复项',
-  'home.moveTo.mergeTip.1': '1、勾选后，如果移动标签页，则与目标分组中相同 url 的标签页合并（去重）。',
-  'home.moveTo.mergeTip.2': '2、勾选后，如果移动标签组，则与目标分类中同名的标签组合并，标签页去重。',
-  'home.tip.tooManyTabs': '当前分类中标签页数量超过预定值, 已开启虚拟滚动。',
-  'home.tip.addScope': '下一个版本将添加快捷键等功能，需要新增授权，新版本发布后可能会自动停用，如需继续使用请手动启用。',
-  'home.tip.multiSelection': 'Shift多选：第一步，Shift + Click A (高亮显示A) 。第二步，Shift + Click B (A到B全被选中)。Shift多选操作也适用于页面中间的标签页列表。',
-
-}
+  'home.moveTo.copyLabel': '复制，保留原项目',
+  'home.moveTo.copyTip': '保留原项目，在目标分类或标签组中创建副本。',
+  'home.moveTo.mergeLabel': '合并重复项',
+  'home.moveTo.mergeTip.1': '移动标签页时，合并目标标签组中网址相同的标签页。',
+  'home.moveTo.mergeTip.2': '移动标签组时，合并目标分类中的同名标签组。',
+  'home.tip.tooManyTabs': '列表较长，将随滚动显示内容。',
+  'home.tip.addScope':
+    '下一个版本将添加快捷键等功能，需要新增授权，新版本发布后可能会自动停用，如需继续使用请手动启用。',
+  'home.tip.multiSelection':
+    '按住 Shift 点击起始项，再按住 Shift 点击结束项，即可选中整个范围。已保存标签页列表也支持此操作。',
+};
 
 export type LocaleKey = keyof typeof zhCN;
 

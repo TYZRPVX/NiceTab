@@ -22,7 +22,7 @@ import '~/assets/css/index.css';
 import './App.css';
 import { GlobalContext, useIntlUtls } from '~/entrypoints/common/hooks/global';
 import {
-  getAdminTabInfo,
+  isNiceTabControlTab,
   openNewTab,
   discardOtherTabs,
   openUserGuide,
@@ -220,7 +220,7 @@ export default function App() {
   }, []);
 
   const handleTabsChange = useCallback(async (_tabs: Tabs.Tab[]) => {
-    const tabs = _tabs.filter(tab => !tab.pinned);
+    const tabs = _tabs.filter(tab => !tab.pinned && !isNiceTabControlTab(tab));
 
     let groupList: GroupListItem[] = [];
     if (!isGroupSupported()) {
@@ -262,8 +262,7 @@ export default function App() {
 
   const refreshTabs = useCallback(async () => {
     const allTabs = await browser.tabs.query({ currentWindow: true });
-    const { tab: adminTab } = await getAdminTabInfo();
-    await handleTabsChange(allTabs.filter(tab => tab.id !== adminTab?.id));
+    await handleTabsChange(allTabs);
   }, [handleTabsChange]);
 
   const handleTabRemove = useCallback(
@@ -302,8 +301,7 @@ export default function App() {
 
     if (modules.includes('openedTabs')) {
       browser.tabs.query({ currentWindow: true }).then(async allTabs => {
-        const { tab: adminTab } = await getAdminTabInfo();
-        handleTabsChange(allTabs?.filter(t => t.id !== adminTab?.id));
+        await handleTabsChange(allTabs);
       });
     }
   };

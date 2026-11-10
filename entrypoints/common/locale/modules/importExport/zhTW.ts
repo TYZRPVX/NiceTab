@@ -1,40 +1,30 @@
 import { LocaleKey } from './zhCN';
 
 const zhTW: Record<LocaleKey, string> = {
-  "importExport.import": "匯入",
-  "importExport.export": "匯出",
-  'importExport.moduleTitle': `標籤{action, select,
-    import {匯入}
-    export {匯出}
-    other {匯入/匯出}
-  }`,
-  'importExport.formatType': `選擇{action, select,
-    import {匯入}
-    export {匯出}
-    other {''}
-  }格式：`,
-  "importExport.formatType.optionLabel": "{label}",
-  "importExport.importMode": "選擇匯入模式：",
-  'importExport.importMode.optionLabel': `{label, select,
-    Append {新增匯入}
-    Overwrite {覆蓋匯入}
-    Merge {合併匯入}
-    other {新增匯入}
-  }`,
-  "importExport.importContent": "填寫匯入内容：",
-  "importExport.importFromText": "從文字匯入",
-  "importExport.importFromFile": "從文件匯入",
-  "importExport.importFromHTML": "從HTML匯入",
-  "importExport.importSuccess": "匯入成功",
-  "importExport.importFailed": "匯入失敗，請檢查格式是否正確",
-  "importExport.settingsModuleTitle": "偏好設定匯入匯出",
-  "importExport.exportContent": "匯出内容：",
-  "importExport.getContent": "生成内容",
-  "importExport.copy": "複製到剪貼板",
-  "importExport.exportToFile": "匯出到本地",
-  "importExport.saveAsHtml": "儲存為HTML",
-  "importExport.CopySuccess": "複製成功",
-  "importExport.CopyFailed": "複製失敗",
+  'importExport.import': '匯入',
+  'importExport.export': '匯出',
+  'importExport.moduleTitle':
+    '{action, select, import {匯入分頁} export {匯出分頁} other {匯入與匯出分頁}}',
+  'importExport.formatType':
+    '{action, select, import {匯入格式} export {匯出格式} other {格式}}',
+  'importExport.formatType.optionLabel': '{label}',
+  'importExport.importMode': '匯入方式',
+  'importExport.importMode.optionLabel':
+    '{label, select, Append {新增項目} Overwrite {覆寫現有資料} Merge {與現有資料合併} other {新增項目}}',
+  'importExport.importContent': '匯入內容',
+  'importExport.importFromText': '從文字匯入',
+  'importExport.importFromFile': '從檔案匯入',
+  'importExport.importFromHTML': '從 HTML 匯入',
+  'importExport.importSuccess': '匯入完成',
+  'importExport.importFailed': '匯入失敗，請確認內容是否符合所選格式。',
+  'importExport.settingsModuleTitle': '匯入與匯出偏好設定',
+  'importExport.exportContent': '匯出內容',
+  'importExport.getContent': '產生匯出內容',
+  'importExport.copy': '複製到剪貼簿',
+  'importExport.exportToFile': '下載檔案',
+  'importExport.saveAsHtml': '儲存為 HTML',
+  'importExport.CopySuccess': '已複製到剪貼簿',
+  'importExport.CopyFailed': '複製失敗',
 };
 
 export default zhTW;

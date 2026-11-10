@@ -1,16 +1,16 @@
 import { LocaleKey } from './zhCN';
 
 const enUS: Record<LocaleKey, string> = {
-  'newtab.searchEngine': 'Search Engine',
-  'newtab.manageEngines': 'Manage Search Engines',
-  'newtab.engineUrl': 'URL format (replace search term with "%s")',
-  'newtab.removeEngine.tip': 'Are you sure you want to remove this search engine?',
-  'newtab.addEngine': 'Add Search Engine',
-  'newtab.editEngine': 'Edit Search Engine',
-  'newtab.searchPlaceholder': 'Type search term or URL',
-  'newtab.addTab': 'Add Tab',
-  'newtab.noGroups': 'No starred groups',
-  'newtab.noGroupsDesc': 'Starred tab groups in the "NiceTab Admin Page". They will be displayed on the new tab page.',
+  'newtab.searchEngine': 'Search engine',
+  'newtab.manageEngines': 'Manage search engines',
+  'newtab.engineUrl': 'Search URL (use %s for the search term)',
+  'newtab.removeEngine.tip': 'Remove this search engine?',
+  'newtab.addEngine': 'Add search engine',
+  'newtab.editEngine': 'Edit search engine',
+  'newtab.searchPlaceholder': 'Search or enter a URL',
+  'newtab.addTab': 'Add tab',
+  'newtab.noGroups': 'No starred groups yet',
+  'newtab.noGroupsDesc': 'Star a group in NiceTab to show it here.',
 };
 
 export default enUS;

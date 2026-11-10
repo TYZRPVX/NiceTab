@@ -8,7 +8,7 @@ import {
   CircleHelpIcon,
 } from '~/entrypoints/common/components/icon/Icons';
 import { getDisplayGroupName, isGroupSupported } from '~/entrypoints/common/utils';
-import { getAdminTabInfo } from '~/entrypoints/common/tabs';
+import { isNiceTabControlTab } from '~/entrypoints/common/tabs';
 import {
   TAB_EVENTS,
   TAB_GROUP_EVENTS,
@@ -55,8 +55,7 @@ function OpenedTabsContent() {
     setLoading(true);
 
     const allTabs = await browser.tabs.query({ currentWindow: true });
-    const { tab: adminTab } = await getAdminTabInfo();
-    const _tabs = allTabs.filter(tab => tab.id && tab.id !== adminTab?.id);
+    const _tabs = allTabs.filter(tab => tab.id && !isNiceTabControlTab(tab));
     let groupList: TabGroupItemProps[] = [];
     if (!isGroupSupported()) {
       groupList = _tabs.map(tab => ({

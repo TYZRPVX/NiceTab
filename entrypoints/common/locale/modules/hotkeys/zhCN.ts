@@ -4,7 +4,7 @@ const zhCN = {
   'hotkeys.desc': '描述',
   'hotkeys.moveUp': '上移',
   'hotkeys.moveDown': '下移',
-}
+};
 
 export type LocaleKey = keyof typeof zhCN;
 

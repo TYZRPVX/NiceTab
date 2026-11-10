@@ -1,33 +1,33 @@
 {
   "action_openAdminTab": {
-    "message": "打开NiceTab管理后台"
+    "message": "打开 NiceTab"
   },
   "action_sendAllTabs": {
-    "message": "发送所有标签页"
+    "message": "保存全部标签页"
   },
   "action_sendAllWindowsTabs": {
-    "message": "发送所有窗口的标签页"
+    "message": "保存所有窗口的标签页"
   },
   "action_sendCurrentGroup": {
-    "message": "发送当前标签组"
+    "message": "保存当前标签组"
   },
   "action_sendCurrentTab": {
-    "message": "发送当前标签页"
+    "message": "保存当前标签页"
   },
   "action_sendOtherTabs": {
-    "message": "发送其他标签页"
+    "message": "保存其他标签页"
   },
   "action_sendLeftTabs": {
-    "message": "发送左侧标签页"
+    "message": "保存左侧标签页"
   },
   "action_sendRightTabs": {
-    "message": "发送右侧标签页"
+    "message": "保存右侧标签页"
   },
   "action_globalSearch": {
-    "message": "全局搜索"
+    "message": "搜索全部已保存标签页"
   },
   "action_startSync": {
-    "message": "开始同步"
+    "message": "立即同步"
   },
   "action_hibernateTabs": {
     "message": "休眠其他标签页"

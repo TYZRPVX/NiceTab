@@ -172,6 +172,11 @@ export function isAdminTab(tab: Tabs.Tab) {
   return isExtensionPage(tab, '/options.html');
 }
 
+// Reuse URL matching for both saving and displaying browser tabs; no extra queries or cache.
+export function isNiceTabControlTab(tab: Tabs.Tab) {
+  return isAdminTab(tab) || isExtensionPage(tab, '/command.html');
+}
+
 async function getAdminTabs(windowId: number) {
   return (await browser.tabs.query({ windowId }))
     .filter(isAdminTab)
@@ -334,7 +339,7 @@ export async function getFilteredTabs(
 ) {
   const result = tabs.filter(tab => {
     if (!tab?.id) return false;
-    if (isAdminTab(tab) || isExtensionPage(tab, '/command.html')) return false;
+    if (isNiceTabControlTab(tab)) return false;
     // 如果设置不允许发送固定标签页，则过滤掉固定标签页
     if (tab.pinned && !settings[ALLOW_SEND_PINNED_TABS]) {
       return false;
