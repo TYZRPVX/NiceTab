@@ -1,3 +1,4 @@
+import copyToClipboard from 'copy-to-clipboard';
 import {
   lazy,
   Suspense,
@@ -27,6 +28,7 @@ import {
   type MenuProps,
 } from 'antd';
 import {
+  LinkIcon,
   HouseIcon,
   SettingsIcon,
   ImportIcon,
@@ -198,6 +200,7 @@ const StyledPageContainer = styled.div<{
       }
     }
     .menu-right {
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       padding: 0 24px;
@@ -335,12 +338,12 @@ function AppLayout() {
 
   const { globalSearchPanelRef, open: openGlobalSearchPanel } = useGlobalSearchPanel();
 
-  const handleThemeTypeChange = () => {
+  const handleThemeTypeChange = async () => {
     const currentThemeType = NiceGlobalContext.themeType || defaultThemeType;
     const currentIndex = themeTypes.indexOf(currentThemeType);
     const themeType = themeTypes[(currentIndex + 1) % themeTypes.length];
 
-    NiceGlobalContext.setThemeType(themeType);
+    await NiceGlobalContext.setThemeType(themeType);
     sendRuntimeMessage({ msgType: 'setThemeType', data: { themeType } });
   };
 
@@ -354,6 +357,18 @@ function AppLayout() {
     },
     [navs, navigate],
   );
+  const handleCopyCommandLink = () => {
+    try {
+      const copied = copyToClipboard(
+        browser.runtime.getURL('/command.html?action=sendAllTabs'),
+      );
+      if (!copied) throw new Error('Clipboard unavailable');
+      $message.success($fmt('common.commandLinkCopied'));
+    } catch {
+      $message.error($fmt('common.commandLinkCopyFailed'));
+    }
+  };
+
   const handleSendAllTabs = useCallback(async () => {
     // 这里之所以没有直接使用 strategyHandler 方法，是因为在 option 页面中发送消息，本页面是不会监听到 runtimeMessage 消息的
     const settings = await settingsUtils.getSettings();
@@ -371,6 +386,11 @@ function AppLayout() {
     () =>
       createMenus([
         { key: 'sendAllTabs', icon: <InboxIcon />, label: $fmt('common.sendAllTabs') },
+        {
+          key: 'copyCommandLink',
+          icon: <LinkIcon />,
+          label: $fmt('common.copyCommandLink'),
+        },
         {
           key: 'createSnapshot',
           icon: <CameraIcon />,
@@ -417,6 +437,8 @@ function AppLayout() {
   const handleExtActionClick: MenuProps['onClick'] = async ({ key }) => {
     if (key === 'sendAllTabs') {
       handleSendAllTabs();
+    } else if (key === 'copyCommandLink') {
+      handleCopyCommandLink();
     } else if (key === 'reload') {
       browser.runtime.reload();
     } else if (key === 'userGuide') {

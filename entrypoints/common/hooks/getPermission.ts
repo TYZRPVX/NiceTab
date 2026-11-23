@@ -46,8 +46,7 @@ export default function usePermission() {
               [UNNAMED_GROUP_RESTORE_AS_GROUP]: true,
               [NAMED_GROUP_RESTORE_AS_GROUP]: true,
             };
-            await settingsUtils.setSettings(newSettings);
-            NiceGlobalContext.setSettings(newSettings);
+            await NiceGlobalContext.setSettings(newSettings);
             updateAdminPageUrlDebounced();
           }
         } catch (error) {

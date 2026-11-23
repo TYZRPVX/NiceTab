@@ -162,9 +162,8 @@ export default function Settings() {
     console.log('Save Success: newSettings', newSettings);
     form.setFieldsValue(newSettings);
 
-    await settingsUtils.setSettings(newSettings);
+    await NiceGlobalContext.setSettings(newSettings);
     await recycleUtils.checkAndClear();
-    NiceGlobalContext.setSettings(newSettings);
     sendRuntimeMessage({ msgType: 'setLocale', data: { locale: newSettings.language } });
     sendRuntimeMessage({
       msgType: 'setThemeType',

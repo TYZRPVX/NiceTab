@@ -25,3 +25,26 @@
 - After finishing code changes, run `pnpm build && pnpm pack:crx`.
 - Do not run `pnpm dev`.
 - Do not change the version unless explicitly asked.
+
+# Settings and event rules
+
+- Initialization, reads, and storage watchers must not write back to observed storage.
+- Separate applying UI state from persistence. Each user change has one save entry point.
+- Normalize browser locales and external settings through the shared language normalizer.
+- Skip persistence when the normalized value equals the stored value.
+- Test new listener chains for feedback loops, including unsupported locales and multiple pages.
+
+# Content script document safety
+
+- Only load React page overlays in supported `text/html` documents. Skip XML, SVG,
+  XHTML and other non-HTML documents before importing any UI dependency.
+- Keep the automatic content script free of React/ReactDOM and UI libraries.
+  WXT IIFE builds can eagerly evaluate inlined dynamic imports; use the separate
+  `content-ui` ES module and verify the production bundles after loader changes.
+- Catch overlay import/mount failures, clear failed in-flight state, and prevent
+  mounting after content-script invalidation. Never patch the host document APIs.
+- Regression-check non-HTML documents and idle HTML pages for zero UI imports,
+  plus on-demand loading, failure handling and invalidation during loading.
+
+- Await overlay component readiness after asynchronous settings initialization before
+  delivering its first action; clean up partially mounted UI on failure.

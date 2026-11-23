@@ -285,6 +285,7 @@ const watcherSource = sourceExpression(
 let reloaded = 0;
 let displayed;
 const watcherScope = {
+  applySettings: settings => { displayed = settings.pageTitleConfig; },
   isEqual: isDeepStrictEqual,
   settingsUtils: { initialSettings: {}, settings: persisted },
   pageContext: 'optionsPage',
@@ -305,7 +306,7 @@ assert.equal(reloaded, 0); // Title-only updates do not reinitialize the setting
 watcher(saved, saved);
 assert.equal(reloaded, 0);
 watcher({ ...saved, themeType: 'light' }, saved);
-assert.equal(reloaded, 1);
+assert.equal(reloaded, 0); // All settings events apply state without reinitialization.
 
 // A failed storage write must not replace the in-memory settings either.
 const settingsSource = fs.readFileSync(
@@ -331,16 +332,19 @@ const setterSource = ts.transpileModule(
 ).outputText;
 const setSettings = new Function(
   'storage',
+  'isEqual',
   `${setterSource}\nreturn methods.setSettings;`,
 )({
+  getItem: async () => persisted,
   setItem: async () => {
     throw new Error('storage failed');
   },
-});
+}, isDeepStrictEqual);
 const settingsInstance = {
   settings: persisted,
   initialSettings: {},
   storageKey: 'local:settings',
+  normalizeSettings: settings => settings,
 };
 await assert.rejects(setSettings.call(settingsInstance, saved), /storage failed/);
 assert.equal(settingsInstance.settings, persisted);

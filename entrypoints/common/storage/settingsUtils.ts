@@ -1,3 +1,5 @@
+import { isEqual } from 'lodash-es';
+import { normalizeLanguage } from '../locale/normalize';
 // import { storage } from 'wxt/storage';
 import type {
   LanguageTypes,
@@ -165,22 +167,26 @@ export default class SettingsUtils {
   storageKey: `local:${string}` = 'local:settings';
   settings: SettingsProps = this.initialSettings;
 
-  async setSettings(settings: SettingsProps) {
-    const nextSettings = { ...this.initialSettings, ...settings };
-    await storage.setItem(this.storageKey, nextSettings);
+  normalizeSettings(settings: Partial<SettingsProps> = {}): SettingsProps {
+    return {
+      ...this.initialSettings,
+      ...settings,
+      language: normalizeLanguage(settings.language ?? navigator.language),
+    };
+  }
+
+  async setSettings(settings: Partial<SettingsProps>) {
+    const saved = await storage.getItem<SettingsProps>(this.storageKey);
+    const nextSettings = this.normalizeSettings({ ...saved, ...settings });
+    if (!isEqual(saved, nextSettings)) {
+      await storage.setItem(this.storageKey, nextSettings);
+    }
     this.settings = nextSettings;
   }
+
   async getSettings() {
     const settings = await storage.getItem<SettingsProps>(this.storageKey);
-    const _savedBefore = !!settings;
-    this.settings = {
-      ...this.initialSettings,
-      language: (navigator?.language as LanguageTypes) || defaultLanguage,
-      ...settings,
-    };
-    if (!_savedBefore) {
-      this.setSettings(this.settings);
-    }
+    this.settings = this.normalizeSettings(settings || {});
     return this.settings;
   }
 }

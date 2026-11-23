@@ -1,6 +1,9 @@
 import { LocaleKey } from './zhCN';
 
 const zhTW: Record<LocaleKey, string> = {
+  'common.copyCommandLink': '複製收集分頁連結',
+  'common.commandLinkCopied': '連結已複製',
+  'common.commandLinkCopyFailed': '複製失敗，請重試',
   'common.list': '已儲存分頁',
   'common.settings': '設定',
   'common.importExport': '匯入與匯出',

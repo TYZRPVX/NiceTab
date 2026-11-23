@@ -1,6 +1,9 @@
 import { LocaleKey } from './zhCN';
 
 const enUS: Record<LocaleKey, string> = {
+  'common.copyCommandLink': 'Copy tab collection link',
+  'common.commandLinkCopied': 'Link copied',
+  'common.commandLinkCopyFailed': 'Could not copy link. Please try again.',
   'common.list': 'Saved tabs',
   'common.settings': 'Settings',
   'common.importExport': 'Import and export',

@@ -1,3 +1,4 @@
+import { normalizeLanguage } from '../locale/normalize';
 import { createContext, useState, useEffect, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import mitt from 'mitt';
@@ -58,13 +59,7 @@ export function useAntdLocale() {
   }, [language]);
 
   const changeLocale = async (language: LanguageTypes = defaultLanguage) => {
-    const settings = await settingsUtils.getSettings();
-    let lang = language;
-    if (!antdMap[language]) {
-      lang = defaultLanguage;
-    }
-    await settingsUtils.setSettings({ ...settings, language: lang });
-    setLanguage(language);
+    setLanguage(normalizeLanguage(language));
   };
   useEffect(() => {
     settingsUtils.getSettings().then(settings => {
@@ -85,9 +80,7 @@ export function useCustomLocale() {
   );
 
   const changeLocale = async (language: LanguageTypes = defaultLanguage) => {
-    const settings = await settingsUtils.getSettings();
-    await settingsUtils.setSettings({ ...settings, language });
-    setLocale(language);
+    setLocale(normalizeLanguage(language));
   };
 
   useEffect(() => {
@@ -122,8 +115,6 @@ export function useThemeTypeConfig() {
   };
 
   const changeThemeType = async (themeType: ThemeTypes = defaultThemeType) => {
-    const settings = await settingsUtils.getSettings();
-    await settingsUtils.setSettings({ ...settings, themeType });
     setThemeType(themeType);
     updateThemeTypeConfig(themeType);
   };

@@ -328,12 +328,15 @@ export default defineBackground(() => {
       tabUtils.openAdminRoutePage({ path: '/home' });
     }
   }
-  browser.runtime.onInstalled.addListener(async () => {
+  browser.runtime.onInstalled.addListener(async details => {
     console.log('browser.runtime.onInstalled');
     await stateUtils.setStateByModule('global', { snapshotStatus: 'on' });
 
     void refreshActionIcon();
-    startup();
+    // Updates and unpacked-extension reloads must not activate the admin page.
+    if (details.reason === 'install') {
+      await startup();
+    }
   });
   browser.runtime.onStartup.addListener(async () => {
     console.log('browser.runtime.onStartup');

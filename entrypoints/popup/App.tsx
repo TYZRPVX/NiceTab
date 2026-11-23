@@ -210,9 +210,9 @@ export default function App() {
   };
 
   // 切换主题
-  const handleThemeChange = (color: string) => {
+  const handleThemeChange = async (color: string) => {
     const themeData = { colorPrimary: color };
-    NiceGlobalContext.setThemeData(themeData);
+    await NiceGlobalContext.setThemeData(themeData);
     sendRuntimeMessage({ msgType: 'setPrimaryColor', data: themeData });
   };
   const handleTabActive = useCallback((tab: Tabs.Tab) => {

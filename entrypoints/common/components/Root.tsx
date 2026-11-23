@@ -4,7 +4,6 @@ import type { Runtime } from 'wxt/browser';
 import React, { useEffect, useMemo, useState } from 'react';
 import { ConfigProvider, theme, message } from 'antd';
 import { IntlProvider } from 'react-intl';
-import { isEqual } from 'lodash-es';
 import {
   DARK_THEME_TOKENS,
   PRIMARY_COLOR,
@@ -48,9 +47,11 @@ export function applyDocumentFavicon(themeType: 'light' | 'dark') {
 export default function Root({
   pageContext = 'optionsPage',
   children,
+  onInitializationError,
 }: {
   pageContext: PageContextType;
   children: React.ReactNode;
+  onInitializationError?: (error: unknown) => void;
 }) {
   const [messageApi, messageContextHolder] = message.useMessage({
     // Leave the popup's top action toolbar visible while feedback is displayed.
@@ -70,38 +71,38 @@ export default function Root({
   const [primaryColor, setPrimaryColor] = useState(PRIMARY_COLOR);
   const [pageWidthType, setPageWidthType] = useState<PageWidthTypes>('responsive');
 
-  const handleLocaleChange = async (language?: LanguageTypes) => {
-    changeLocaleAntd(language);
-    changeLocaleCustom(language);
+  // Applying state must never persist: initialization and watchers use this path.
+  const applySettings = (settings: SettingsProps) => {
+    const normalized = settingsUtils.normalizeSettings(settings);
+    settingsUtils.settings = normalized;
+    if (pageContext !== 'contentScriptPage') {
+      setPageTitleConfig(normalized.pageTitleConfig || []);
+    }
+    void changeLocaleAntd(normalized.language);
+    void changeLocaleCustom(normalized.language);
+    setPageWidthType(normalized.pageWidthType || settingsUtils.initialSettings.pageWidthType);
+    void changeThemeType(normalized.themeType || settingsUtils.initialSettings.themeType);
+  };
+  const handleSettingsChange = async (settings: Partial<SettingsProps>) => {
+    await settingsUtils.setSettings(settings);
+    applySettings(settingsUtils.settings);
+  };
+  const handleLocaleChange = async (language?: LanguageTypes, callback?: () => void) => {
+    await handleSettingsChange({ language });
+    callback?.();
   };
   const handleThemeTypeChange = async (themeType: ThemeTypes) => {
-    changeThemeType(themeType);
+    await handleSettingsChange({ themeType });
   };
   const handleThemeChange = async (themeData: Partial<ThemeProps>) => {
     const theme = await themeUtils.setThemeData(themeData);
     setPrimaryColor(theme.colorPrimary);
   };
-  const handlePageWidthTypeChange = async (type: PageWidthTypes) => {
-    setPageWidthType(type);
+  const handlePageWidthTypeChange = async (pageWidthType: PageWidthTypes) => {
+    await handleSettingsChange({ pageWidthType });
   };
-  const handleSettingsChange = async (settings: Partial<SettingsProps>) => {
-    await settingsUtils.setSettings(settings);
-    const {
-      language,
-      themeType = settingsUtils.initialSettings.themeType,
-      pageWidthType = settingsUtils.initialSettings.pageWidthType,
-    } = settingsUtils.settings || {};
-    if (pageContext !== 'contentScriptPage') {
-      setPageTitleConfig(settingsUtils.settings.pageTitleConfig || []);
-    }
-    handleLocaleChange(language);
-    handlePageWidthTypeChange(pageWidthType);
-    handleThemeTypeChange(themeType);
-  };
-
   const initData = async () => {
-    const settings = await settingsUtils.getSettings();
-    await handleSettingsChange(settings);
+    applySettings(await settingsUtils.getSettings());
     const theme = await themeUtils.getThemeData();
     setPrimaryColor(theme.colorPrimary);
     setHasReady(true);
@@ -118,15 +119,14 @@ export default function Root({
 
     if (msgType === 'setPrimaryColor') {
       const colorPrimary = data.colorPrimary || PRIMARY_COLOR;
-      await themeUtils.setThemeData({ colorPrimary });
-      handleThemeChange({ colorPrimary });
+      setPrimaryColor(colorPrimary);
     } else if (msgType === 'setThemeData') {
-      await themeUtils.setThemeData(data);
-      handleThemeChange(data);
+      setPrimaryColor((await themeUtils.getThemeData()).colorPrimary);
     } else if (msgType === 'setThemeType') {
-      handleThemeTypeChange(data.themeType);
+      void changeThemeType(data.themeType);
     } else if (msgType === 'setLocale') {
-      handleLocaleChange(data.locale);
+      void changeLocaleAntd(data.locale);
+      void changeLocaleCustom(data.locale);
     } else if (msgType === 'reloadAllAdminPage') {
       updateAdminPageUrlDebounced();
     } else if (msgType === 'reloadOtherAdminPage') {
@@ -158,25 +158,18 @@ export default function Root({
   }, [hasReady, pageContext, themeTypeConfig.type]);
 
   useEffect(() => {
-    initData();
+    void initData().catch(error => {
+      if (onInitializationError) onInitializationError(error);
+      else console.error('NiceTab could not initialize page settings.', error);
+    });
     getManifest();
     browser.runtime.onMessage.addListener(messageListener);
 
-    // Reuse the existing watcher: only the current rules are retained, no cache/polling.
-    const settingsUnwatch = initSettingsStorageListener((settings, oldSettings) => {
-      const { pageTitleConfig: rules = [], ...rest } = settings;
-      const { pageTitleConfig: oldRules = [], ...oldRest } = oldSettings;
-      if (isEqual(rest, oldRest)) {
-        settingsUtils.settings = { ...settingsUtils.initialSettings, ...settings };
-        if (pageContext !== 'contentScriptPage' && !isEqual(rules, oldRules)) {
-          setPageTitleConfig(rules);
-        }
-      } else {
-        initData();
-      }
+    const settingsUnwatch = initSettingsStorageListener(settings => {
+      applySettings(settings);
     });
     const themeUnwatch = initThemeStorageListener(() => {
-      initData();
+      void themeUtils.getThemeData().then(theme => setPrimaryColor(theme.colorPrimary));
     });
 
     return () => {

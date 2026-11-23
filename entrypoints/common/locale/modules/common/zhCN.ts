@@ -1,4 +1,7 @@
 const zhCN = {
+  'common.copyCommandLink': '复制收集标签链接',
+  'common.commandLinkCopied': '链接已复制',
+  'common.commandLinkCopyFailed': '复制失败，请重试',
   'common.list': '已保存标签页',
   'common.settings': '设置',
   'common.importExport': '导入与导出',

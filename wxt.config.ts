@@ -26,6 +26,16 @@ export default defineConfig({
   // entrypointLoader: 'jiti',
   // extensionApi: 'chrome',
   modules: ['@wxt-dev/module-react'],
+  hooks: {
+    'vite:build:extendConfig': (entrypoints, config) => {
+      if (!entrypoints.some(entry => entry.name === 'content-ui')) return;
+      // IIFE output eagerly evaluates inlined dynamic imports. Keep the UI separate.
+      if (config.build?.lib) config.build.lib.formats = ['es'];
+      if (config.esbuild && typeof config.esbuild === 'object') {
+        delete config.esbuild.footer;
+      }
+    },
+  },
   vite: ({ mode }) => ({
     plugins: [svgr({ svgrOptions: { icon: true } })],
     build: {
@@ -62,6 +72,10 @@ export default defineConfig({
     homepage_url: 'https://github.com/web-dahuyou/NiceTab',
     host_permissions: ['<all_urls>'],
     default_locale: 'zh_CN',
+    web_accessible_resources: [{
+      resources: ['content-ui.js'],
+      matches: ['*://*/*'],
+    }],
     incognito: isFirefox ? 'spanning' : 'split',
     content_security_policy: isFirefox
       ? {

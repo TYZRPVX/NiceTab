@@ -1,3 +1,4 @@
+import { normalizeLanguage } from './normalize';
 import { type ConfigProviderProps } from 'antd';
 import {createIntl, createIntlCache, RawIntlProvider} from 'react-intl';
 import antd_zhCN from 'antd/locale/zh_CN';
@@ -23,7 +24,7 @@ export const customMap: Record<LanguageTypes, LocaleModules> = {
   'en-US': modules['en-US']
 };
 export const getCustomLocaleMessages = (locale: LanguageTypes = 'zh-CN') => {
-  return customMap[locale];
+  return customMap[normalizeLanguage(locale)];
 }
 
 
@@ -33,7 +34,8 @@ let createdIntl = createIntl({ locale: 'zh-CN', messages: customMap['zh-CN'] }, 
 
 // 获取 cached intl
 export const getCreatedIntl = (locale: LanguageTypes = 'zh-CN') => {
-  createdIntl = createIntl({ locale, messages: customMap[locale] }, cache);
+  const language = normalizeLanguage(locale);
+  createdIntl = createIntl({ locale: language, messages: customMap[language] }, cache);
   return createdIntl;
 }
 

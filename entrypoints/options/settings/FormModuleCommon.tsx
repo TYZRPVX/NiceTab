@@ -38,9 +38,9 @@ export default function FormModuleCommon(
   const { form, ...formItemProps } = props;
   const autoCleanup = Form.useWatch(AUTO_CLEANUP_SAVED_GROUPS, form);
 
-  const handleThemeChange = (color: string) => {
+  const handleThemeChange = async (color: string) => {
     const themeData = { colorPrimary: color };
-    NiceGlobalContext.setThemeData(themeData);
+    await NiceGlobalContext.setThemeData(themeData);
     sendRuntimeMessage({ msgType: 'setPrimaryColor', data: themeData });
   };
 

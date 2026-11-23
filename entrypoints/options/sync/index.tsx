@@ -1,16 +1,14 @@
 import * as UIIcons from '~/entrypoints/common/components/icon/Icons';
-import { useEffect, useState, useRef, useContext, useMemo, useCallback } from 'react';
+import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { theme, Flex, Button, Modal } from 'antd';
 import { CloudUploadIcon, EraserIcon } from '~/entrypoints/common/components/icon/Icons';
 import { classNames } from '~/entrypoints/common/utils';
 import {
   eventEmitter,
   useIntlUtls,
-  GlobalContext,
 } from '~/entrypoints/common/hooks/global';
 import useUrlParams from '~/entrypoints/common/hooks/urlParams';
 import {
-  settingsUtils,
   syncUtils,
   syncWebDAVUtils,
   initSyncStorageListener,
@@ -38,7 +36,6 @@ export default function SyncPage() {
   const [modal, modalContextHolder] = Modal.useModal();
   // const { token } = theme.useToken();
   const { $fmt } = useIntlUtls();
-  const NiceGlobalContext = useContext(GlobalContext);
   const gistRef = useRef<ChildComponentHandle>(null);
   const webDAVRef = useRef<ChildComponentHandle>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
@@ -73,7 +70,6 @@ export default function SyncPage() {
       getWebDavConfig();
     }
 
-    NiceGlobalContext.setSettings(settingsUtils.settings);
   }, []);
 
   const clearSyncResult = async () => {
