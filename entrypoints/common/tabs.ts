@@ -1,3 +1,4 @@
+import { closeCommandTab } from './commandPage';
 import { Tabs } from 'wxt/browser';
 import { debounce } from 'lodash-es';
 import { settingsUtils, tabListUtils, stateUtils } from './storage';
@@ -260,9 +261,7 @@ export async function openAdminRoutePage(
         if (!existing && !needOpen) return;
         tabId = existing?.id;
         operation = 'pin';
-        if (tabId !== undefined) {
-          await browser.tabs.update(tabId, { pinned });
-        } else {
+        if (tabId === undefined) {
           const created = await browser.tabs.create({
             windowId: targetWindowId,
             url,
@@ -272,9 +271,22 @@ export async function openAdminRoutePage(
           tabId = created.id;
         }
         if (tabId === undefined) throw new Error('Admin tab has no ID');
-        const verified = await browser.tabs.get(tabId);
-        if (verified.pinned !== pinned)
-          throw new Error('Browser did not apply the requested pinned state');
+        // Some Chromium variants do not apply pinned on creation immediately.
+        // Retry only the pin operation, never the tab-saving operation.
+        for (let pinAttempt = 0; ; pinAttempt++) {
+          const verified = await browser.tabs.get(tabId);
+          if (verified.pinned === pinned) break;
+          if (pinAttempt === 3)
+            throw new Error('Browser did not apply the requested pinned state');
+          await new Promise(resolve => setTimeout(resolve, 100 * (pinAttempt + 1)));
+          try {
+            await browser.tabs.update(tabId, { pinned });
+          } catch (error) {
+            if (pinAttempt === 2) throw error;
+            // A temporary drag/reorder lock can also reject the update itself.
+            // The next tabs.get detects a closed tab and lets the outer retry recover.
+          }
+        }
         operation = 'navigate';
         if (existing) {
           await browser.tabs.update(tabId, {
@@ -494,8 +506,11 @@ async function sendAllTabs(
 }
 
 export async function sendAllTabsFromCommandPage(commandTabId: number, windowId: number) {
+  // Establish the requested admin/pin state before saving anything. A failed pin
+  // must not leave a saved group behind for the user to duplicate on retry.
+  await openAdminRoutePage({ path: '/home' }, true, windowId);
   await sendAllTabs({}, { excludedTabIds: [commandTabId], windowId });
-  await browser.tabs.remove(commandTabId).catch(() => undefined);
+  await closeCommandTab(commandTabId);
 }
 // 发送当前选中的标签页所在的标签组（支持多选）
 async function sendCurrentGroup(targetData: SendTargetProps = {}, tab?: Tabs.Tab) {

@@ -17,6 +17,10 @@ const withoutImports = parsed.statements
 const { outputText } = ts.transpileModule(withoutImports, {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 });
+const closeSource = ts.transpileModule(readFileSync(
+  new URL('../entrypoints/common/commandPage.ts', import.meta.url), 'utf8'), {
+  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+}).outputText;
 const admin = 'chrome-extension://test/options.html';
 function fixture(initial = [], settings = {}, faults = {}) {
   const tabs = new Map(
@@ -43,6 +47,7 @@ function fixture(initial = [], settings = {}, faults = {}) {
       get: async id => ({ ...get(id) }),
       create: async props => {
         const tab = { id: nextId++, index: 0, ...props };
+        if (faults.ignoreCreatePin) tab.pinned = false;
         tabs.set(tab.id, tab);
         calls.push(['create', tab.id]);
         return { ...tab };
@@ -54,8 +59,16 @@ function fixture(initial = [], settings = {}, faults = {}) {
           tabs.delete(id);
           throw new Error('Tab closed');
         }
+        if (faults.rejectPinOnce && 'pinned' in props) {
+          faults.rejectPinOnce = false;
+          throw new Error('Tabs cannot be edited right now');
+        }
         const applied = { ...props };
         if (faults.ignorePin) delete applied.pinned;
+        if (faults.ignorePinOnce && 'pinned' in applied) {
+          faults.ignorePinOnce = false;
+          delete applied.pinned;
+        }
         Object.assign(get(id), applied);
         return { ...get(id) };
       },
@@ -69,6 +82,11 @@ function fixture(initial = [], settings = {}, faults = {}) {
         calls.push(['reload', id]);
       },
       remove: async ids => {
+        if (ids === 1 && faults.commandCloseFailures) {
+          faults.commandCloseFailures--;
+          calls.push(['close-rejected', 1]);
+          throw new Error('Tabs cannot be edited right now');
+        }
         for (const id of Array.isArray(ids) ? ids : [ids]) {
           tabs.delete(id);
           calls.push(['remove', id]);
@@ -101,6 +119,8 @@ function fixture(initial = [], settings = {}, faults = {}) {
     },
     objectToUrlParams: obj => new URLSearchParams(obj).toString(),
   };
+  vm.runInNewContext(closeSource, sandbox);
+  sandbox.closeCommandTab = sandbox.exports.closeCommandTab;
   vm.runInNewContext(outputText, sandbox);
   sandbox.exports.initializeAdminPageCoordinator();
   return { api: sandbox.exports, tabs, calls, saved };
@@ -186,6 +206,7 @@ const failedCommand = fixture(
 );
 await assert.rejects(failedCommand.api.sendAllTabsFromCommandPage(1, 1));
 assert(failedCommand.tabs.has(1));
+assert.equal(failedCommand.saved.length, 0);
 
 const cleanup = fixture([
   { id: 1, url: admin, pinned: true },
@@ -200,4 +221,35 @@ failed.tabs.get(1).pinned = true;
 await failed.api.openAdminRoutePage({ path: '/home' }, true, 1);
 assert.equal(failed.tabs.size, 1);
 
+const retriedCommand = fixture([
+  { id: 1, url: 'chrome-extension://test/command.html?action=sendAllTabs' },
+  { id: 2, url: 'https://example.com' },
+], {}, { commandCloseFailures: 2 });
+await retriedCommand.api.sendAllTabsFromCommandPage(1, 1);
+assert(!retriedCommand.tabs.has(1));
+assert.equal(retriedCommand.saved.length, 1, 'Closing retries must not repeat saving');
+assert.equal(retriedCommand.calls.filter(c => c[0] === 'close-rejected').length, 2);
+const changedPage = fixture([{ id: 1, url: 'https://example.com' }]);
+assert.equal(await changedPage.api.closeCommandTab(1), true);
+assert(changedPage.tabs.has(1), 'Never close a tab that navigated away');
+assert.equal(await changedPage.api.closeCommandTab(999), true);
+for (const faults of [{ ignorePinOnce: true }, { ignoreCreatePin: true }, { rejectPinOnce: true }]) {
+  const unpinned = fixture([
+    { id: 1, url: 'chrome-extension://test/command.html?action=sendAllTabs' },
+    { id: 2, url: 'https://example.com' },
+    ...((faults.ignorePinOnce || faults.rejectPinOnce) ? [{ id: 3, url: admin, pinned: false }] : []),
+  ], {}, faults);
+  await unpinned.api.sendAllTabsFromCommandPage(1, 1);
+  assert(!unpinned.tabs.has(1));
+  assert.equal(unpinned.saved.length, 1);
+  assert([...unpinned.tabs.values()].some(t => t.url.startsWith(admin) && t.pinned));
+}
+const cannotPin = fixture([
+  { id: 1, url: 'chrome-extension://test/command.html?action=sendAllTabs' },
+  { id: 2, url: 'https://example.com' },
+  { id: 3, url: admin, pinned: false },
+], {}, { ignorePin: true });
+await assert.rejects(cannotPin.api.sendAllTabsFromCommandPage(1, 1), /pinned state/);
+assert.equal(cannotPin.saved.length, 0, 'Pin failures must happen before any save');
+assert(cannotPin.tabs.has(2));
 console.log('Admin tab regression scenarios passed.');

@@ -1,3 +1,4 @@
+import { registerCommandHandler } from '~/entrypoints/common/commandTransport';
 import { Tabs, Runtime } from 'wxt/browser';
 import { debounce } from 'lodash-es';
 import contextMenusRegister, {
@@ -264,6 +265,7 @@ async function handleNewTabRedirect(tabId: number | undefined, url: string) {
 }
 export default defineBackground(() => {
   tabUtils.initializeAdminPageCoordinator();
+  registerCommandHandler(tabUtils.sendAllTabsFromCommandPage);
   // console.log('Hello background!', { id: browser.runtime.id });
   initTabsUpdateListener();
   // 初始化新标签页重定向监听
